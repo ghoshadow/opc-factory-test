@@ -1,5 +1,6 @@
 import { KpiGrid } from "@/components/factory/KpiGrid"
 import { LineStatusGrid } from "@/components/factory/LineStatusGrid"
+import { WipStats } from "@/components/factory/WipStats"
 
 export default function Home() {
   return (
@@ -14,9 +15,13 @@ export default function Home() {
         <h2 className="mb-3 text-base font-semibold">KPI 指标</h2>
         <KpiGrid />
       </section>
-      <section>
+      <section className="mb-8">
         <h2 className="mb-3 text-base font-semibold">产线状态</h2>
         <LineStatusGrid />
+      </section>
+      <section>
+        <h2 className="mb-3 text-base font-semibold">在制品 (WIP)</h2>
+        <WipStats />
       </section>
     </div>
   )
