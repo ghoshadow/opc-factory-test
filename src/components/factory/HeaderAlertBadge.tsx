@@ -1,16 +1,11 @@
 "use client";
 
-import useSWR from "swr";
 import { Badge } from "@/components/ui/badge";
 import { AlertTriangle } from "lucide-react";
-import type { Alert } from "@/lib/types";
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+import { useAlerts } from "@/hooks/useAlerts";
 
 export function HeaderAlertBadge() {
-  const { data: alerts } = useSWR<Alert[]>("/api/v1/factory/alerts", fetcher, {
-    refreshInterval: 30_000,
-  });
+  const { data: alerts } = useAlerts();
 
   const urgentCount = alerts?.filter((a) => a.severity === "urgent").length ?? 0;
 

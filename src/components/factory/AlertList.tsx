@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback } from "react";
-import useSWR from "swr";
 import { toast } from "sonner";
 import { AlertTriangle, Clock, ArrowRight, Bell } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -9,8 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import type { Alert } from "@/lib/types";
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+import { useAlerts } from "@/hooks/useAlerts";
 
 const severityConfig = {
   urgent: {
@@ -51,11 +49,7 @@ function formatTime(iso: string) {
 }
 
 export function AlertList({ className }: { className?: string }) {
-  const { data: alerts, error, isLoading } = useSWR<Alert[]>(
-    "/api/v1/factory/alerts",
-    fetcher,
-    { refreshInterval: 30_000 }
-  );
+  const { data: alerts, error, isLoading } = useAlerts();
 
   const handleClick = useCallback((alert: Alert) => {
     toast.info(`${alert.id}: ${alert.description}`, {
