@@ -1,1 +1,28 @@
-"\"use client\"\n\nimport { cn } from \"@/lib/utils\"\nimport type { LucideIcon } from \"lucide-react\"\nimport { type ReactNode } from \"react\"\n\ninterface EmptyStateProps {\n  icon?: LucideIcon\n  title: string\n  description?: string\n  action?: ReactNode\n  className?: string\n}\n\nexport function EmptyState({ icon: Icon, title, description, action, className }: EmptyStateProps) {\n  return (\n    <div className={cn(\"flex flex-col items-center justify-center py-16 text-center\", className)}>\n      {Icon && (\n        <div className=\"mb-4 rounded-full bg-muted p-4\">\n          <Icon className=\"size-8 text-muted-foreground\" />\n        </div>\n      )}\n      <h3 className=\"text-lg font-semibold\">{title}</h3>\n      {description && <p className=\"mt-1 max-w-sm text-sm text-muted-foreground\">{description}</p>}\n      {action && <div className=\"mt-4\">{action}</div>}\n    </div>\n  )\n}\n"
+"use client"
+
+import { cn } from "@/lib/utils"
+import type { LucideIcon } from "lucide-react"
+import { type ReactNode } from "react"
+
+interface EmptyStateProps {
+  icon?: LucideIcon
+  title: string
+  description?: string
+  action?: ReactNode
+  className?: string
+}
+
+export function EmptyState({ icon: Icon, title, description, action, className }: EmptyStateProps) {
+  return (
+    <div className={cn("flex flex-col items-center justify-center py-16 text-center", className)}>
+      {Icon && (
+        <div className="mb-4 rounded-full bg-muted p-4">
+          <Icon className="size-8 text-muted-foreground" />
+        </div>
+      )}
+      <h3 className="text-lg font-semibold">{title}</h3>
+      {description && <p className="mt-1 max-w-sm text-sm text-muted-foreground">{description}</p>}
+      {action && <div className="mt-4">{action}</div>}
+    </div>
+  )
+}
