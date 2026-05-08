@@ -9,6 +9,7 @@ import {
   PipelineNode,
 } from "@/components/ui"
 import { Button } from "@/components/ui/button"
+import { WipStats } from "@/components/factory/WipStats"
 
 const metrics = [
   { label: "Total Throughput", value: "184", unit: "items/day", trend: "up" as const, trendValue: "+12.5%", icon: Activity },
@@ -73,6 +74,12 @@ export default function Home() {
             <MetricCard key={m.label} {...m} />
           ))}
         </div>
+      </section>
+
+      {/* WIP Stats */}
+      <section>
+        <h2 className="mb-4 text-lg font-semibold">Production Line WIP</h2>
+        <WipStats />
       </section>
 
       {/* Status Badges */}
