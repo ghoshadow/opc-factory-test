@@ -50,10 +50,10 @@ export function MetricCard({ label, value, unit, trend, trendValue, subtitle, co
           {trendCfg && TrendIcon && (
             <span className={cn("inline-flex items-center gap-1", trendCfg.color)}>
               <TrendIcon className="size-3" />
-              {trendValue !== undefined && <span className={trendCfg.color}>{formatTrendValue(trend!, trendValue)}</span>}
+              {trendValue !== undefined && <span>{formatTrendValue(trend!, trendValue)}</span>}
             </span>
           )}
-          {!trendCfg && subtitle && <span className="text-muted-foreground">{subtitle}</span>}
+          {subtitle && <span className="text-muted-foreground">{subtitle}</span>}
         </div>
       )}
       {costUSD !== undefined && (
