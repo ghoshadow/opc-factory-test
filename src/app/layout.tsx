@@ -10,7 +10,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "OPC Factory",
-  description: "Automated software engineering system",
+  description: "自动化软件工程系统 · 4 条 AI Agent 产线",
 };
 
 export default function RootLayout({
