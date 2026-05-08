@@ -1,1 +1,140 @@
-"\"use client\"\n\nimport { useState, useMemo } from \"react\"\nimport { ArrowUpDown, ArrowUp, ArrowDown, Loader2 } from \"lucide-react\"\nimport { cn } from \"@/lib/utils\"\n\ninterface Column<T> {\n  key: string\n  header: string\n  sortable?: boolean\n  render?: (item: T) => React.ReactNode\n  className?: string\n}\n\ninterface DataTableProps<T> {\n  columns: Column<T>[]\n  data: T[]\n  onRowClick?: (item: T) => void\n  isLoading?: boolean\n  emptyMessage?: string\n  className?: string\n}\n\ntype SortState = { key: string; direction: \"asc\" | \"desc\" } | null\n\nexport function DataTable<T extends object>({\n  columns,\n  data,\n  onRowClick,\n  isLoading,\n  emptyMessage = \"No data available\",\n  className,\n}: DataTableProps<T>) {\n  const [sort, setSort] = useState<SortState>(null)\n\n  const sortedData = useMemo(() => {\n    if (!sort) return data\n    return [...data].sort((a, b) => {\n      const aVal = (a as Record<string, unknown>)[sort.key]\n      const bVal = (b as Record<string, unknown>)[sort.key]\n      if (aVal == null || bVal == null) return 0\n      const cmp = aVal < bVal ? -1 : aVal > bVal ? 1 : 0\n      return sort.direction === \"asc\" ? cmp : -cmp\n    })\n  }, [data, sort])\n\n  const handleSort = (key: string) => {\n    setSort((prev) => {\n      if (prev?.key !== key) return { key, direction: \"asc\" }\n      if (prev.direction === \"asc\") return { key, direction: \"desc\" }\n      return null\n    })\n  }\n\n  const SortIcon = ({ columnKey }: { columnKey: string }) => {\n    if (sort?.key !== columnKey) return <ArrowUpDown className=\"ml-1 size-3 text-muted-foreground/50\" />\n    return sort.direction === \"asc\"\n      ? <ArrowUp className=\"ml-1 size-3\" />\n      : <ArrowDown className=\"ml-1 size-3\" />\n  }\n\n  if (isLoading) {\n    return (\n      <div className={cn(\"w-full rounded-lg border\", className)}>\n        <div className=\"animate-pulse\">\n          <div className=\"flex border-b bg-muted/50 px-4 py-3\">\n            {columns.map((col) => (\n              <div key={col.key} className=\"flex-1\">\n                <div className=\"h-4 w-20 rounded bg-muted-foreground/20\" />\n              </div>\n            ))}\n          </div>\n          {Array.from({ length: 5 }).map((_, i) => (\n            <div key={i} className=\"flex border-b px-4 py-3 last:border-0\">\n              {columns.map((col) => (\n                <div key={col.key} className=\"flex-1\">\n                  <div className=\"h-4 w-24 rounded bg-muted-foreground/10\" />\n                </div>\n              ))}\n            </div>\n          ))}\n        </div>\n      </div>\n    )\n  }\n\n  if (data.length === 0) {\n    return (\n      <div className={cn(\"flex flex-col items-center justify-center rounded-lg border py-12 text-center\", className)}>\n        <Loader2 className=\"mb-2 size-8 text-muted-foreground/40\" />\n        <p className=\"text-sm text-muted-foreground\">{emptyMessage}</p>\n      </div>\n    )\n  }\n\n  return (\n    <div className={cn(\"w-full overflow-auto rounded-lg border\", className)}>\n      <table className=\"w-full\">\n        <thead>\n          <tr className=\"border-b bg-muted/50\">\n            {columns.map((col) => (\n              <th\n                key={col.key}\n                className={cn(\n                  \"px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide\",\n                  col.sortable && \"cursor-pointer select-none hover:text-foreground\",\n                  col.className,\n                )}\n                onClick={() => col.sortable && handleSort(col.key)}\n              >\n                <span className=\"inline-flex items-center\">\n                  {col.header}\n                  {col.sortable && <SortIcon columnKey={col.key} />}\n                </span>\n              </th>\n            ))}\n          </tr>\n        </thead>\n        <tbody>\n          {sortedData.map((item, index) => (\n            <tr\n              key={index}\n              className={cn(\n                \"border-b last:border-0 transition-colors\",\n                onRowClick && \"cursor-pointer hover:bg-muted/50\",\n              )}\n              onClick={() => onRowClick?.(item)}\n            >\n              {columns.map((col) => (\n                <td key={col.key} className={cn(\"px-4 py-3 text-sm\", col.className)}>\n                  {col.render ? col.render(item) : String((item as Record<string, unknown>)[col.key] ?? \"\")}\n                </td>\n              ))}\n            </tr>\n          ))}\n        </tbody>\n      </table>\n    </div>\n  )\n}\n"
+"use client"
+
+import { useState, useMemo } from "react"
+import { ArrowUpDown, ArrowUp, ArrowDown, Loader2 } from "lucide-react"
+import { cn } from "@/lib/utils"
+
+interface Column<T> {
+  key: string
+  header: string
+  sortable?: boolean
+  render?: (item: T) => React.ReactNode
+  className?: string
+}
+
+interface DataTableProps<T> {
+  columns: Column<T>[]
+  data: T[]
+  onRowClick?: (item: T) => void
+  isLoading?: boolean
+  emptyMessage?: string
+  className?: string
+}
+
+type SortState = { key: string; direction: "asc" | "desc" } | null
+
+export function DataTable<T extends object>({
+  columns,
+  data,
+  onRowClick,
+  isLoading,
+  emptyMessage = "No data available",
+  className,
+}: DataTableProps<T>) {
+  const [sort, setSort] = useState<SortState>(null)
+
+  const sortedData = useMemo(() => {
+    if (!sort) return data
+    return [...data].sort((a, b) => {
+      const aVal = (a as Record<string, unknown>)[sort.key]
+      const bVal = (b as Record<string, unknown>)[sort.key]
+      if (aVal == null || bVal == null) return 0
+      const cmp = aVal < bVal ? -1 : aVal > bVal ? 1 : 0
+      return sort.direction === "asc" ? cmp : -cmp
+    })
+  }, [data, sort])
+
+  const handleSort = (key: string) => {
+    setSort((prev) => {
+      if (prev?.key !== key) return { key, direction: "asc" }
+      if (prev.direction === "asc") return { key, direction: "desc" }
+      return null
+    })
+  }
+
+  const SortIcon = ({ columnKey }: { columnKey: string }) => {
+    if (sort?.key !== columnKey) return <ArrowUpDown className="ml-1 size-3 text-muted-foreground/50" />
+    return sort.direction === "asc"
+      ? <ArrowUp className="ml-1 size-3" />
+      : <ArrowDown className="ml-1 size-3" />
+  }
+
+  if (isLoading) {
+    return (
+      <div className={cn("w-full rounded-lg border", className)}>
+        <div className="animate-pulse">
+          <div className="flex border-b bg-muted/50 px-4 py-3">
+            {columns.map((col) => (
+              <div key={col.key} className="flex-1">
+                <div className="h-4 w-20 rounded bg-muted-foreground/20" />
+              </div>
+            ))}
+          </div>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="flex border-b px-4 py-3 last:border-0">
+              {columns.map((col) => (
+                <div key={col.key} className="flex-1">
+                  <div className="h-4 w-24 rounded bg-muted-foreground/10" />
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  if (data.length === 0) {
+    return (
+      <div className={cn("flex flex-col items-center justify-center rounded-lg border py-12 text-center", className)}>
+        <Loader2 className="mb-2 size-8 text-muted-foreground/40" />
+        <p className="text-sm text-muted-foreground">{emptyMessage}</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className={cn("w-full overflow-auto rounded-lg border", className)}>
+      <table className="w-full">
+        <thead>
+          <tr className="border-b bg-muted/50">
+            {columns.map((col) => (
+              <th
+                key={col.key}
+                className={cn(
+                  "px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide",
+                  col.sortable && "cursor-pointer select-none hover:text-foreground",
+                  col.className,
+                )}
+                onClick={() => col.sortable && handleSort(col.key)}
+              >
+                <span className="inline-flex items-center">
+                  {col.header}
+                  {col.sortable && <SortIcon columnKey={col.key} />}
+                </span>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {sortedData.map((item, index) => (
+            <tr
+              key={index}
+              className={cn(
+                "border-b last:border-0 transition-colors",
+                onRowClick && "cursor-pointer hover:bg-muted/50",
+              )}
+              onClick={() => onRowClick?.(item)}
+            >
+              {columns.map((col) => (
+                <td key={col.key} className={cn("px-4 py-3 text-sm", col.className)}>
+                  {col.render ? col.render(item) : String((item as Record<string, unknown>)[col.key] ?? "")}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}

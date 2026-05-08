@@ -1,1 +1,52 @@
-"\"use client\"\n\nimport { cn } from \"@/lib/utils\"\n\ntype Status = \"NOMINAL\" | \"ATTENTION\" | \"BLOCKED\"\n\ninterface StatusBadgeProps {\n  status: Status\n  className?: string\n}\n\nconst statusConfig: Record<Status, { label: string; dotColor: string; textColor: string; bg: string }> = {\n  NOMINAL: {\n    label: \"Nominal\",\n    dotColor: \"bg-emerald-500\",\n    textColor: \"text-emerald-700 dark:text-emerald-400\",\n    bg: \"bg-emerald-50 dark:bg-emerald-950/40\",\n  },\n  ATTENTION: {\n    label: \"Attention\",\n    dotColor: \"bg-amber-500\",\n    textColor: \"text-amber-700 dark:text-amber-400\",\n    bg: \"bg-amber-50 dark:bg-amber-950/40\",\n  },\n  BLOCKED: {\n    label: \"Blocked\",\n    dotColor: \"bg-red-500\",\n    textColor: \"text-red-700 dark:text-red-400\",\n    bg: \"bg-red-50 dark:bg-red-950/40\",\n  },\n}\n\nexport function StatusBadge({ status, className }: StatusBadgeProps) {\n  const cfg = statusConfig[status]\n\n  return (\n    <span\n      className={cn(\n        \"inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium\",\n        cfg.textColor,\n        cfg.bg,\n        className,\n      )}\n    >\n      <span className=\"relative flex size-2\">\n        <span className={cn(\"absolute inset-0 rounded-full\", cfg.dotColor)} />\n        <span className={cn(\"absolute inset-0 animate-ping rounded-full opacity-75\", cfg.dotColor)} />\n      </span>\n      {cfg.label}\n    </span>\n  )\n}\n"
+"use client"
+
+import { cn } from "@/lib/utils"
+
+type Status = "NOMINAL" | "ATTENTION" | "BLOCKED"
+
+interface StatusBadgeProps {
+  status: Status
+  className?: string
+}
+
+const statusConfig: Record<Status, { label: string; dotColor: string; textColor: string; bg: string }> = {
+  NOMINAL: {
+    label: "Nominal",
+    dotColor: "bg-emerald-500",
+    textColor: "text-emerald-700 dark:text-emerald-400",
+    bg: "bg-emerald-50 dark:bg-emerald-950/40",
+  },
+  ATTENTION: {
+    label: "Attention",
+    dotColor: "bg-amber-500",
+    textColor: "text-amber-700 dark:text-amber-400",
+    bg: "bg-amber-50 dark:bg-amber-950/40",
+  },
+  BLOCKED: {
+    label: "Blocked",
+    dotColor: "bg-red-500",
+    textColor: "text-red-700 dark:text-red-400",
+    bg: "bg-red-50 dark:bg-red-950/40",
+  },
+}
+
+export function StatusBadge({ status, className }: StatusBadgeProps) {
+  const cfg = statusConfig[status]
+
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium",
+        cfg.textColor,
+        cfg.bg,
+        className,
+      )}
+    >
+      <span className="relative flex size-2">
+        <span className={cn("absolute inset-0 rounded-full", cfg.dotColor)} />
+        <span className={cn("absolute inset-0 animate-ping rounded-full opacity-75", cfg.dotColor)} />
+      </span>
+      {cfg.label}
+    </span>
+  )
+}
