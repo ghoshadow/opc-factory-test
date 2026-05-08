@@ -10,6 +10,18 @@ export const productionLines: ProductionLine[] = [
     completed: 47,
     anomaly: "—",
     status: "NOMINAL",
+    pipelineSteps: [
+      { label: "需求提交" },
+      { label: "Spec 产出" },
+      { label: "成熟度评审" },
+      { label: "交付" },
+    ],
+    deliverables: [
+      { label: "Spec 文档" },
+      { label: "本体条目" },
+      { label: "需求规格书" },
+      { label: "评审记录" },
+    ],
   },
   {
     id: "coding",
@@ -20,6 +32,19 @@ export const productionLines: ProductionLine[] = [
     completed: 35,
     anomaly: "F-2341 Silent Gap",
     status: "ATTENTION",
+    pipelineSteps: [
+      { label: "方案评审" },
+      { label: "设计评审" },
+      { label: "编码实现" },
+      { label: "PR 审查" },
+      { label: "交付" },
+    ],
+    deliverables: [
+      { label: "代码" },
+      { label: "测试用例" },
+      { label: "PR 记录" },
+      { label: "方案文档" },
+    ],
   },
   {
     id: "testing",
@@ -30,6 +55,19 @@ export const productionLines: ProductionLine[] = [
     completed: 28,
     anomaly: "—",
     status: "NOMINAL",
+    pipelineSteps: [
+      { label: "测试计划" },
+      { label: "用例设计" },
+      { label: "执行测试" },
+      { label: "缺陷报告" },
+      { label: "交付" },
+    ],
+    deliverables: [
+      { label: "测试用例" },
+      { label: "缺陷报告" },
+      { label: "覆盖报告" },
+      { label: "测试总结" },
+    ],
   },
   {
     id: "sre",
@@ -40,5 +78,18 @@ export const productionLines: ProductionLine[] = [
     completed: 15,
     anomaly: "—",
     status: "NOMINAL",
+    pipelineSteps: [
+      { label: "部署准备" },
+      { label: "灰度发布" },
+      { label: "监控观察" },
+      { label: "全量发布" },
+      { label: "运维" },
+    ],
+    deliverables: [
+      { label: "部署配置" },
+      { label: "Runbook" },
+      { label: "告警规则" },
+      { label: "回滚方案" },
+    ],
   },
 ];

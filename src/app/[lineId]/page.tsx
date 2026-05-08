@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import { productionLines } from "@/lib/mock-data";
 import { StatusBadge } from "@/components/factory/StatusBadge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,6 +19,14 @@ export default async function LineDetailPage({ params }: LineDetailPageProps) {
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-6">
+      <Link
+        href="/"
+        className="inline-flex w-fit items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+      >
+        <ArrowLeft className="size-4" />
+        返回总览
+      </Link>
+
       <div className="flex items-center gap-3">
         <h1 className="text-2xl font-bold tracking-tight">{line.name}</h1>
         <StatusBadge status={line.status} />
@@ -29,22 +39,17 @@ export default async function LineDetailPage({ params }: LineDetailPageProps) {
             <CardTitle className="text-base">Pipeline 流程图</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center gap-2 py-8 text-sm text-muted-foreground justify-center">
-              <span className="rounded-md bg-muted px-3 py-1.5 text-xs font-medium">
-                需求提交
-              </span>
-              <span className="text-border">→</span>
-              <span className="rounded-md bg-muted px-3 py-1.5 text-xs font-medium">
-                Spec 产出
-              </span>
-              <span className="text-border">→</span>
-              <span className="rounded-md bg-muted px-3 py-1.5 text-xs font-medium">
-                成熟度评审
-              </span>
-              <span className="text-border">→</span>
-              <span className="rounded-md bg-muted px-3 py-1.5 text-xs font-medium">
-                交付
-              </span>
+            <div className="flex flex-wrap items-center gap-2 py-8 text-sm text-muted-foreground justify-center">
+              {line.pipelineSteps.map((step, i) => (
+                <span key={step.label} className="inline-flex items-center gap-2">
+                  <span className="rounded-md bg-muted px-3 py-1.5 text-xs font-medium">
+                    {step.label}
+                  </span>
+                  {i < line.pipelineSteps.length - 1 && (
+                    <span className="text-border">→</span>
+                  )}
+                </span>
+              ))}
             </div>
           </CardContent>
         </Card>
@@ -81,22 +86,12 @@ export default async function LineDetailPage({ params }: LineDetailPageProps) {
           </CardHeader>
           <CardContent>
             <ul className="space-y-1.5 text-sm text-muted-foreground">
-              <li className="flex items-center gap-2">
-                <span className="size-1.5 rounded-full bg-emerald-500" />
-                Spec 文档
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="size-1.5 rounded-full bg-emerald-500" />
-                本体条目
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="size-1.5 rounded-full bg-emerald-500" />
-                需求规格书
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="size-1.5 rounded-full bg-emerald-500" />
-                评审记录
-              </li>
+              {line.deliverables.map((d) => (
+                <li key={d.label} className="flex items-center gap-2">
+                  <span className="size-1.5 rounded-full bg-emerald-500" />
+                  {d.label}
+                </li>
+              ))}
             </ul>
           </CardContent>
         </Card>
