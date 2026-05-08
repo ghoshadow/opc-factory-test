@@ -3,14 +3,14 @@ import { Inter, Geist } from "next/font/google";
 import "./globals.css";
 import { AppShell } from "@/components/layout/AppShell";
 import { cn } from "@/lib/utils";
+import { Toaster } from "@/components/ui/sonner";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
-
+const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "OPC Factory",
-  description: "Automated software engineering system",
+  description: "OPC Factory — Automated Software Engineering System",
 };
 
 export default function RootLayout({
@@ -22,6 +22,7 @@ export default function RootLayout({
     <html lang="zh-CN" className={cn("font-sans", geist.variable)}>
       <body className={inter.className}>
         <AppShell>{children}</AppShell>
+        <Toaster />
       </body>
     </html>
   );

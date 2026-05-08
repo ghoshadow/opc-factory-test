@@ -3,6 +3,7 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { Activity, Pause } from "lucide-react";
+import { HeaderAlertBadge } from "@/components/factory/HeaderAlertBadge";
 
 type FactoryStatus = "running" | "paused";
 
@@ -46,6 +47,7 @@ export function TopBar({ status = "running" }: TopBarProps) {
         </div>
       </div>
       <div className="flex items-center gap-3">
+        <HeaderAlertBadge />
         <Avatar className="h-8 w-8">
           <AvatarFallback className="bg-primary text-primary-foreground text-xs font-medium">
             OP
