@@ -81,6 +81,7 @@ export const navigation: NavItem[] = [
       { label: "部署编排", icon: Activity, path: "/l5/deploy" },
       { label: "事件分类", icon: Activity, path: "/l5/incidents" },
       { label: "Runbooks", icon: Activity, path: "/l5/runbooks" },
+      { label: "Checker 门禁", icon: Shield, path: "/l5/checker" },
     ],
   },
 ];

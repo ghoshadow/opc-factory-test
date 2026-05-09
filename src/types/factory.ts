@@ -46,3 +46,21 @@ export interface BugTriageResponse {
   bugs: Bug[]
   total: number
 }
+
+// SRE Checker types
+export type CheckerItemStatus = "pass" | "fail" | "warning"
+
+export interface SreCheckerItem {
+  id: string
+  name: string
+  description: string
+  status: CheckerItemStatus
+  detail: string
+  supplementLabel?: string
+}
+
+export interface SreCheckerResponse {
+  items: SreCheckerItem[]
+  allPass: boolean
+  canRelease: boolean
+}
