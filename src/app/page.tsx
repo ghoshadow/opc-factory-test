@@ -2,6 +2,7 @@
 
 import useSWR from "swr"
 import { LineStatusGrid } from "@/components/factory/LineStatusGrid"
+import { WipStats } from "@/components/factory/WipStats"
 import { MetricCard } from "@/components/ui/MetricCard"
 import type { LineStatusData } from "@/types/factory"
 import { Factory } from "lucide-react"
@@ -58,6 +59,9 @@ export default function Home() {
       ) : (
         <LineStatusGrid lines={lines ?? []} />
       )}
+
+      {/* WIP stats */}
+      <WipStats />
     </div>
   )
 }
