@@ -1,45 +1,51 @@
-"use client"
+"use client";
 
-import { useState, useCallback } from "react"
-import useSWR from "swr"
-import { Columns3, GripVertical, MoreHorizontal } from "lucide-react"
-import { cn } from "@/lib/utils"
-import type { KanbanBoardData, KanbanItem, TestingOpsResponse } from "@/types/factory"
-import { Skeleton } from "@/components/ui/skeleton"
+import { useCallback, useState } from "react";
+
+import { Columns3, GripVertical, MoreHorizontal } from "lucide-react";
+import useSWR from "swr";
+
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
+import type { KanbanBoardData, KanbanItem, TestingOpsResponse } from "@/types/factory";
 
 const fetcher = (url: string): Promise<KanbanBoardData> =>
-  fetch(url).then((res) => res.json()).then((d: TestingOpsResponse) => d.kanban)
+  fetch(url)
+    .then((res) => res.json())
+    .then((d: TestingOpsResponse) => d.kanban);
 
 export function KanbanBoard() {
   const { data, error, isLoading } = useSWR<KanbanBoardData>(
     "/api/v1/testing/ops",
     (url: string) => fetcher(url).then((d) => d),
-    { refreshInterval: 25000 }
-  )
+    { refreshInterval: 25000 },
+  );
 
-  const [dragOverCol, setDragOverCol] = useState<string | null>(null)
-  const [draggingItem, setDraggingItem] = useState<{ itemId: string; fromCol: string } | null>(null)
+  const [dragOverCol, setDragOverCol] = useState<string | null>(null);
+  const [draggingItem, setDraggingItem] = useState<{ itemId: string; fromCol: string } | null>(
+    null,
+  );
 
   const handleDragStart = useCallback((e: React.DragEvent, itemId: string, colId: string) => {
-    e.dataTransfer.setData("text/plain", JSON.stringify({ itemId, colId }))
-    e.dataTransfer.effectAllowed = "move"
-    setDraggingItem({ itemId, fromCol: colId })
-  }, [])
+    e.dataTransfer.setData("text/plain", JSON.stringify({ itemId, colId }));
+    e.dataTransfer.effectAllowed = "move";
+    setDraggingItem({ itemId, fromCol: colId });
+  }, []);
 
   const handleDragOver = useCallback((e: React.DragEvent, colId: string) => {
-    e.preventDefault()
-    e.dataTransfer.dropEffect = "move"
-    setDragOverCol(colId)
-  }, [])
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    setDragOverCol(colId);
+  }, []);
 
   const handleDragLeave = useCallback(() => {
-    setDragOverCol(null)
-  }, [])
+    setDragOverCol(null);
+  }, []);
 
   const handleDragEnd = useCallback(() => {
-    setDragOverCol(null)
-    setDraggingItem(null)
-  }, [])
+    setDragOverCol(null);
+    setDraggingItem(null);
+  }, []);
 
   if (isLoading) {
     return (
@@ -56,7 +62,7 @@ export function KanbanBoard() {
           ))}
         </div>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -67,10 +73,10 @@ export function KanbanBoard() {
           <p className="text-sm text-muted-foreground">暂无法加载看板数据</p>
         </div>
       </div>
-    )
+    );
   }
 
-  if (!data) return null
+  if (!data) return null;
 
   return (
     <div className="rounded-xl border bg-card shadow-sm p-6 space-y-4">
@@ -90,7 +96,7 @@ export function KanbanBoard() {
             onDragLeave={handleDragLeave}
             className={cn(
               "rounded-lg border bg-muted/20 p-3 transition-colors",
-              dragOverCol === col.id && "border-primary/50 bg-primary/5 ring-1 ring-primary/20"
+              dragOverCol === col.id && "border-primary/50 bg-primary/5 ring-1 ring-primary/20",
             )}
           >
             {/* Column header */}
@@ -113,7 +119,7 @@ export function KanbanBoard() {
                   onDragEnd={handleDragEnd}
                   className={cn(
                     "rounded-lg border bg-card p-3 cursor-grab active:cursor-grabbing hover:shadow-sm transition-all",
-                    draggingItem?.itemId === item.id && "opacity-50 scale-95"
+                    draggingItem?.itemId === item.id && "opacity-50 scale-95",
                   )}
                 >
                   <div className="flex items-start gap-2">
@@ -129,7 +135,9 @@ export function KanbanBoard() {
                             {tag}
                           </span>
                         ))}
-                        <span className="text-[10px] text-muted-foreground/60 ml-auto">{item.owner}</span>
+                        <span className="text-[10px] text-muted-foreground/60 ml-auto">
+                          {item.owner}
+                        </span>
                       </div>
                     </div>
                     <MoreHorizontal className="size-3.5 text-muted-foreground/30 shrink-0" />
@@ -147,5 +155,5 @@ export function KanbanBoard() {
         ))}
       </div>
     </div>
-  )
+  );
 }

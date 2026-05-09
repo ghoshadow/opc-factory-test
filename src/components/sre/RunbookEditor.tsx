@@ -1,13 +1,15 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Save, ArrowLeft, Plus, Trash2, GitBranch } from "lucide-react"
-import type { Runbook, TroubleshootNode } from "@/types/factory"
+import { useState } from "react";
+
+import { ArrowLeft, GitBranch, Plus, Save, Trash2 } from "lucide-react";
+
+import type { Runbook, TroubleshootNode } from "@/types/factory";
 
 interface RunbookEditorProps {
-  runbook: Runbook | null
-  onBack: () => void
-  onSaved: () => void
+  runbook: Runbook | null;
+  onBack: () => void;
+  onSaved: () => void;
 }
 
 function newRunbookTemplate(): Partial<Runbook> {
@@ -20,49 +22,33 @@ function newRunbookTemplate(): Partial<Runbook> {
     troubleshootTree: [],
     emergencyPlan: "",
     topologyExport: "",
-  }
+  };
 }
 
 export function RunbookEditor({ runbook, onBack, onSaved }: RunbookEditorProps) {
-  const isNew = !runbook
-  const [saving, setSaving] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const source = runbook ?? newRunbookTemplate();
+  const isNew = !runbook;
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const [name, setName] = useState("")
-  const [description, setDescription] = useState("")
-  const [service, setService] = useState("")
-  const [startStopSteps, setStartStopSteps] = useState<string[]>([""])
-  const [scaleSteps, setScaleSteps] = useState<string[]>([""])
-  const [emergencyPlan, setEmergencyPlan] = useState("")
-  const [topologyExport, setTopologyExport] = useState("")
-  const [troubleshootTree, setTroubleshootTree] = useState<TroubleshootNode[]>([])
-
-  useEffect(() => {
-    if (runbook) {
-      setName(runbook.name)
-      setDescription(runbook.description)
-      setService(runbook.service)
-      setStartStopSteps(runbook.startStopSteps.length > 0 ? runbook.startStopSteps : [""])
-      setScaleSteps(runbook.scaleSteps.length > 0 ? runbook.scaleSteps : [""])
-      setEmergencyPlan(runbook.emergencyPlan)
-      setTopologyExport(runbook.topologyExport)
-      setTroubleshootTree(runbook.troubleshootTree)
-    } else {
-      const tpl = newRunbookTemplate()
-      setName(tpl.name!)
-      setDescription(tpl.description!)
-      setService(tpl.service!)
-      setStartStopSteps(tpl.startStopSteps!)
-      setScaleSteps(tpl.scaleSteps!)
-      setEmergencyPlan(tpl.emergencyPlan!)
-      setTopologyExport(tpl.topologyExport!)
-      setTroubleshootTree(tpl.troubleshootTree!)
-    }
-  }, [runbook])
+  const [name, setName] = useState(source.name!);
+  const [description, setDescription] = useState(source.description!);
+  const [service, setService] = useState(source.service!);
+  const [startStopSteps, setStartStopSteps] = useState<string[]>(
+    source.startStopSteps!.length > 0 ? source.startStopSteps! : [""],
+  );
+  const [scaleSteps, setScaleSteps] = useState<string[]>(
+    source.scaleSteps!.length > 0 ? source.scaleSteps! : [""],
+  );
+  const [emergencyPlan, setEmergencyPlan] = useState(source.emergencyPlan!);
+  const [topologyExport, setTopologyExport] = useState(source.topologyExport!);
+  const [troubleshootTree, setTroubleshootTree] = useState<TroubleshootNode[]>(
+    source.troubleshootTree!,
+  );
 
   const handleSave = async () => {
-    setSaving(true)
-    setError(null)
+    setSaving(true);
+    setError(null);
     try {
       const body = {
         id: runbook?.id,
@@ -74,46 +60,46 @@ export function RunbookEditor({ runbook, onBack, onSaved }: RunbookEditorProps) 
         troubleshootTree,
         emergencyPlan,
         topologyExport,
-      }
-      const method = isNew ? "POST" : "PUT"
+      };
+      const method = isNew ? "POST" : "PUT";
       const res = await fetch("/api/v1/sre/runbooks", {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
-      })
-      if (!res.ok) throw new Error("保存失败")
-      onSaved()
+      });
+      if (!res.ok) throw new Error("保存失败");
+      onSaved();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "保存失败")
+      setError(e instanceof Error ? e.message : "保存失败");
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
   const addStep = (target: "startStop" | "scale") => {
-    if (target === "startStop") setStartStopSteps([...startStopSteps, ""])
-    else setScaleSteps([...scaleSteps, ""])
-  }
+    if (target === "startStop") setStartStopSteps([...startStopSteps, ""]);
+    else setScaleSteps([...scaleSteps, ""]);
+  };
 
   const updateStep = (target: "startStop" | "scale", idx: number, value: string) => {
     if (target === "startStop") {
-      const next = [...startStopSteps]
-      next[idx] = value
-      setStartStopSteps(next)
+      const next = [...startStopSteps];
+      next[idx] = value;
+      setStartStopSteps(next);
     } else {
-      const next = [...scaleSteps]
-      next[idx] = value
-      setScaleSteps(next)
+      const next = [...scaleSteps];
+      next[idx] = value;
+      setScaleSteps(next);
     }
-  }
+  };
 
   const removeStep = (target: "startStop" | "scale", idx: number) => {
     if (target === "startStop" && startStopSteps.length > 1) {
-      setStartStopSteps(startStopSteps.filter((_, i) => i !== idx))
+      setStartStopSteps(startStopSteps.filter((_, i) => i !== idx));
     } else if (target === "scale" && scaleSteps.length > 1) {
-      setScaleSteps(scaleSteps.filter((_, i) => i !== idx))
+      setScaleSteps(scaleSteps.filter((_, i) => i !== idx));
     }
-  }
+  };
 
   const addTroubleshootNode = () => {
     const newNode: TroubleshootNode = {
@@ -122,33 +108,33 @@ export function RunbookEditor({ runbook, onBack, onSaved }: RunbookEditorProps) 
       steps: [""],
       solution: "",
       children: [],
-    }
-    setTroubleshootTree([...troubleshootTree, newNode])
-  }
+    };
+    setTroubleshootTree([...troubleshootTree, newNode]);
+  };
 
   const updateTroubleshootNode = (idx: number, field: "question" | "solution", value: string) => {
-    const next = [...troubleshootTree]
-    next[idx] = { ...next[idx], [field]: value }
-    setTroubleshootTree(next)
-  }
+    const next = [...troubleshootTree];
+    next[idx] = { ...next[idx], [field]: value };
+    setTroubleshootTree(next);
+  };
 
   const updateTroubleshootSteps = (idx: number, stepIdx: number, value: string) => {
-    const next = [...troubleshootTree]
-    const steps = [...next[idx].steps]
-    steps[stepIdx] = value
-    next[idx] = { ...next[idx], steps }
-    setTroubleshootTree(next)
-  }
+    const next = [...troubleshootTree];
+    const steps = [...next[idx].steps];
+    steps[stepIdx] = value;
+    next[idx] = { ...next[idx], steps };
+    setTroubleshootTree(next);
+  };
 
   const addTroubleshootStep = (idx: number) => {
-    const next = [...troubleshootTree]
-    next[idx] = { ...next[idx], steps: [...next[idx].steps, ""] }
-    setTroubleshootTree(next)
-  }
+    const next = [...troubleshootTree];
+    next[idx] = { ...next[idx], steps: [...next[idx].steps, ""] };
+    setTroubleshootTree(next);
+  };
 
   const removeTroubleshootNode = (idx: number) => {
-    setTroubleshootTree(troubleshootTree.filter((_, i) => i !== idx))
-  }
+    setTroubleshootTree(troubleshootTree.filter((_, i) => i !== idx));
+  };
 
   return (
     <div className="flex flex-col h-full">
@@ -163,7 +149,9 @@ export function RunbookEditor({ runbook, onBack, onSaved }: RunbookEditorProps) 
             <ArrowLeft className="size-4" />
           </button>
           <div>
-            <h2 className="text-lg font-semibold">{isNew ? "新建 Runbook" : `编辑: ${runbook?.name}`}</h2>
+            <h2 className="text-lg font-semibold">
+              {isNew ? "新建 Runbook" : `编辑: ${runbook?.name}`}
+            </h2>
             {!isNew && (
               <p className="text-xs text-muted-foreground">
                 当前版本: v{runbook?.version} · 保存后将生成 v{runbook!.version + 1}
@@ -320,7 +308,7 @@ export function RunbookEditor({ runbook, onBack, onSaved }: RunbookEditorProps) 
           </div>
           {troubleshootTree.length === 0 ? (
             <p className="text-xs text-muted-foreground py-4 text-center border-2 border-dashed rounded-lg border-muted-foreground/20">
-              暂无排障节点，点击"添加节点"开始构建排障树
+              暂无排障节点，点击&ldquo;添加节点&rdquo;开始构建排障树
             </p>
           ) : (
             <div className="space-y-4">
@@ -404,5 +392,5 @@ export function RunbookEditor({ runbook, onBack, onSaved }: RunbookEditorProps) 
         </section>
       </div>
     </div>
-  )
+  );
 }

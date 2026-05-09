@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server"
-import type { SreCheckerResponse, SreCheckerItem } from "@/types/factory"
+import { NextResponse } from "next/server";
+
+import type { SreCheckerItem, SreCheckerResponse } from "@/types/factory";
 
 const checkerData: SreCheckerItem[] = [
   {
@@ -37,17 +38,18 @@ const checkerData: SreCheckerItem[] = [
     name: "超时声明",
     description: "所有外部接口有 timeout 配置",
     status: "warning",
-    detail: "4/5 外部接口已配置：支付网关 (5s), 通知服务 (3s), 库存服务 (3s), 认证服务 (2s)。缺少: 网关路由",
+    detail:
+      "4/5 外部接口已配置：支付网关 (5s), 通知服务 (3s), 库存服务 (3s), 认证服务 (2s)。缺少: 网关路由",
     supplementLabel: "补充 timeout 配置",
   },
-]
+];
 
 export async function GET() {
-  const allPass = checkerData.every((item) => item.status === "pass")
+  const allPass = checkerData.every((item) => item.status === "pass");
   const response: SreCheckerResponse = {
     items: checkerData,
     allPass,
     canRelease: allPass,
-  }
-  return NextResponse.json(response)
+  };
+  return NextResponse.json(response);
 }

@@ -1,15 +1,21 @@
-"use client"
+"use client";
 
-import useSWR from "swr"
-import { ArrowRight, Play } from "lucide-react"
-import { cn } from "@/lib/utils"
-import type { PipelineRun, PipelineStageStatus, TestingOpsResponse } from "@/types/factory"
-import { Skeleton } from "@/components/ui/skeleton"
+import { ArrowRight, Play } from "lucide-react";
+import useSWR from "swr";
+
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
+import type { PipelineRun, PipelineStageStatus, TestingOpsResponse } from "@/types/factory";
 
 const fetcher = (url: string): Promise<PipelineRun> =>
-  fetch(url).then((res) => res.json()).then((d: TestingOpsResponse) => d.pipeline)
+  fetch(url)
+    .then((res) => res.json())
+    .then((d: TestingOpsResponse) => d.pipeline);
 
-const statusConfig: Record<PipelineStageStatus, { dotColor: string; borderColor: string; bg: string; textColor: string }> = {
+const statusConfig: Record<
+  PipelineStageStatus,
+  { dotColor: string; borderColor: string; bg: string; textColor: string }
+> = {
   waiting: {
     dotColor: "bg-muted-foreground/40",
     borderColor: "border-muted-foreground/20",
@@ -34,23 +40,23 @@ const statusConfig: Record<PipelineStageStatus, { dotColor: string; borderColor:
     bg: "bg-red-50 dark:bg-red-950/30",
     textColor: "text-red-700 dark:text-red-300",
   },
-}
+};
 
 function ConnectorLine({ active }: { active: boolean }) {
   return (
     <div className="flex items-center shrink-0">
       <div className={cn("h-px w-6 sm:w-10", active ? "bg-blue-400" : "bg-muted-foreground/20")} />
-      <ArrowRight className={cn("size-3 -ml-1", active ? "text-blue-400" : "text-muted-foreground/30")} />
+      <ArrowRight
+        className={cn("size-3 -ml-1", active ? "text-blue-400" : "text-muted-foreground/30")}
+      />
     </div>
-  )
+  );
 }
 
 export function PipelineFlow() {
-  const { data, error, isLoading } = useSWR<PipelineRun>(
-    "/api/v1/testing/ops",
-    fetcher,
-    { refreshInterval: 15000 }
-  )
+  const { data, error, isLoading } = useSWR<PipelineRun>("/api/v1/testing/ops", fetcher, {
+    refreshInterval: 15000,
+  });
 
   if (isLoading) {
     return (
@@ -65,7 +71,7 @@ export function PipelineFlow() {
           ))}
         </div>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -76,10 +82,10 @@ export function PipelineFlow() {
           <p className="text-sm text-muted-foreground">暂无法加载流水线状态</p>
         </div>
       </div>
-    )
+    );
   }
 
-  if (!data) return null
+  if (!data) return null;
 
   return (
     <div className="rounded-xl border bg-card shadow-sm p-6">
@@ -93,8 +99,8 @@ export function PipelineFlow() {
       </div>
       <div className="flex items-start gap-0 overflow-x-auto pb-3 scrollbar-thin">
         {data.stages.map((stage, i) => {
-          const cfg = statusConfig[stage.status]
-          const isActive = stage.id === data.currentStageId
+          const cfg = statusConfig[stage.status];
+          const isActive = stage.id === data.currentStageId;
 
           return (
             <div key={stage.id} className="flex items-center shrink-0">
@@ -107,7 +113,9 @@ export function PipelineFlow() {
                   stage.status === "failed" && "ring-1 ring-red-200",
                 )}
               >
-                <span className={cn("mb-1.5 size-2.5 rounded-full", cfg.dotColor, isActive && "size-3")} />
+                <span
+                  className={cn("mb-1.5 size-2.5 rounded-full", cfg.dotColor, isActive && "size-3")}
+                />
                 <span className={cn("text-xs font-semibold leading-tight", cfg.textColor)}>
                   {stage.label}
                 </span>
@@ -121,14 +129,12 @@ export function PipelineFlow() {
                 )}
               </div>
               {i < data.stages.length - 1 && (
-                <ConnectorLine active={
-                  stage.status === "done" || stage.status === "running"
-                } />
+                <ConnectorLine active={stage.status === "done" || stage.status === "running"} />
               )}
             </div>
-          )
+          );
         })}
       </div>
     </div>
-  )
+  );
 }

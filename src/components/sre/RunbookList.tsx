@@ -1,27 +1,26 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import useSWR from "swr"
-import { BookOpen, Search, Plus, GitBranch, Clock, FileText } from "lucide-react"
-import type { RunbookListResponse, Runbook } from "@/types/factory"
-import { Skeleton } from "@/components/ui/skeleton"
+import { useState } from "react";
 
-const fetcher = (url: string): Promise<RunbookListResponse> =>
-  fetch(url).then((res) => res.json())
+import { BookOpen, Clock, FileText, GitBranch, Plus, Search } from "lucide-react";
+import useSWR from "swr";
+
+import { Skeleton } from "@/components/ui/skeleton";
+import type { Runbook, RunbookListResponse } from "@/types/factory";
+
+const fetcher = (url: string): Promise<RunbookListResponse> => fetch(url).then((res) => res.json());
 
 interface RunbookListProps {
-  onSelect: (runbook: Runbook) => void
-  selectedId?: string
-  onCreateNew: () => void
+  onSelect: (runbook: Runbook) => void;
+  selectedId?: string;
+  onCreateNew: () => void;
 }
 
 export function RunbookList({ onSelect, selectedId, onCreateNew }: RunbookListProps) {
-  const [search, setSearch] = useState("")
-  const { data, error, isLoading } = useSWR<RunbookListResponse>(
-    "/api/v1/sre/runbooks",
-    fetcher,
-    { refreshInterval: 30000 }
-  )
+  const [search, setSearch] = useState("");
+  const { data, error, isLoading } = useSWR<RunbookListResponse>("/api/v1/sre/runbooks", fetcher, {
+    refreshInterval: 30000,
+  });
 
   if (isLoading) {
     return (
@@ -30,7 +29,7 @@ export function RunbookList({ onSelect, selectedId, onCreateNew }: RunbookListPr
           <Skeleton key={i} className="h-20 w-full rounded-lg" />
         ))}
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -44,18 +43,18 @@ export function RunbookList({ onSelect, selectedId, onCreateNew }: RunbookListPr
           </div>
         </div>
       </div>
-    )
+    );
   }
 
-  const runbooks = data?.runbooks ?? []
+  const runbooks = data?.runbooks ?? [];
   const filtered = search
     ? runbooks.filter(
         (r) =>
           r.name.toLowerCase().includes(search.toLowerCase()) ||
           r.service.toLowerCase().includes(search.toLowerCase()) ||
-          r.description.toLowerCase().includes(search.toLowerCase())
+          r.description.toLowerCase().includes(search.toLowerCase()),
       )
-    : runbooks
+    : runbooks;
 
   return (
     <div className="flex flex-col h-full">
@@ -104,18 +103,21 @@ export function RunbookList({ onSelect, selectedId, onCreateNew }: RunbookListPr
                 }`}
               >
                 <div className="flex items-start gap-3">
-                  <BookOpen className={`size-4 mt-0.5 shrink-0 ${selectedId === rb.id ? "text-primary" : "text-muted-foreground"}`} />
+                  <BookOpen
+                    className={`size-4 mt-0.5 shrink-0 ${selectedId === rb.id ? "text-primary" : "text-muted-foreground"}`}
+                  />
                   <div className="flex-1 min-w-0">
                     <h4 className="text-sm font-semibold truncate">{rb.name}</h4>
-                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{rb.description}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
+                      {rb.description}
+                    </p>
                     <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
                       <span className="inline-flex items-center gap-1">
                         <GitBranch className="size-3" />
                         {rb.service}
                       </span>
                       <span className="inline-flex items-center gap-1">
-                        <Clock className="size-3" />
-                        v{rb.version}
+                        <Clock className="size-3" />v{rb.version}
                       </span>
                     </div>
                   </div>
@@ -131,5 +133,5 @@ export function RunbookList({ onSelect, selectedId, onCreateNew }: RunbookListPr
         共 {runbooks.length} 个 Runbook
       </div>
     </div>
-  )
+  );
 }

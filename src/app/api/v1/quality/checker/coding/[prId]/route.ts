@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server"
-import type { CodingCheckerResponse, CodingCheckerItem } from "@/types/factory"
+import { NextResponse } from "next/server";
+
+import type { CodingCheckerItem, CodingCheckerResponse } from "@/types/factory";
 
 const checkerData: CodingCheckerItem[] = [
   {
@@ -32,19 +33,16 @@ const checkerData: CodingCheckerItem[] = [
     detail: "refund/handler.ts 函数签名与 Spec 定义不一致：参数 orderId 在 Spec 中为 order_id",
     supplementLabel: "查看差异 →",
   },
-]
+];
 
-export async function GET(
-  _request: Request,
-  { params }: { params: Promise<{ prId: string }> }
-) {
-  const { prId } = await params
-  const allPass = checkerData.every((item) => item.status === "pass")
+export async function GET(_request: Request, { params }: { params: Promise<{ prId: string }> }) {
+  const { prId } = await params;
+  const allPass = checkerData.every((item) => item.status === "pass");
   const response: CodingCheckerResponse = {
     items: checkerData,
     prId,
     allPass,
     canMerge: allPass,
-  }
-  return NextResponse.json(response)
+  };
+  return NextResponse.json(response);
 }

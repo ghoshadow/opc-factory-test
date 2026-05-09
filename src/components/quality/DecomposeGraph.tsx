@@ -1,86 +1,87 @@
-"use client"
+"use client";
 
-import { useEffect, useRef, useState, useCallback, useMemo } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
 import {
+  Box,
+  CheckSquare,
   ChevronRight,
   FileText,
-  CheckSquare,
-  GitPullRequest,
   FlaskConical,
+  GitPullRequest,
+  Maximize,
   ShieldCheck,
-  Box,
   ZoomIn,
   ZoomOut,
-  Maximize,
-} from "lucide-react"
+} from "lucide-react";
+
 import type {
   DecomposeNode,
   DecomposePipelineResponse,
   PipelineStageStatus,
-} from "@/types/factory"
+} from "@/types/factory";
 
 // ──── Layout ────────────────────────────────────────────────────────────────
 interface LayoutNode extends DecomposeNode {
-  x: number
-  y: number
+  x: number;
+  y: number;
 }
 
 function layoutNodes(data: DecomposePipelineResponse): LayoutNode[] {
-  const nodeMap = new Map<string, DecomposeNode>()
-  data.nodes.forEach((n) => nodeMap.set(n.id, n))
+  const nodeMap = new Map<string, DecomposeNode>();
+  data.nodes.forEach((n) => nodeMap.set(n.id, n));
 
   // BFS to assign layer
-  const layer = new Map<string, number>()
-  const queue = [data.rootId]
-  layer.set(data.rootId, 0)
+  const layer = new Map<string, number>();
+  const queue = [data.rootId];
+  layer.set(data.rootId, 0);
 
   while (queue.length > 0) {
-    const id = queue.shift()!
-    const currentLayer = layer.get(id)!
-    const node = nodeMap.get(id)
-    if (!node) continue
+    const id = queue.shift()!;
+    const currentLayer = layer.get(id)!;
+    const node = nodeMap.get(id);
+    if (!node) continue;
     for (const childId of node.children) {
       if (!layer.has(childId)) {
-        layer.set(childId, currentLayer + 1)
-        queue.push(childId)
+        layer.set(childId, currentLayer + 1);
+        queue.push(childId);
       }
     }
   }
 
   // Group nodes by layer
-  const layerGroups = new Map<number, string[]>()
+  const layerGroups = new Map<number, string[]>();
   for (const [id, l] of layer) {
-    if (!layerGroups.has(l)) layerGroups.set(l, [])
-    layerGroups.get(l)!.push(id)
+    if (!layerGroups.has(l)) layerGroups.set(l, []);
+    layerGroups.get(l)!.push(id);
   }
 
-  const maxLayer = Math.max(...layerGroups.keys())
-  const LAYER_GAP = 160
-  const NODE_GAP = 40
-  const NODE_WIDTH = 200
-  const PADDING_LEFT = 100
-  let maxWidth = 0
+  const maxLayer = Math.max(...layerGroups.keys());
+  const LAYER_GAP = 160;
+  const NODE_GAP = 40;
+  const NODE_WIDTH = 200;
+  const PADDING_LEFT = 100;
+  let maxWidth = 0;
 
-  const result: LayoutNode[] = []
+  const result: LayoutNode[] = [];
 
   for (let l = 0; l <= maxLayer; l++) {
-    const ids = layerGroups.get(l) ?? []
-    const totalWidth =
-      ids.length * NODE_WIDTH + (ids.length - 1) * NODE_GAP
-    maxWidth = Math.max(maxWidth, totalWidth)
-    const startX = PADDING_LEFT + (maxWidth - totalWidth) / 2
+    const ids = layerGroups.get(l) ?? [];
+    const totalWidth = ids.length * NODE_WIDTH + (ids.length - 1) * NODE_GAP;
+    maxWidth = Math.max(maxWidth, totalWidth);
+    const startX = PADDING_LEFT + (maxWidth - totalWidth) / 2;
 
     ids.forEach((id, i) => {
-      const node = nodeMap.get(id)!
+      const node = nodeMap.get(id)!;
       result.push({
         ...node,
         x: startX + i * (NODE_WIDTH + NODE_GAP) + NODE_WIDTH / 2,
         y: 80 + l * LAYER_GAP,
-      } as LayoutNode)
-    })
+      } as LayoutNode);
+    });
   }
 
-  return result
+  return result;
 }
 
 // ──── Config ────────────────────────────────────────────────────────────────
@@ -131,193 +132,173 @@ const typeConfig: Record<
     text: "fill-slate-800 dark:fill-slate-200",
     badge: "Artifact",
   },
-}
+};
 
 const statusPulse: Record<PipelineStageStatus, string> = {
   waiting: "fill-muted-foreground/40",
   running: "fill-blue-500 animate-pulse",
   done: "fill-emerald-500",
   failed: "fill-red-500",
-}
+};
 
 const statusText: Record<PipelineStageStatus, string> = {
   waiting: "fill-muted-foreground/60",
   running: "fill-blue-700 dark:fill-blue-300",
   done: "fill-emerald-700 dark:fill-emerald-300",
   failed: "fill-red-700 dark:fill-red-300",
-}
+};
 
 // ──── Helpers ───────────────────────────────────────────────────────────────
 
-function curvePath(
-  x1: number,
-  y1: number,
-  x2: number,
-  y2: number
-): string {
-  const dx = x2 - x1
-  const cx = x1 + dx * 0.5
+function curvePath(x1: number, y1: number, x2: number, y2: number): string {
+  const dx = x2 - x1;
+  const cx = x1 + dx * 0.5;
   // Add slight horizontal offset to avoid straight overlap
-  const offset = Math.min(Math.abs(dx) * 0.15, 30)
-  const cx1 = cx + (dx > 0 ? offset : -offset)
-  const cx2 = cx - (dx > 0 ? offset : -offset)
-  return `M ${x1} ${y1 + 28} C ${cx1} ${y1 + 28}, ${cx2} ${y2 - 28}, ${x2} ${y2 - 28}`
+  const offset = Math.min(Math.abs(dx) * 0.15, 30);
+  const cx1 = cx + (dx > 0 ? offset : -offset);
+  const cx2 = cx - (dx > 0 ? offset : -offset);
+  return `M ${x1} ${y1 + 28} C ${cx1} ${y1 + 28}, ${cx2} ${y2 - 28}, ${x2} ${y2 - 28}`;
 }
 
 // ──── Component ─────────────────────────────────────────────────────────────
 
 export function DecomposeGraph({ data }: { data: DecomposePipelineResponse }) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const [viewBox, setViewBox] = useState({ x: 0, y: 0, w: 1200, h: 800 })
-  const [draggingNodeId, setDraggingNodeId] = useState<string | null>(null)
-  const [panning, setPanning] = useState(false)
-  const [panStart, setPanStart] = useState({ x: 0, y: 0 })
-  const [selectedId, setSelectedId] = useState<string | null>(null)
-  const initialLayout = useMemo(() => layoutNodes(data), [data])
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [viewBox, setViewBox] = useState({ x: 0, y: 0, w: 1200, h: 800 });
+  const [draggingNodeId, setDraggingNodeId] = useState<string | null>(null);
+  const [panning, setPanning] = useState(false);
+  const [panStart, setPanStart] = useState({ x: 0, y: 0 });
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const initialLayout = useMemo(() => layoutNodes(data), [data]);
   const [nodePositions, setNodePositions] = useState<Map<string, { x: number; y: number }>>(() => {
-    const map = new Map<string, { x: number; y: number }>()
+    const map = new Map<string, { x: number; y: number }>();
     initialLayout.forEach((n) => {
-      map.set(n.id, { x: n.x, y: n.y })
-    })
-    return map
-  })
+      map.set(n.id, { x: n.x, y: n.y });
+    });
+    return map;
+  });
 
   const nodeMap = useMemo(() => {
-    const m = new Map<string, DecomposeNode>()
-    data.nodes.forEach((n) => m.set(n.id, n))
-    return m
-  }, [data.nodes])
+    const m = new Map<string, DecomposeNode>();
+    data.nodes.forEach((n) => m.set(n.id, n));
+    return m;
+  }, [data.nodes]);
 
   const getPos = useCallback(
     (id: string) => nodePositions.get(id) ?? { x: 0, y: 0 },
     [nodePositions],
-  )
+  );
 
-  const selectedNode = selectedId ? nodeMap.get(selectedId) ?? null : null
+  const selectedNode = selectedId ? (nodeMap.get(selectedId) ?? null) : null;
 
   // Close detail on Escape
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setSelectedId(null)
-    }
-    window.addEventListener("keydown", handler)
-    return () => window.removeEventListener("keydown", handler)
-  }, [])
+      if (e.key === "Escape") setSelectedId(null);
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
 
   // Zoom
-  const zoom = useCallback(
-    (factor: number) => {
-      setViewBox((vb) => {
-        const cw = vb.w * factor
-        const ch = vb.h * factor
-        const cx = vb.x + (vb.w - cw) / 2
-        const cy = vb.y + (vb.h - ch) / 2
-        return { x: cx, y: cy, w: cw, h: ch }
-      })
-    },
-    [],
-  )
+  const zoom = useCallback((factor: number) => {
+    setViewBox((vb) => {
+      const cw = vb.w * factor;
+      const ch = vb.h * factor;
+      const cx = vb.x + (vb.w - cw) / 2;
+      const cy = vb.y + (vb.h - ch) / 2;
+      return { x: cx, y: cy, w: cw, h: ch };
+    });
+  }, []);
 
   const resetView = useCallback(() => {
-    setViewBox({ x: 0, y: 0, w: 1200, h: 800 })
-  }, [])
+    setViewBox({ x: 0, y: 0, w: 1200, h: 800 });
+  }, []);
 
   // Wheel zoom
-  const handleWheel = useCallback(
-    (e: React.WheelEvent) => {
-      e.preventDefault()
-      const factor = e.deltaY > 0 ? 1.15 : 1 / 1.15
-      const rect = containerRef.current?.getBoundingClientRect()
-      if (!rect) return
-      // Zoom centered on mouse
-      const mx = e.clientX - rect.left
-      const my = e.clientY - rect.top
-      setViewBox((vb) => {
-        const svgX = vb.x + (mx / rect.width) * vb.w
-        const svgY = vb.y + (my / rect.height) * vb.h
-        const nw = vb.w * factor
-        const nh = vb.h * factor
-        const nx = svgX - (mx / rect.width) * nw
-        const ny = svgY - (my / rect.height) * nh
-        return { x: nx, y: ny, w: nw, h: nh }
-      })
-    },
-    [],
-  )
+  const handleWheel = useCallback((e: React.WheelEvent) => {
+    e.preventDefault();
+    const factor = e.deltaY > 0 ? 1.15 : 1 / 1.15;
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    // Zoom centered on mouse
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    setViewBox((vb) => {
+      const svgX = vb.x + (mx / rect.width) * vb.w;
+      const svgY = vb.y + (my / rect.height) * vb.h;
+      const nw = vb.w * factor;
+      const nh = vb.h * factor;
+      const nx = svgX - (mx / rect.width) * nw;
+      const ny = svgY - (my / rect.height) * nh;
+      return { x: nx, y: ny, w: nw, h: nh };
+    });
+  }, []);
 
   // Pan / drag
-  const handlePointerDown = useCallback(
-    (e: React.PointerEvent) => {
-      const target = e.target as Element
-      const nodeGroup = target.closest("[data-node-id]")
-      if (nodeGroup) {
-        const nodeId = nodeGroup.getAttribute("data-node-id")!
-        if (e.button === 0) {
-          setDraggingNodeId(nodeId)
-          ;(nodeGroup as Element).setPointerCapture(e.pointerId)
-          setSelectedId(nodeId)
-        }
-        return
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
+    const target = e.target as Element;
+    const nodeGroup = target.closest("[data-node-id]");
+    if (nodeGroup) {
+      const nodeId = nodeGroup.getAttribute("data-node-id")!;
+      if (e.button === 0) {
+        setDraggingNodeId(nodeId);
+        (nodeGroup as Element).setPointerCapture(e.pointerId);
+        setSelectedId(nodeId);
       }
-      // Pan
-      setPanning(true)
-      setPanStart({ x: e.clientX, y: e.clientY })
-    },
-    [],
-  )
+      return;
+    }
+    // Pan
+    setPanning(true);
+    setPanStart({ x: e.clientX, y: e.clientY });
+  }, []);
 
   const handlePointerMove = useCallback(
     (e: React.PointerEvent) => {
       if (draggingNodeId) {
-        const rect = containerRef.current?.getBoundingClientRect()
-        if (!rect) return
-        const svgX =
-          viewBox.x + (e.clientX - rect.left) * (viewBox.w / rect.width)
-        const svgY =
-          viewBox.y + (e.clientY - rect.top) * (viewBox.h / rect.height)
+        const rect = containerRef.current?.getBoundingClientRect();
+        if (!rect) return;
+        const svgX = viewBox.x + (e.clientX - rect.left) * (viewBox.w / rect.width);
+        const svgY = viewBox.y + (e.clientY - rect.top) * (viewBox.h / rect.height);
         setNodePositions((prev) => {
-          const next = new Map(prev)
-          next.set(draggingNodeId, { x: svgX, y: svgY })
-          return next
-        })
-        return
+          const next = new Map(prev);
+          next.set(draggingNodeId, { x: svgX, y: svgY });
+          return next;
+        });
+        return;
       }
       if (panning) {
-        const dx = e.clientX - panStart.x
-        const dy = e.clientY - panStart.y
-        const rect = containerRef.current?.getBoundingClientRect()
-        if (!rect) return
-        const scale = viewBox.w / rect.width
+        const dx = e.clientX - panStart.x;
+        const dy = e.clientY - panStart.y;
+        const rect = containerRef.current?.getBoundingClientRect();
+        if (!rect) return;
+        const scale = viewBox.w / rect.width;
         setViewBox((vb) => ({
           ...vb,
           x: vb.x - dx * scale,
           y: vb.y - dy * scale,
-        }))
-        setPanStart({ x: e.clientX, y: e.clientY })
+        }));
+        setPanStart({ x: e.clientX, y: e.clientY });
       }
     },
     [draggingNodeId, panning, panStart, viewBox],
-  )
+  );
 
   const handlePointerUp = useCallback(() => {
-    setDraggingNodeId(null)
-    setPanning(false)
-  }, [])
+    setDraggingNodeId(null);
+    setPanning(false);
+  }, []);
 
   const nodeElements = useMemo(() => {
     return data.nodes.map((node) => {
-      const pos = getPos(node.id)
-      const t = typeConfig[node.type]
-      const Icon = t.icon
-      const isSelected = selectedId === node.id
-      const isFailed = node.status === "failed"
+      const pos = getPos(node.id);
+      const t = typeConfig[node.type];
+      const Icon = t.icon;
+      const isSelected = selectedId === node.id;
+      const isFailed = node.status === "failed";
 
       return (
-        <g
-          key={node.id}
-          data-node-id={node.id}
-          className={isSelected ? "z-10" : ""}
-        >
+        <g key={node.id} data-node-id={node.id} className={isSelected ? "z-10" : ""}>
           {/* Node box */}
           <rect
             x={pos.x - 100}
@@ -326,26 +307,14 @@ export function DecomposeGraph({ data }: { data: DecomposePipelineResponse }) {
             height={56}
             rx={10}
             className={`${t.bg} ${t.border} ${isSelected ? "stroke-2" : "stroke-1"} ${
-              isFailed
-                ? "stroke-red-400 dark:stroke-red-600"
-                : ""
+              isFailed ? "stroke-red-400 dark:stroke-red-600" : ""
             } transition-colors`}
             strokeWidth={isSelected ? 2.5 : 1.5}
           />
           {/* Status indicator dot */}
-          <circle
-            cx={pos.x - 84}
-            cy={pos.y - 8}
-            r={4}
-            className={statusPulse[node.status]}
-          />
+          <circle cx={pos.x - 84} cy={pos.y - 8} r={4} className={statusPulse[node.status]} />
           {/* Type icon */}
-          <foreignObject
-            x={pos.x - 72}
-            y={pos.y - 16}
-            width={16}
-            height={16}
-          >
+          <foreignObject x={pos.x - 72} y={pos.y - 16} width={16} height={16}>
             <Icon className="size-4 text-muted-foreground" />
           </foreignObject>
           {/* Label */}
@@ -364,9 +333,7 @@ export function DecomposeGraph({ data }: { data: DecomposePipelineResponse }) {
             className="text-[9px] fill-muted-foreground/60"
             textAnchor="start"
           >
-            {node.detail.length > 20
-              ? node.detail.slice(0, 20) + "…"
-              : node.detail}
+            {node.detail.length > 20 ? node.detail.slice(0, 20) + "…" : node.detail}
           </text>
           {/* Badge */}
           <rect
@@ -397,24 +364,22 @@ export function DecomposeGraph({ data }: { data: DecomposePipelineResponse }) {
             </text>
           )}
         </g>
-      )
-    })
-  }, [data.nodes, getPos, selectedId])
+      );
+    });
+  }, [data.nodes, getPos, selectedId]);
 
   const edgeElements = useMemo(() => {
     return data.edges.map((edge) => {
-      const src = getPos(edge.source)
-      const tgt = getPos(edge.target)
-      const srcNode = nodeMap.get(edge.source)
-      const tgtNode = nodeMap.get(edge.target)
-      const active =
-        srcNode?.status === "done" || srcNode?.status === "running"
-      const failed =
-        srcNode?.status === "failed" || tgtNode?.status === "failed"
+      const src = getPos(edge.source);
+      const tgt = getPos(edge.target);
+      const srcNode = nodeMap.get(edge.source);
+      const tgtNode = nodeMap.get(edge.target);
+      const active = srcNode?.status === "done" || srcNode?.status === "running";
+      const failed = srcNode?.status === "failed" || tgtNode?.status === "failed";
 
       // Midpoint for label
-      const mx = (src.x + tgt.x) / 2
-      const my = (src.y + tgt.y) / 2
+      const mx = (src.x + tgt.x) / 2;
+      const my = (src.y + tgt.y) / 2;
 
       return (
         <g key={`${edge.source}-${edge.target}`}>
@@ -439,22 +404,11 @@ export function DecomposeGraph({ data }: { data: DecomposePipelineResponse }) {
             }
             strokeWidth={failed ? 1.5 : 1.2}
             markerEnd={
-              failed
-                ? "url(#arrow-failed)"
-                : active
-                  ? "url(#arrow-active)"
-                  : "url(#arrow-idle)"
+              failed ? "url(#arrow-failed)" : active ? "url(#arrow-active)" : "url(#arrow-idle)"
             }
           />
           {/* Edge label */}
-          <rect
-            x={mx - 14}
-            y={my - 8}
-            width={28}
-            height={14}
-            rx={4}
-            className="fill-card/80"
-          />
+          <rect x={mx - 14} y={my - 8} width={28} height={14} rx={4} className="fill-card/80" />
           <text
             x={mx}
             y={my + 2}
@@ -464,9 +418,9 @@ export function DecomposeGraph({ data }: { data: DecomposePipelineResponse }) {
             {edge.label}
           </text>
         </g>
-      )
-    })
-  }, [data.edges, getPos, nodeMap])
+      );
+    });
+  }, [data.edges, getPos, nodeMap]);
 
   return (
     <div className="flex flex-col gap-0 rounded-xl border bg-card shadow-sm overflow-hidden">
@@ -474,9 +428,7 @@ export function DecomposeGraph({ data }: { data: DecomposePipelineResponse }) {
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-muted/30">
         <div>
           <h2 className="text-sm font-semibold">流水线分解图谱</h2>
-          <p className="text-[11px] text-muted-foreground">
-            拖拽节点 · 滚轮缩放 · 点击查看详情
-          </p>
+          <p className="text-[11px] text-muted-foreground">拖拽节点 · 滚轮缩放 · 点击查看详情</p>
         </div>
         <div className="flex items-center gap-1">
           <button
@@ -514,13 +466,13 @@ export function DecomposeGraph({ data }: { data: DecomposePipelineResponse }) {
             (typeof typeConfig)[DecomposeNode["type"]],
           ][]
         ).map(([t, cfg]) => {
-          const Icon = cfg.icon
+          const Icon = cfg.icon;
           return (
             <span key={t} className="inline-flex items-center gap-1">
               <Icon className="size-3" />
               {cfg.badge}
             </span>
-          )
+          );
         })}
         <span className="mx-1 text-border">|</span>
         <span className="inline-flex items-center gap-1">
@@ -568,10 +520,7 @@ export function DecomposeGraph({ data }: { data: DecomposePipelineResponse }) {
                 markerHeight={5}
                 orient="auto-start-reverse"
               >
-                <path
-                  d="M 0 0 L 8 4 L 0 8 Z"
-                  className="fill-muted-foreground/30"
-                />
+                <path d="M 0 0 L 8 4 L 0 8 Z" className="fill-muted-foreground/30" />
               </marker>
               <marker
                 id="arrow-active"
@@ -582,10 +531,7 @@ export function DecomposeGraph({ data }: { data: DecomposePipelineResponse }) {
                 markerHeight={5}
                 orient="auto-start-reverse"
               >
-                <path
-                  d="M 0 0 L 8 4 L 0 8 Z"
-                  className="fill-blue-400/60"
-                />
+                <path d="M 0 0 L 8 4 L 0 8 Z" className="fill-blue-400/60" />
               </marker>
               <marker
                 id="arrow-failed"
@@ -596,19 +542,11 @@ export function DecomposeGraph({ data }: { data: DecomposePipelineResponse }) {
                 markerHeight={5}
                 orient="auto-start-reverse"
               >
-                <path
-                  d="M 0 0 L 8 4 L 0 8 Z"
-                  className="fill-red-300/60 dark:fill-red-700/40"
-                />
+                <path d="M 0 0 L 8 4 L 0 8 Z" className="fill-red-300/60 dark:fill-red-700/40" />
               </marker>
             </defs>
             {/* Grid pattern */}
-            <pattern
-              id="grid"
-              width={40}
-              height={40}
-              patternUnits="userSpaceOnUse"
-            >
+            <pattern id="grid" width={40} height={40} patternUnits="userSpaceOnUse">
               <path
                 d="M 40 0 L 0 0 0 40"
                 fill="none"
@@ -644,8 +582,8 @@ export function DecomposeGraph({ data }: { data: DecomposePipelineResponse }) {
               </button>
             </div>
             {(() => {
-              const t = typeConfig[selectedNode.type]
-              const Icon = t.icon
+              const t = typeConfig[selectedNode.type];
+              const Icon = t.icon;
               return (
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
@@ -667,9 +605,7 @@ export function DecomposeGraph({ data }: { data: DecomposePipelineResponse }) {
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] text-muted-foreground">状态</span>
                     <span className="inline-flex items-center gap-1.5">
-                      <span
-                        className={`size-2 rounded-full ${statusPulse[selectedNode.status]}`}
-                      />
+                      <span className={`size-2 rounded-full ${statusPulse[selectedNode.status]}`} />
                       <span className="text-xs font-medium">
                         {selectedNode.status === "done"
                           ? "已完成"
@@ -692,10 +628,10 @@ export function DecomposeGraph({ data }: { data: DecomposePipelineResponse }) {
                       </span>
                       <div className="mt-1 space-y-0.5">
                         {selectedNode.children.map((childId) => {
-                          const child = nodeMap.get(childId)
-                          if (!child) return null
-                          const ct = typeConfig[child.type]
-                          const CIcon = ct.icon
+                          const child = nodeMap.get(childId);
+                          if (!child) return null;
+                          const ct = typeConfig[child.type];
+                          const CIcon = ct.icon;
                           return (
                             <button
                               key={childId}
@@ -710,17 +646,17 @@ export function DecomposeGraph({ data }: { data: DecomposePipelineResponse }) {
                               />
                               <ChevronRight className="size-3 text-muted-foreground/40 shrink-0" />
                             </button>
-                          )
+                          );
                         })}
                       </div>
                     </div>
                   )}
                 </div>
-              )
+              );
             })()}
           </div>
         )}
       </div>
     </div>
-  )
+  );
 }

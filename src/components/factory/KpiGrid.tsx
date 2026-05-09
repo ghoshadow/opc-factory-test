@@ -1,22 +1,19 @@
-"use client"
+"use client";
 
-import { MetricCard } from "@/components/ui/MetricCard"
-import { useFactoryMetrics } from "@/lib/api/factory"
+import { MetricCard } from "@/components/ui/MetricCard";
+import { useFactoryMetrics } from "@/lib/api/factory";
 
 export function KpiGrid() {
-  const { metrics, isLoading, isError } = useFactoryMetrics()
+  const { metrics, isLoading, isError } = useFactoryMetrics();
 
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {Array.from({ length: 9 }).map((_, i) => (
-          <div
-            key={i}
-            className="h-[120px] rounded-xl bg-muted animate-pulse"
-          />
+          <div key={i} className="h-[120px] rounded-xl bg-muted animate-pulse" />
         ))}
       </div>
-    )
+    );
   }
 
   if (isError || !metrics) {
@@ -24,7 +21,7 @@ export function KpiGrid() {
       <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-center text-red-700 dark:border-red-800 dark:bg-red-950/20 dark:text-red-400">
         Failed to load metrics. Please try again.
       </div>
-    )
+    );
   }
 
   return (
@@ -101,5 +98,5 @@ export function KpiGrid() {
         subtitle="环比趋势"
       />
     </div>
-  )
+  );
 }

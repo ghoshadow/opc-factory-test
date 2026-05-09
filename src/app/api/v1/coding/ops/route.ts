@@ -1,5 +1,13 @@
-import { NextResponse } from "next/server"
-import type { CodingOpsResponse, PipelineRun, PlanReviewItem, DesignReviewItem, TocoReportData, KanbanColumn } from "@/types/factory"
+import { NextResponse } from "next/server";
+
+import type {
+  CodingOpsResponse,
+  DesignReviewItem,
+  KanbanColumn,
+  PipelineRun,
+  PlanReviewItem,
+  TocoReportData,
+} from "@/types/factory";
 
 const pipeline: PipelineRun = {
   currentStageId: "code-stage-3",
@@ -14,32 +22,115 @@ const pipeline: PipelineRun = {
     { id: "code-stage-7", label: "集成测试", status: "waiting", subtext: "待执行" },
     { id: "code-stage-8", label: "合并门禁", status: "waiting", subtext: "待审核" },
   ],
-}
+};
 
 const planReview: PlanReviewItem[] = [
-  { id: "pr-1", name: "函数签名一致性", description: "实现与 Spec 定义一致", status: "pass", detail: "12/12 函数签名匹配 Spec 定义" },
-  { id: "pr-2", name: "错误处理覆盖", description: "所有异常路径有处理", status: "warning", detail: "refund/handler.ts 缺少 payment_timeout 异常处理" },
-  { id: "pr-3", name: "数据模型对齐", description: "结构体字段与本体一致", status: "pass", detail: "8 个实体全部对齐本体定义" },
-  { id: "pr-4", name: "接口契约检查", description: "API 入参/出参与 Spec 一致", status: "fail", detail: "POST /refund 返回体缺少 refund_id 字段" },
-]
+  {
+    id: "pr-1",
+    name: "函数签名一致性",
+    description: "实现与 Spec 定义一致",
+    status: "pass",
+    detail: "12/12 函数签名匹配 Spec 定义",
+  },
+  {
+    id: "pr-2",
+    name: "错误处理覆盖",
+    description: "所有异常路径有处理",
+    status: "warning",
+    detail: "refund/handler.ts 缺少 payment_timeout 异常处理",
+  },
+  {
+    id: "pr-3",
+    name: "数据模型对齐",
+    description: "结构体字段与本体一致",
+    status: "pass",
+    detail: "8 个实体全部对齐本体定义",
+  },
+  {
+    id: "pr-4",
+    name: "接口契约检查",
+    description: "API 入参/出参与 Spec 一致",
+    status: "fail",
+    detail: "POST /refund 返回体缺少 refund_id 字段",
+  },
+];
 
 const designReview: DesignReviewItem[] = [
-  { id: "dr-1", name: "目录结构规范", description: "遵循项目目录约定", status: "pass", detail: "handlers/, services/, models/ 结构符合规范" },
-  { id: "dr-2", name: "依赖方向正确", description: "无反向依赖", status: "pass", detail: "依赖图无环，分层清晰" },
-  { id: "dr-3", name: "抽象层级一致", description: "同层组件粒度匹配", status: "warning", detail: "payment/service.ts 粒度过细（3 个单行函数）" },
-  { id: "dr-4", name: "命名规范", description: "遵循团队命名约定", status: "pass", detail: "所有导出符号符合 camelCase/PascalCase 约定" },
-]
+  {
+    id: "dr-1",
+    name: "目录结构规范",
+    description: "遵循项目目录约定",
+    status: "pass",
+    detail: "handlers/, services/, models/ 结构符合规范",
+  },
+  {
+    id: "dr-2",
+    name: "依赖方向正确",
+    description: "无反向依赖",
+    status: "pass",
+    detail: "依赖图无环，分层清晰",
+  },
+  {
+    id: "dr-3",
+    name: "抽象层级一致",
+    description: "同层组件粒度匹配",
+    status: "warning",
+    detail: "payment/service.ts 粒度过细（3 个单行函数）",
+  },
+  {
+    id: "dr-4",
+    name: "命名规范",
+    description: "遵循团队命名约定",
+    status: "pass",
+    detail: "所有导出符号符合 camelCase/PascalCase 约定",
+  },
+];
 
 const tocoReport: TocoReportData = {
   metrics: { totalLines: 4320, changedLines: 187, filesChanged: 9, complexityDelta: -3 },
   findings: [
-    { id: "TF-1", severity: "major", category: "安全", title: "未校验的输入参数", description: "refund/handler.ts:42 未对 amount 做非负校验", lineRef: "refund/handler.ts:42" },
-    { id: "TF-2", severity: "minor", category: "性能", title: "N+1 查询风险", description: "order/services.ts:87 循环内执行数据库查询", lineRef: "order/services.ts:87" },
-    { id: "TF-3", severity: "info", category: "风格", title: "Magic Number", description: "payment/calc.ts:15 使用裸数字 0.05 作为手续费率", lineRef: "payment/calc.ts:15" },
-    { id: "TF-4", severity: "critical", category: "安全", title: "密钥硬编码", description: "config/provider.ts:8 包含疑似 API Key 的硬编码字符串", lineRef: "config/provider.ts:8" },
-    { id: "TF-5", severity: "minor", category: "可维护性", title: "过长函数", description: "refund/handler.ts:processRefund 方法 87 行，建议拆分", lineRef: "refund/handler.ts:56-143" },
+    {
+      id: "TF-1",
+      severity: "major",
+      category: "安全",
+      title: "未校验的输入参数",
+      description: "refund/handler.ts:42 未对 amount 做非负校验",
+      lineRef: "refund/handler.ts:42",
+    },
+    {
+      id: "TF-2",
+      severity: "minor",
+      category: "性能",
+      title: "N+1 查询风险",
+      description: "order/services.ts:87 循环内执行数据库查询",
+      lineRef: "order/services.ts:87",
+    },
+    {
+      id: "TF-3",
+      severity: "info",
+      category: "风格",
+      title: "Magic Number",
+      description: "payment/calc.ts:15 使用裸数字 0.05 作为手续费率",
+      lineRef: "payment/calc.ts:15",
+    },
+    {
+      id: "TF-4",
+      severity: "critical",
+      category: "安全",
+      title: "密钥硬编码",
+      description: "config/provider.ts:8 包含疑似 API Key 的硬编码字符串",
+      lineRef: "config/provider.ts:8",
+    },
+    {
+      id: "TF-5",
+      severity: "minor",
+      category: "可维护性",
+      title: "过长函数",
+      description: "refund/handler.ts:processRefund 方法 87 行，建议拆分",
+      lineRef: "refund/handler.ts:56-143",
+    },
   ],
-}
+};
 
 const kanbanColumns: KanbanColumn[] = [
   {
@@ -76,7 +167,7 @@ const kanbanColumns: KanbanColumn[] = [
       { id: "W-10", title: "数据库迁移脚本", tags: ["数据", "P0"], owner: "陈" },
     ],
   },
-]
+];
 
 export async function GET() {
   const response: CodingOpsResponse = {
@@ -85,7 +176,7 @@ export async function GET() {
     designReview,
     tocoReport,
     kanban: { columns: kanbanColumns },
-  }
+  };
 
-  return NextResponse.json(response)
+  return NextResponse.json(response);
 }

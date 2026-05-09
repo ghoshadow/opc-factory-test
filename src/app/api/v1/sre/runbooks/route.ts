@@ -1,11 +1,16 @@
-import { NextRequest, NextResponse } from "next/server"
-import type { Runbook, RunbookListResponse, TroubleshootNode } from "@/types/factory"
+import { NextRequest, NextResponse } from "next/server";
+
+import type { Runbook, RunbookListResponse, TroubleshootNode } from "@/types/factory";
 
 const sampleTroubleshootTree: TroubleshootNode[] = [
   {
     id: "ts-1",
     question: "服务无法启动",
-    steps: ["检查端口是否被占用: lsof -i :3000", "检查环境变量配置: cat .env", "查看启动日志: tail -f logs/app.log"],
+    steps: [
+      "检查端口是否被占用: lsof -i :3000",
+      "检查环境变量配置: cat .env",
+      "查看启动日志: tail -f logs/app.log",
+    ],
     solution: "释放被占用端口或修改端口配置，确保环境变量完整",
     children: [
       {
@@ -25,7 +30,11 @@ const sampleTroubleshootTree: TroubleshootNode[] = [
   {
     id: "ts-2",
     question: "数据库连接失败",
-    steps: ["检查数据库服务状态: systemctl status postgresql", "验证连接字符串: echo $DATABASE_URL", "测试网络连通性: telnet <db-host> 5432"],
+    steps: [
+      "检查数据库服务状态: systemctl status postgresql",
+      "验证连接字符串: echo $DATABASE_URL",
+      "测试网络连通性: telnet <db-host> 5432",
+    ],
     solution: "确认数据库服务运行正常，连接字符串正确，网络可达",
     children: [
       {
@@ -42,7 +51,7 @@ const sampleTroubleshootTree: TroubleshootNode[] = [
     steps: ["top -o MEM 查看内存占用进程", "检查是否有内存泄漏: 对比历史内存趋势", "检查 GC 日志"],
     solution: "重启服务释放内存，排查内存泄漏根因",
   },
-]
+];
 
 const sampleRunbooks: Runbook[] = [
   {
@@ -65,8 +74,10 @@ const sampleRunbooks: Runbook[] = [
       "4. 验证流量分发: 检查 Nginx 日志确认负载均衡生效",
     ],
     troubleshootTree: sampleTroubleshootTree,
-    emergencyPlan: "## 应急响应\n\n### 完全宕机\n1. 触发 PagerDuty 告警\n2. 回滚至上一个稳定版本\n3. 切换至备用支付通道\n\n### 部分降级\n1. 启用限流模式\n2. 关闭非核心功能\n3. 扩容实例数",
-    topologyExport: "digraph { payment_gateway -> redis; payment_gateway -> postgresql; payment_gateway -> notification_service; }",
+    emergencyPlan:
+      "## 应急响应\n\n### 完全宕机\n1. 触发 PagerDuty 告警\n2. 回滚至上一个稳定版本\n3. 切换至备用支付通道\n\n### 部分降级\n1. 启用限流模式\n2. 关闭非核心功能\n3. 扩容实例数",
+    topologyExport:
+      "digraph { payment_gateway -> redis; payment_gateway -> postgresql; payment_gateway -> notification_service; }",
     createdAt: "2026-04-15T08:00:00Z",
     updatedAt: "2026-05-09T10:30:00Z",
   },
@@ -95,8 +106,10 @@ const sampleRunbooks: Runbook[] = [
         solution: "优化慢查询索引，扩容 Kafka 分区",
       },
     ],
-    emergencyPlan: "## 应急响应\n\n### 订单积压\n1. 临时启用订单限流\n2. 扩容消费者实例\n3. 清理积压队列",
-    topologyExport: "digraph { order_service -> kafka; order_service -> postgresql; order_service -> payment_gateway; }",
+    emergencyPlan:
+      "## 应急响应\n\n### 订单积压\n1. 临时启用订单限流\n2. 扩容消费者实例\n3. 清理积压队列",
+    topologyExport:
+      "digraph { order_service -> kafka; order_service -> postgresql; order_service -> payment_gateway; }",
     createdAt: "2026-04-20T09:00:00Z",
     updatedAt: "2026-05-08T14:00:00Z",
   },
@@ -112,10 +125,7 @@ const sampleRunbooks: Runbook[] = [
       "3. 验证: curl http://localhost:3003/health",
       "4. 停止: pm2 stop notification-service",
     ],
-    scaleSteps: [
-      "1. 检查消息积压量",
-      "2. 扩容 Worker: pm2 scale notification-service +2",
-    ],
+    scaleSteps: ["1. 检查消息积压量", "2. 扩容 Worker: pm2 scale notification-service +2"],
     troubleshootTree: [
       {
         id: "ts-5",
@@ -124,24 +134,26 @@ const sampleRunbooks: Runbook[] = [
         solution: "切换备用推送通道，清理无效 Token",
       },
     ],
-    emergencyPlan: "## 应急响应\n\n### 推送中断\n1. 切换备用推送通道 (APNs/FCM)\n2. 启用短信兜底方案",
-    topologyExport: "digraph { notification_service -> redis; notification_service -> apns; notification_service -> fcm; }",
+    emergencyPlan:
+      "## 应急响应\n\n### 推送中断\n1. 切换备用推送通道 (APNs/FCM)\n2. 启用短信兜底方案",
+    topologyExport:
+      "digraph { notification_service -> redis; notification_service -> apns; notification_service -> fcm; }",
     createdAt: "2026-05-01T10:00:00Z",
     updatedAt: "2026-05-05T16:00:00Z",
   },
-]
+];
 
 export async function GET() {
   const response: RunbookListResponse = {
     runbooks: sampleRunbooks,
     total: sampleRunbooks.length,
-  }
-  return NextResponse.json(response)
+  };
+  return NextResponse.json(response);
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
+    const body = await request.json();
     const newRunbook: Runbook = {
       id: `rb-${Date.now()}`,
       name: body.name || "未命名 Runbook",
@@ -155,30 +167,30 @@ export async function POST(request: NextRequest) {
       topologyExport: body.topologyExport || "",
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-    }
-    sampleRunbooks.push(newRunbook)
-    return NextResponse.json(newRunbook, { status: 201 })
+    };
+    sampleRunbooks.push(newRunbook);
+    return NextResponse.json(newRunbook, { status: 201 });
   } catch {
-    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 })
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 }
 
 export async function PUT(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { id, ...updates } = body
-    const idx = sampleRunbooks.findIndex((r) => r.id === id)
+    const body = await request.json();
+    const { id, ...updates } = body;
+    const idx = sampleRunbooks.findIndex((r) => r.id === id);
     if (idx === -1) {
-      return NextResponse.json({ error: "Runbook not found" }, { status: 404 })
+      return NextResponse.json({ error: "Runbook not found" }, { status: 404 });
     }
     sampleRunbooks[idx] = {
       ...sampleRunbooks[idx],
       ...updates,
       version: sampleRunbooks[idx].version + 1,
       updatedAt: new Date().toISOString(),
-    }
-    return NextResponse.json(sampleRunbooks[idx])
+    };
+    return NextResponse.json(sampleRunbooks[idx]);
   } catch {
-    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 })
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 }

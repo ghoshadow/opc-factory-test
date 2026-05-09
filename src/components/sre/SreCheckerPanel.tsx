@@ -1,14 +1,17 @@
-"use client"
+"use client";
 
-import useSWR from "swr"
-import { Check, X, AlertTriangle, Shield, ExternalLink } from "lucide-react"
-import type { SreCheckerResponse, SreCheckerItem, CheckerItemStatus } from "@/types/factory"
-import { Skeleton } from "@/components/ui/skeleton"
+import { AlertTriangle, Check, ExternalLink, Shield, X } from "lucide-react";
+import useSWR from "swr";
 
-const fetcher = (url: string): Promise<SreCheckerResponse> =>
-  fetch(url).then((res) => res.json())
+import { Skeleton } from "@/components/ui/skeleton";
+import type { CheckerItemStatus, SreCheckerItem, SreCheckerResponse } from "@/types/factory";
 
-const statusConfig: Record<CheckerItemStatus, { icon: typeof Check; label: string; cardBorder: string; badgeClass: string; iconClass: string }> = {
+const fetcher = (url: string): Promise<SreCheckerResponse> => fetch(url).then((res) => res.json());
+
+const statusConfig: Record<
+  CheckerItemStatus,
+  { icon: typeof Check; label: string; cardBorder: string; badgeClass: string; iconClass: string }
+> = {
   pass: {
     icon: Check,
     label: "通过",
@@ -30,11 +33,11 @@ const statusConfig: Record<CheckerItemStatus, { icon: typeof Check; label: strin
     badgeClass: "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400",
     iconClass: "text-amber-500",
   },
-}
+};
 
 function CheckerCard({ item }: { item: SreCheckerItem }) {
-  const cfg = statusConfig[item.status]
-  const Icon = cfg.icon
+  const cfg = statusConfig[item.status];
+  const Icon = cfg.icon;
 
   return (
     <div className={`rounded-xl border bg-card p-5 shadow-sm ${cfg.cardBorder}`}>
@@ -46,7 +49,9 @@ function CheckerCard({ item }: { item: SreCheckerItem }) {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <h3 className="text-sm font-semibold">{item.name}</h3>
-              <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium ${cfg.badgeClass}`}>
+              <span
+                className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium ${cfg.badgeClass}`}
+              >
                 {cfg.label}
               </span>
             </div>
@@ -67,15 +72,13 @@ function CheckerCard({ item }: { item: SreCheckerItem }) {
         </div>
       )}
     </div>
-  )
+  );
 }
 
 export function SreCheckerPanel() {
-  const { data, error, isLoading } = useSWR<SreCheckerResponse>(
-    "/api/v1/sre/checker",
-    fetcher,
-    { refreshInterval: 30000 }
-  )
+  const { data, error, isLoading } = useSWR<SreCheckerResponse>("/api/v1/sre/checker", fetcher, {
+    refreshInterval: 30000,
+  });
 
   if (isLoading) {
     return (
@@ -87,7 +90,7 @@ export function SreCheckerPanel() {
           <Skeleton key={i} className="h-24 w-full rounded-lg" />
         ))}
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -101,14 +104,14 @@ export function SreCheckerPanel() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
-  if (!data) return null
+  if (!data) return null;
 
-  const passCount = data.items.filter((i) => i.status === "pass").length
-  const failCount = data.items.filter((i) => i.status === "fail").length
-  const warnCount = data.items.filter((i) => i.status === "warning").length
+  const passCount = data.items.filter((i) => i.status === "pass").length;
+  const failCount = data.items.filter((i) => i.status === "fail").length;
+  const warnCount = data.items.filter((i) => i.status === "warning").length;
 
   return (
     <div className="rounded-xl border bg-card shadow-sm p-6 space-y-5">
@@ -193,5 +196,5 @@ export function SreCheckerPanel() {
         )}
       </div>
     </div>
-  )
+  );
 }

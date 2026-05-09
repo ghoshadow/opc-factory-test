@@ -1,20 +1,18 @@
-"use client"
+"use client";
 
-import useSWR from "swr"
-import { GitBranch } from "lucide-react"
-import { PipelineFlow } from "@/components/factory/PipelineFlow"
-import type { PipelineResponse } from "@/types/factory"
-import { Skeleton } from "@/components/ui/skeleton"
+import { GitBranch } from "lucide-react";
+import useSWR from "swr";
 
-const fetcher = (url: string): Promise<PipelineResponse> =>
-  fetch(url).then((res) => res.json())
+import { PipelineFlow } from "@/components/factory/PipelineFlow";
+import { Skeleton } from "@/components/ui/skeleton";
+import type { PipelineResponse } from "@/types/factory";
+
+const fetcher = (url: string): Promise<PipelineResponse> => fetch(url).then((res) => res.json());
 
 export default function TestingPipelinePage() {
-  const { data, error, isLoading } = useSWR<PipelineResponse>(
-    "/api/v1/testing/pipeline",
-    fetcher,
-    { refreshInterval: 30000 }
-  )
+  const { data, error, isLoading } = useSWR<PipelineResponse>("/api/v1/testing/pipeline", fetcher, {
+    refreshInterval: 30000,
+  });
 
   return (
     <div className="space-y-6">
@@ -56,5 +54,5 @@ export default function TestingPipelinePage() {
         <PipelineFlow nodes={data.nodes} />
       ) : null}
     </div>
-  )
+  );
 }

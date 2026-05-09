@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server"
-import type { ReqCheckerResponse, ReqCheckerItem } from "@/types/factory"
+import { NextResponse } from "next/server";
+
+import type { ReqCheckerItem, ReqCheckerResponse } from "@/types/factory";
 
 const checkerData: ReqCheckerItem[] = [
   {
@@ -33,19 +34,16 @@ const checkerData: ReqCheckerItem[] = [
     status: "pass",
     detail: "已校验 23 个交叉引用（本体 → Spec, Spec → Spec），0 个失效",
   },
-]
+];
 
-export async function GET(
-  _request: Request,
-  { params }: { params: Promise<{ specId: string }> }
-) {
-  const { specId } = await params
-  const allPass = checkerData.every((item) => item.status === "pass")
+export async function GET(_request: Request, { params }: { params: Promise<{ specId: string }> }) {
+  const { specId } = await params;
+  const allPass = checkerData.every((item) => item.status === "pass");
   const response: ReqCheckerResponse = {
     items: checkerData,
     specId,
     allPass,
     canRelease: allPass,
-  }
-  return NextResponse.json(response)
+  };
+  return NextResponse.json(response);
 }

@@ -1,4 +1,4 @@
-import { CodingPipelinePanel } from "@/components/coding/CodingPipelinePanel"
+import { CodingPipelinePanel } from "@/components/coding/CodingPipelinePanel";
 
 export default function CodingPipelinePage() {
   return (
@@ -11,5 +11,5 @@ export default function CodingPipelinePage() {
       </div>
       <CodingPipelinePanel />
     </div>
-  )
+  );
 }

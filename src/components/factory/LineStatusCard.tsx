@@ -1,13 +1,15 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { StatusBadge } from "./StatusBadge";
-import { ProductionLine } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import type { LineStatusData } from "@/types/factory";
+
+import { StatusBadge } from "./StatusBadge";
 
 interface LineStatusCardProps {
-  line: ProductionLine;
+  line: LineStatusData;
 }
 
 export function LineStatusCard({ line }: LineStatusCardProps) {
@@ -17,9 +19,7 @@ export function LineStatusCard({ line }: LineStatusCardProps) {
     <Card
       className={cn(
         "cursor-pointer transition-shadow hover:shadow-md",
-        line.status === "ATTENTION"
-          ? "border-amber-400 ring-amber-400/20"
-          : "border-transparent"
+        line.status === "ATTENTION" ? "border-amber-400 ring-amber-400/20" : "border-transparent",
       )}
       onClick={() => router.push(`/${line.id}`)}
     >
@@ -43,15 +43,12 @@ export function LineStatusCard({ line }: LineStatusCardProps) {
             <div className="text-xs text-muted-foreground">在制</div>
           </div>
           <div className="rounded-md bg-muted/50 p-2 text-center">
-            <div className="text-2xl font-bold text-foreground">
-              {line.completed}
-            </div>
+            <div className="text-2xl font-bold text-foreground">{line.completed}</div>
             <div className="text-xs text-muted-foreground">已完成</div>
           </div>
         </div>
         <div className="text-xs text-muted-foreground">
-          <span className="font-medium text-foreground">异常:</span>{" "}
-          {line.anomaly}
+          <span className="font-medium text-foreground">异常:</span> {line.anomaly ?? "无"}
         </div>
       </CardContent>
     </Card>

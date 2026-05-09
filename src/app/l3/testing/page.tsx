@@ -1,24 +1,26 @@
-"use client"
+"use client";
 
-import { useRef } from "react"
-import { Anchor, GitBranch } from "lucide-react"
-import { PipelineFlow } from "@/components/testing/PipelineFlow"
-import { TestCaseList } from "@/components/testing/TestCaseList"
-import { BugTriagePanel } from "@/components/testing/BugTriagePanel"
-import { KanbanBoard } from "@/components/testing/KanbanBoard"
+import { useRef } from "react";
+
+import { Anchor, GitBranch } from "lucide-react";
+
+import { BugTriagePanel } from "@/components/testing/BugTriagePanel";
+import { KanbanBoard } from "@/components/testing/KanbanBoard";
+import { PipelineFlow } from "@/components/testing/PipelineFlow";
+import { TestCaseList } from "@/components/testing/TestCaseList";
 
 const sections = [
   { id: "pipeline", label: "流水线", icon: GitBranch },
   { id: "test-cases", label: "用例", icon: GitBranch },
   { id: "bugs", label: "Bug 分诊", icon: GitBranch },
   { id: "kanban", label: "看板", icon: GitBranch },
-]
+];
 
 export default function TestingOpsPage() {
-  const pipelineRef = useRef<HTMLDivElement>(null)
-  const testCasesRef = useRef<HTMLDivElement>(null)
-  const bugsRef = useRef<HTMLDivElement>(null)
-  const kanbanRef = useRef<HTMLDivElement>(null)
+  const pipelineRef = useRef<HTMLDivElement>(null);
+  const testCasesRef = useRef<HTMLDivElement>(null);
+  const bugsRef = useRef<HTMLDivElement>(null);
+  const kanbanRef = useRef<HTMLDivElement>(null);
 
   const scrollTo = (id: string) => {
     const refMap: Record<string, React.RefObject<HTMLDivElement | null>> = {
@@ -26,18 +28,16 @@ export default function TestingOpsPage() {
       "test-cases": testCasesRef,
       bugs: bugsRef,
       kanban: kanbanRef,
-    }
-    refMap[id]?.current?.scrollIntoView({ behavior: "smooth", block: "start" })
-  }
+    };
+    refMap[id]?.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   return (
     <div className="space-y-6">
       {/* Page header */}
       <div>
         <h1 className="text-2xl font-bold text-foreground">测试产线操作台</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          流水线 · 用例 · Bug 分诊 · 看板
-        </p>
+        <p className="mt-1 text-sm text-muted-foreground">流水线 · 用例 · Bug 分诊 · 看板</p>
       </div>
 
       {/* Anchor navigation */}
@@ -74,5 +74,5 @@ export default function TestingOpsPage() {
         <KanbanBoard />
       </div>
     </div>
-  )
+  );
 }

@@ -1,22 +1,23 @@
-"use client"
+"use client";
 
-import { cn } from "@/lib/utils"
-import { PipelineNode } from "./PipelineNode"
+import { cn } from "@/lib/utils";
 
-type PipelineStatus = "waiting" | "running" | "done" | "failed"
+import { PipelineNode } from "./PipelineNode";
+
+type PipelineStatus = "waiting" | "running" | "done" | "failed";
 
 export interface PipelineNodeData {
-  id: string
-  label: string
-  status: PipelineStatus
-  description?: string
+  id: string;
+  label: string;
+  status: PipelineStatus;
+  description?: string;
 }
 
 interface PipelineFlowProps {
-  nodes: PipelineNodeData[]
-  direction?: "horizontal" | "vertical"
-  showLabels?: boolean
-  className?: string
+  nodes: PipelineNodeData[];
+  direction?: "horizontal" | "vertical";
+  showLabels?: boolean;
+  className?: string;
 }
 
 function ArrowHorizontal() {
@@ -37,7 +38,7 @@ function ArrowHorizontal() {
         strokeLinejoin="round"
       />
     </svg>
-  )
+  );
 }
 
 function ArrowVertical() {
@@ -58,7 +59,7 @@ function ArrowVertical() {
         strokeLinejoin="round"
       />
     </svg>
-  )
+  );
 }
 
 export function PipelineFlow({
@@ -67,10 +68,10 @@ export function PipelineFlow({
   showLabels = true,
   className,
 }: PipelineFlowProps) {
-  if (!nodes.length) return null
+  if (!nodes.length) return null;
 
-  const isHorizontal = direction === "horizontal"
-  const Arrow = isHorizontal ? ArrowHorizontal : ArrowVertical
+  const isHorizontal = direction === "horizontal";
+  const Arrow = isHorizontal ? ArrowHorizontal : ArrowVertical;
 
   return (
     <div
@@ -91,5 +92,5 @@ export function PipelineFlow({
         </div>
       ))}
     </div>
-  )
+  );
 }

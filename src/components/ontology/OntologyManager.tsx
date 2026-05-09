@@ -1,31 +1,61 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import useSWR from "swr"
-import { BookOpen, Box, Database, Shield, ChevronRight, GitBranch, Layers, Key } from "lucide-react"
-import { cn } from "@/lib/utils"
-import type { OntologyResponse, TermKind } from "@/types/factory"
-import { Skeleton } from "@/components/ui/skeleton"
+import { useState } from "react";
 
-const fetcher = (url: string): Promise<OntologyResponse> =>
-  fetch(url).then((res) => res.json())
+import {
+  BookOpen,
+  Box,
+  ChevronRight,
+  Database,
+  GitBranch,
+  Key,
+  Layers,
+  Shield,
+} from "lucide-react";
+import useSWR from "swr";
+
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
+import type { OntologyResponse, TermKind } from "@/types/factory";
+
+const fetcher = (url: string): Promise<OntologyResponse> => fetch(url).then((res) => res.json());
 
 const kindConfig: Record<TermKind, { icon: typeof Box; label: string; badgeClass: string }> = {
-  entity: { icon: Database, label: "实体", badgeClass: "bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400" },
-  value_object: { icon: Layers, label: "值对象", badgeClass: "bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-400" },
-  aggregate: { icon: Shield, label: "聚合根", badgeClass: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400" },
-  domain_event: { icon: GitBranch, label: "领域事件", badgeClass: "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400" },
-  business_rule: { icon: Key, label: "业务规则", badgeClass: "bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-400" },
-}
+  entity: {
+    icon: Database,
+    label: "实体",
+    badgeClass: "bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400",
+  },
+  value_object: {
+    icon: Layers,
+    label: "值对象",
+    badgeClass: "bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-400",
+  },
+  aggregate: {
+    icon: Shield,
+    label: "聚合根",
+    badgeClass: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400",
+  },
+  domain_event: {
+    icon: GitBranch,
+    label: "领域事件",
+    badgeClass: "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400",
+  },
+  business_rule: {
+    icon: Key,
+    label: "业务规则",
+    badgeClass: "bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-400",
+  },
+};
 
 export function OntologyManager() {
   const { data, error, isLoading } = useSWR<OntologyResponse>(
     "/api/v1/requirements/ontology",
     fetcher,
-    { refreshInterval: 60000 }
-  )
+    { refreshInterval: 60000 },
+  );
 
-  const [selectedDomainId, setSelectedDomainId] = useState<string | null>(null)
+  const [selectedDomainId, setSelectedDomainId] = useState<string | null>(null);
 
   if (isLoading) {
     return (
@@ -43,7 +73,7 @@ export function OntologyManager() {
           ))}
         </div>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -57,21 +87,21 @@ export function OntologyManager() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
-  if (!data) return null
+  if (!data) return null;
 
   const selectedDomain = selectedDomainId
-    ? data.domains.find((d) => d.id === selectedDomainId) ?? null
-    : null
+    ? (data.domains.find((d) => d.id === selectedDomainId) ?? null)
+    : null;
 
   const domainTerms = selectedDomainId
     ? data.terms.filter((t) => t.domainId === selectedDomainId)
-    : []
+    : [];
 
-  const factoryDomains = data.domains.filter((d) => d.type === "factory")
-  const businessDomains = data.domains.filter((d) => d.type === "business")
+  const factoryDomains = data.domains.filter((d) => d.type === "factory");
+  const businessDomains = data.domains.filter((d) => d.type === "business");
 
   return (
     <div className="rounded-xl border bg-card shadow-sm h-[calc(100vh-12rem)] flex overflow-hidden">
@@ -81,8 +111,12 @@ export function OntologyManager() {
         <div className="p-3">
           <div className="flex items-center gap-2 px-2 py-1.5 mb-1">
             <Shield className="size-3.5 text-muted-foreground" />
-            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">工厂本体</span>
-            <span className="ml-auto text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">只读</span>
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+              工厂本体
+            </span>
+            <span className="ml-auto text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
+              只读
+            </span>
           </div>
           {factoryDomains.map((domain) => (
             <button
@@ -93,14 +127,18 @@ export function OntologyManager() {
                 "w-full text-left px-3 py-2.5 rounded-lg mb-0.5 transition-colors",
                 selectedDomainId === domain.id
                   ? "bg-primary/10 text-primary font-medium"
-                  : "hover:bg-muted/50 text-foreground"
+                  : "hover:bg-muted/50 text-foreground",
               )}
             >
               <div className="flex items-center gap-2">
                 <span className="text-sm truncate">{domain.name}</span>
-                <span className="ml-auto text-[10px] text-muted-foreground tabular-nums">{domain.termCount}</span>
+                <span className="ml-auto text-[10px] text-muted-foreground tabular-nums">
+                  {domain.termCount}
+                </span>
               </div>
-              <p className="text-[11px] text-muted-foreground/60 truncate mt-0.5">{domain.description}</p>
+              <p className="text-[11px] text-muted-foreground/60 truncate mt-0.5">
+                {domain.description}
+              </p>
             </button>
           ))}
         </div>
@@ -112,7 +150,9 @@ export function OntologyManager() {
         <div className="p-3">
           <div className="flex items-center gap-2 px-2 py-1.5 mb-1">
             <BookOpen className="size-3.5 text-muted-foreground" />
-            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">业务本体</span>
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+              业务本体
+            </span>
           </div>
           {businessDomains.map((domain) => (
             <button
@@ -123,14 +163,18 @@ export function OntologyManager() {
                 "w-full text-left px-3 py-2.5 rounded-lg mb-0.5 transition-colors",
                 selectedDomainId === domain.id
                   ? "bg-primary/10 text-primary font-medium"
-                  : "hover:bg-muted/50 text-foreground"
+                  : "hover:bg-muted/50 text-foreground",
               )}
             >
               <div className="flex items-center gap-2">
                 <span className="text-sm truncate">{domain.name}</span>
-                <span className="ml-auto text-[10px] text-muted-foreground tabular-nums">{domain.termCount}</span>
+                <span className="ml-auto text-[10px] text-muted-foreground tabular-nums">
+                  {domain.termCount}
+                </span>
               </div>
-              <p className="text-[11px] text-muted-foreground/60 truncate mt-0.5">{domain.description}</p>
+              <p className="text-[11px] text-muted-foreground/60 truncate mt-0.5">
+                {domain.description}
+              </p>
             </button>
           ))}
         </div>
@@ -157,7 +201,9 @@ export function OntologyManager() {
                 <ChevronRight className="size-4 text-muted-foreground" />
                 <h2 className="text-lg font-semibold">{selectedDomain.name}</h2>
                 {selectedDomain.type === "factory" && (
-                  <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded-full text-muted-foreground">只读</span>
+                  <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded-full text-muted-foreground">
+                    只读
+                  </span>
                 )}
               </div>
               <p className="text-sm text-muted-foreground ml-6">{selectedDomain.description}</p>
@@ -166,10 +212,13 @@ export function OntologyManager() {
             {/* Terms */}
             <div className="space-y-3">
               {domainTerms.map((term) => {
-                const kindCfg = kindConfig[term.kind]
-                const KindIcon = kindCfg.icon
+                const kindCfg = kindConfig[term.kind];
+                const KindIcon = kindCfg.icon;
                 return (
-                  <div key={term.id} className="rounded-lg border border-border bg-card p-4 hover:shadow-sm transition-shadow">
+                  <div
+                    key={term.id}
+                    className="rounded-lg border border-border bg-card p-4 hover:shadow-sm transition-shadow"
+                  >
                     <div className="flex items-start gap-3">
                       <div className={`mt-0.5 shrink-0 rounded-md p-1.5 ${kindCfg.badgeClass}`}>
                         <KindIcon className="size-3.5" />
@@ -177,11 +226,15 @@ export function OntologyManager() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <h3 className="text-sm font-semibold">{term.name}</h3>
-                          <span className={`inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium ${kindCfg.badgeClass}`}>
+                          <span
+                            className={`inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium ${kindCfg.badgeClass}`}
+                          >
                             {kindCfg.label}
                           </span>
                         </div>
-                        <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{term.definition}</p>
+                        <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                          {term.definition}
+                        </p>
                         <div className="flex items-center gap-1.5 mt-2 flex-wrap">
                           {term.attributes.map((attr) => (
                             <span
@@ -208,7 +261,7 @@ export function OntologyManager() {
                       </div>
                     )}
                   </div>
-                )
+                );
               })}
             </div>
 
@@ -223,5 +276,5 @@ export function OntologyManager() {
         )}
       </div>
     </div>
-  )
+  );
 }

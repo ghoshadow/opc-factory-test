@@ -1,43 +1,23 @@
-"use client"
+"use client";
 
-import { useParams, useRouter } from "next/navigation"
-import { ArrowLeft, Zap, Clock, Package } from "lucide-react"
-import { useLineDetail } from "@/lib/api/factory"
-import { StatusBadge } from "@/components/ui/StatusBadge"
-import { PipelineNode } from "@/components/ui/PipelineNode"
-import { DataTable } from "@/components/ui/DataTable"
-import { EmptyState } from "@/components/ui/EmptyState"
-import type { Deliverable } from "@/app/api/v1/factory/line-status/route"
+import { useParams, useRouter } from "next/navigation";
+
+import { ArrowLeft, Clock, Package, Zap } from "lucide-react";
+
+import { DataTable } from "@/components/ui/DataTable";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { PipelineNode } from "@/components/ui/PipelineNode";
+import { StatusBadge } from "@/components/ui/StatusBadge";
+import { productionLines } from "@/lib/mock-data";
+import type { Deliverable, PipelineStage, ProductionLine } from "@/lib/types";
 
 export default function LineDetailPage() {
-  const params = useParams()
-  const router = useRouter()
-  const lineId = params.lineId as string
+  const params = useParams();
+  const router = useRouter();
+  const lineId = params.lineId as string;
 
-  const { line, isLoading, isError, isNotFound } = useLineDetail(lineId)
-
-  if (isLoading) {
-    return (
-      <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 py-8">
-        <div className="animate-pulse space-y-6">
-          <div className="h-8 w-48 rounded bg-muted" />
-          <div className="h-4 w-64 rounded bg-muted" />
-          <div className="h-32 rounded-xl bg-muted" />
-          <div className="h-64 rounded-xl bg-muted" />
-        </div>
-      </div>
-    )
-  }
-
-  if (isError) {
-    return (
-      <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 py-8">
-        <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-center text-red-700 dark:border-red-800 dark:bg-red-950/20 dark:text-red-400">
-          Failed to load line details. Please try again.
-        </div>
-      </div>
-    )
-  }
+  const line = productionLines.find((l: ProductionLine) => l.id === lineId);
+  const isNotFound = !line;
 
   if (isNotFound || !line) {
     return (
@@ -56,7 +36,7 @@ export default function LineDetailPage() {
           }
         />
       </div>
-    )
+    );
   }
 
   const deliverableColumns = [
@@ -71,21 +51,23 @@ export default function LineDetailPage() {
           done: "已完成",
           in_progress: "进行中",
           pending: "待开始",
-        }
+        };
         const statusColor: Record<string, string> = {
           done: "text-emerald-600 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-950/30",
           in_progress: "text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-950/30",
           pending: "text-muted-foreground bg-muted",
-        }
+        };
         return (
-          <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${statusColor[item.status]}`}>
+          <span
+            className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${statusColor[item.status]}`}
+          >
             {statusLabel[item.status]}
           </span>
-        )
+        );
       },
     },
     { key: "updatedAt", header: "更新时间" },
-  ]
+  ];
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 py-8">
@@ -143,12 +125,10 @@ export default function LineDetailPage() {
             <div key={i} className="flex items-center gap-2">
               <PipelineNode
                 label={stage.name}
-                status={stage.status}
+                status={stage.status as "waiting" | "running" | "done" | "failed"}
                 isActive={stage.status === "running"}
               />
-              {i < line.pipeline.length - 1 && (
-                <div className="w-6 h-px bg-border" />
-              )}
+              {i < line.pipeline.length - 1 && <div className="w-6 h-px bg-border" />}
             </div>
           ))}
         </div>
@@ -164,5 +144,5 @@ export default function LineDetailPage() {
         />
       </section>
     </div>
-  )
+  );
 }

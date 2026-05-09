@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server"
-import type { TestingOpsResponse, PipelineRun, TestCase, KanbanColumn } from "@/types/factory"
+import { NextResponse } from "next/server";
+
+import type { KanbanColumn, PipelineRun, TestCase, TestingOpsResponse } from "@/types/factory";
 
 const pipeline: PipelineRun = {
   currentStageId: "stage-4",
@@ -14,22 +15,112 @@ const pipeline: PipelineRun = {
     { id: "stage-7", label: "Bug 分诊", status: "waiting", subtext: "9 个待处理" },
     { id: "stage-8", label: "质量门禁", status: "waiting", subtext: "待审核" },
   ],
-}
+};
 
 const testCases: TestCase[] = [
-  { id: "TC-001", title: "用户登录流程验证", status: "pass", priority: "high", stage: "端到端测试", owner: "林", duration: "2.3s", bugRef: null },
-  { id: "TC-002", title: "订单创建 API 幂等性", status: "pass", priority: "high", stage: "集成测试", owner: "陈", duration: "1.1s", bugRef: null },
-  { id: "TC-003", title: "支付回调状态同步", status: "fail", priority: "high", stage: "集成测试", owner: "林", duration: "3.8s", bugRef: "BUG-101" },
-  { id: "TC-004", title: "列表分页筛选联动", status: "pass", priority: "medium", stage: "单元测试", owner: "王", duration: "0.4s", bugRef: null },
-  { id: "TC-005", title: "Token 过期自动刷新", status: "fail", priority: "high", stage: "集成测试", owner: "陈", duration: "5.2s", bugRef: "BUG-102" },
-  { id: "TC-006", title: "WebSocket 断线重连", status: "running", priority: "medium", stage: "单元测试", owner: "王", duration: "—", bugRef: null },
-  { id: "TC-007", title: "移动端响应式布局检查", status: "pass", priority: "low", stage: "端到端测试", owner: "李", duration: "8.1s", bugRef: null },
-  { id: "TC-008", title: "权限变更缓存失效验证", status: "pass", priority: "medium", stage: "集成测试", owner: "林", duration: "1.7s", bugRef: null },
-  { id: "TC-009", title: "导出数据日期格式一致性", status: "pass", priority: "low", stage: "单元测试", owner: "李", duration: "0.6s", bugRef: null },
-  { id: "TC-010", title: "首页渲染可用性检查", status: "fail", priority: "high", stage: "端到端测试", owner: "李", duration: "12.4s", bugRef: "BUG-109" },
-]
+  {
+    id: "TC-001",
+    title: "用户登录流程验证",
+    status: "pass",
+    priority: "high",
+    stage: "端到端测试",
+    owner: "林",
+    duration: "2.3s",
+    bugRef: null,
+  },
+  {
+    id: "TC-002",
+    title: "订单创建 API 幂等性",
+    status: "pass",
+    priority: "high",
+    stage: "集成测试",
+    owner: "陈",
+    duration: "1.1s",
+    bugRef: null,
+  },
+  {
+    id: "TC-003",
+    title: "支付回调状态同步",
+    status: "fail",
+    priority: "high",
+    stage: "集成测试",
+    owner: "林",
+    duration: "3.8s",
+    bugRef: "BUG-101",
+  },
+  {
+    id: "TC-004",
+    title: "列表分页筛选联动",
+    status: "pass",
+    priority: "medium",
+    stage: "单元测试",
+    owner: "王",
+    duration: "0.4s",
+    bugRef: null,
+  },
+  {
+    id: "TC-005",
+    title: "Token 过期自动刷新",
+    status: "fail",
+    priority: "high",
+    stage: "集成测试",
+    owner: "陈",
+    duration: "5.2s",
+    bugRef: "BUG-102",
+  },
+  {
+    id: "TC-006",
+    title: "WebSocket 断线重连",
+    status: "running",
+    priority: "medium",
+    stage: "单元测试",
+    owner: "王",
+    duration: "—",
+    bugRef: null,
+  },
+  {
+    id: "TC-007",
+    title: "移动端响应式布局检查",
+    status: "pass",
+    priority: "low",
+    stage: "端到端测试",
+    owner: "李",
+    duration: "8.1s",
+    bugRef: null,
+  },
+  {
+    id: "TC-008",
+    title: "权限变更缓存失效验证",
+    status: "pass",
+    priority: "medium",
+    stage: "集成测试",
+    owner: "林",
+    duration: "1.7s",
+    bugRef: null,
+  },
+  {
+    id: "TC-009",
+    title: "导出数据日期格式一致性",
+    status: "pass",
+    priority: "low",
+    stage: "单元测试",
+    owner: "李",
+    duration: "0.6s",
+    bugRef: null,
+  },
+  {
+    id: "TC-010",
+    title: "首页渲染可用性检查",
+    status: "fail",
+    priority: "high",
+    stage: "端到端测试",
+    owner: "李",
+    duration: "12.4s",
+    bugRef: "BUG-109",
+  },
+];
 
-const passCount = testCases.filter((tc) => tc.status === "pass").length
+const passCount = testCases.filter((tc) => tc.status === "pass").length;
 
 const kanbanColumns: KanbanColumn[] = [
   {
@@ -62,11 +153,9 @@ const kanbanColumns: KanbanColumn[] = [
   {
     id: "col-blocked",
     label: "已阻塞",
-    items: [
-      { id: "K-10", title: "第三方支付 Mock 环境", tags: ["外部依赖", "P0"], owner: "林" },
-    ],
+    items: [{ id: "K-10", title: "第三方支付 Mock 环境", tags: ["外部依赖", "P0"], owner: "林" }],
   },
-]
+];
 
 export async function GET() {
   const response: TestingOpsResponse = {
@@ -77,7 +166,7 @@ export async function GET() {
       total: testCases.length,
     },
     kanban: { columns: kanbanColumns },
-  }
+  };
 
-  return NextResponse.json(response)
+  return NextResponse.json(response);
 }

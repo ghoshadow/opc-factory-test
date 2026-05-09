@@ -1,10 +1,14 @@
-"use client"
+"use client";
 
-import { Check, X, AlertTriangle, Clock, PencilRuler } from "lucide-react"
-import type { DesignReviewItem, ReviewItemStatus } from "@/types/factory"
-import { Skeleton } from "@/components/ui/skeleton"
+import { AlertTriangle, Check, Clock, PencilRuler, X } from "lucide-react";
 
-const statusConfig: Record<ReviewItemStatus, { icon: typeof Check; label: string; badgeClass: string }> = {
+import { Skeleton } from "@/components/ui/skeleton";
+import type { DesignReviewItem, ReviewItemStatus } from "@/types/factory";
+
+const statusConfig: Record<
+  ReviewItemStatus,
+  { icon: typeof Check; label: string; badgeClass: string }
+> = {
   pass: {
     icon: Check,
     label: "通过",
@@ -25,11 +29,11 @@ const statusConfig: Record<ReviewItemStatus, { icon: typeof Check; label: string
     label: "待审查",
     badgeClass: "bg-muted text-muted-foreground",
   },
-}
+};
 
 function ReviewItem({ item }: { item: DesignReviewItem }) {
-  const cfg = statusConfig[item.status]
-  const Icon = cfg.icon
+  const cfg = statusConfig[item.status];
+  const Icon = cfg.icon;
 
   return (
     <div className="flex items-start gap-3 rounded-lg border border-border bg-card p-4">
@@ -39,7 +43,9 @@ function ReviewItem({ item }: { item: DesignReviewItem }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
           <h4 className="text-sm font-medium">{item.name}</h4>
-          <span className={`inline-flex items-center rounded-md px-1.5 py-0.5 text-xs font-medium ${cfg.badgeClass}`}>
+          <span
+            className={`inline-flex items-center rounded-md px-1.5 py-0.5 text-xs font-medium ${cfg.badgeClass}`}
+          >
             {cfg.label}
           </span>
         </div>
@@ -47,10 +53,16 @@ function ReviewItem({ item }: { item: DesignReviewItem }) {
         <p className="text-xs mt-1.5 leading-relaxed">{item.detail}</p>
       </div>
     </div>
-  )
+  );
 }
 
-export function DesignReviewPanel({ items, isLoading }: { items?: DesignReviewItem[]; isLoading?: boolean }) {
+export function DesignReviewPanel({
+  items,
+  isLoading,
+}: {
+  items?: DesignReviewItem[];
+  isLoading?: boolean;
+}) {
   if (isLoading) {
     return (
       <div className="rounded-xl border bg-card shadow-sm p-6 space-y-3">
@@ -59,7 +71,7 @@ export function DesignReviewPanel({ items, isLoading }: { items?: DesignReviewIt
           <Skeleton key={i} className="h-16 w-full rounded-lg" />
         ))}
       </div>
-    )
+    );
   }
 
   if (!items || items.length === 0) {
@@ -70,10 +82,10 @@ export function DesignReviewPanel({ items, isLoading }: { items?: DesignReviewIt
           <p className="text-sm text-muted-foreground">暂无 Design Review 数据</p>
         </div>
       </div>
-    )
+    );
   }
 
-  const passCount = items.filter((i) => i.status === "pass").length
+  const passCount = items.filter((i) => i.status === "pass").length;
 
   return (
     <div className="rounded-xl border bg-card shadow-sm p-6 space-y-4">
@@ -92,5 +104,5 @@ export function DesignReviewPanel({ items, isLoading }: { items?: DesignReviewIt
         ))}
       </div>
     </div>
-  )
+  );
 }

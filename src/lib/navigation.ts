@@ -1,16 +1,16 @@
 import {
-  LayoutDashboard,
+  Activity,
+  Award,
+  Columns3,
+  FileEdit,
   FileText,
   GitBranch,
-  Shield,
-  Activity,
+  LayoutDashboard,
   ListOrdered,
-  FileEdit,
-  Award,
-  Zap,
   Play,
+  Shield,
   TestTubeDiagonal,
-  Columns3,
+  Zap,
   type LucideIcon,
 } from "lucide-react";
 
@@ -26,9 +26,7 @@ export const navigation: NavItem[] = [
     label: "L1 总览",
     icon: LayoutDashboard,
     path: "/l1",
-    children: [
-      { label: "WIP 统计", icon: LayoutDashboard, path: "/l1/wip" },
-    ],
+    children: [{ label: "WIP 统计", icon: LayoutDashboard, path: "/l1/wip" }],
   },
   {
     label: "L2 需求管理",
@@ -80,10 +78,7 @@ export const navigation: NavItem[] = [
   },
 ];
 
-export function findNavItem(
-  items: NavItem[],
-  path: string
-): NavItem | null {
+export function findNavItem(items: NavItem[], path: string): NavItem | null {
   for (const item of items) {
     if (item.path === path) return item;
     if (item.children) {

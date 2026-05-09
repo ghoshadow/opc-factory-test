@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server"
-import type { DecomposePipelineResponse } from "@/types/factory"
+import { NextResponse } from "next/server";
+
+import type { DecomposePipelineResponse } from "@/types/factory";
 
 const mock: DecomposePipelineResponse = {
   rootId: "spec-refund-v2",
@@ -187,8 +188,8 @@ const mock: DecomposePipelineResponse = {
     { source: "pr-channel-alipay", target: "pr-channel-wx", label: "依赖" },
     { source: "pr-state-core", target: "pr-state-edge", label: "依赖" },
   ],
-}
+};
 
 export async function GET() {
-  return NextResponse.json(mock)
+  return NextResponse.json(mock);
 }

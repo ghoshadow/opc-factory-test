@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+
 import { ArrowLeft } from "lucide-react";
-import { productionLines } from "@/lib/mock-data";
+
 import { StatusBadge } from "@/components/factory/StatusBadge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { productionLines } from "@/lib/mock-data";
 
 interface LineDetailPageProps {
   params: Promise<{ lineId: string }>;
@@ -45,9 +47,7 @@ export default async function LineDetailPage({ params }: LineDetailPageProps) {
                   <span className="rounded-md bg-muted px-3 py-1.5 text-xs font-medium">
                     {step.label}
                   </span>
-                  {i < line.pipelineSteps.length - 1 && (
-                    <span className="text-border">→</span>
-                  )}
+                  {i < line.pipelineSteps.length - 1 && <span className="text-border">→</span>}
                 </span>
               ))}
             </div>
@@ -70,9 +70,7 @@ export default async function LineDetailPage({ params }: LineDetailPageProps) {
                 <div className="text-muted-foreground">已完成</div>
               </div>
               <div className="rounded-md bg-muted p-3">
-                <div className="text-lg font-bold">
-                  {line.wip + line.completed}
-                </div>
+                <div className="text-lg font-bold">{line.wip + line.completed}</div>
                 <div className="text-muted-foreground">总计</div>
               </div>
             </div>

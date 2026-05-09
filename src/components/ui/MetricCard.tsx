@@ -7,15 +7,15 @@ import { cn } from "@/lib/utils";
 type Trend = "up" | "down" | "stable";
 
 interface MetricCardProps {
-  label: string
-  value: string | number
-  unit?: string
-  trend?: Trend
-  trendValue?: string | number
-  subtitle?: string
-  costUSD?: number
-  icon?: LucideIcon
-  className?: string
+  label: string;
+  value: string | number;
+  unit?: string;
+  trend?: Trend;
+  trendValue?: string | number;
+  subtitle?: string;
+  costUSD?: number;
+  icon?: LucideIcon;
+  className?: string;
 }
 
 const trendConfig: Record<Trend, { icon: typeof ArrowUp; color: string; bg: string }> = {
@@ -34,15 +34,25 @@ const trendConfig: Record<Trend, { icon: typeof ArrowUp; color: string; bg: stri
 
 function formatTrendValue(trend: Trend, value: string | number): string {
   if (typeof value === "number") {
-    const prefix = trend === "up" ? "+" : trend === "down" ? "-" : ""
-    return `${prefix}${value}`
+    const prefix = trend === "up" ? "+" : trend === "down" ? "-" : "";
+    return `${prefix}${value}`;
   }
-  return value
+  return value;
 }
 
-export function MetricCard({ label, value, unit, trend, trendValue, subtitle, costUSD, icon: Icon, className }: MetricCardProps) {
-  const trendCfg = trend ? trendConfig[trend] : null
-  const TrendIcon = trendCfg?.icon
+export function MetricCard({
+  label,
+  value,
+  unit,
+  trend,
+  trendValue,
+  subtitle,
+  costUSD,
+  icon: Icon,
+  className,
+}: MetricCardProps) {
+  const trendCfg = trend ? trendConfig[trend] : null;
+  const TrendIcon = trendCfg?.icon;
 
   return (
     <div className={cn("rounded-xl border bg-card p-5 shadow-sm", className)}>
@@ -66,9 +76,7 @@ export function MetricCard({ label, value, unit, trend, trendValue, subtitle, co
         </div>
       )}
       {costUSD !== undefined && (
-        <div className="mt-1 text-xs text-muted-foreground">
-          ≈ ${costUSD.toFixed(2)} USD
-        </div>
+        <div className="mt-1 text-xs text-muted-foreground">≈ ${costUSD.toFixed(2)} USD</div>
       )}
     </div>
   );

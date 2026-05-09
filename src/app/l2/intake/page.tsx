@@ -1,4 +1,4 @@
-import { IntakeList } from "@/components/requirement/IntakeList"
+import { IntakeList } from "@/components/requirement/IntakeList";
 
 export default function IntakePage() {
   return (
@@ -12,5 +12,5 @@ export default function IntakePage() {
 
       <IntakeList />
     </div>
-  )
+  );
 }

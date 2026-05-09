@@ -1,5 +1,5 @@
-import { PlanReviewPanel } from "@/components/coding/PlanReviewPanel"
+import { PlanReviewPanel } from "@/components/coding/PlanReviewPanel";
 
 export default function PlanReviewPage() {
-  return <PlanReviewPanel />
+  return <PlanReviewPanel />;
 }

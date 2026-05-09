@@ -1,5 +1,5 @@
-import { SkillsPanel } from "@/components/factory/SkillsPanel"
+import { SkillsPanel } from "@/components/factory/SkillsPanel";
 
 export default function SkillsPage() {
-  return <SkillsPanel />
+  return <SkillsPanel />;
 }

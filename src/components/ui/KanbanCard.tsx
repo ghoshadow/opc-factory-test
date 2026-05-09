@@ -1,14 +1,15 @@
-"use client"
+"use client";
 
-import { useSortable } from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
-import { GripVertical } from "lucide-react"
-import { cn } from "@/lib/utils"
-import type { KanbanCard as KanbanCardData } from "@/types/kanban"
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { GripVertical } from "lucide-react";
+
+import { cn } from "@/lib/utils";
+import type { KanbanCard as KanbanCardData } from "@/types/kanban";
 
 interface KanbanCardProps {
-  card: KanbanCardData
-  isDragging?: boolean
+  card: KanbanCardData;
+  isDragging?: boolean;
 }
 
 const priorityConfig: Record<string, { label: string; color: string }> = {
@@ -16,21 +17,24 @@ const priorityConfig: Record<string, { label: string; color: string }> = {
   high: { label: "P1", color: "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400" },
   medium: { label: "P2", color: "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-400" },
   low: { label: "P3", color: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400" },
-}
+};
 
 function formatDueDate(dateStr: string): { text: string; isOverdue: boolean } {
-  const due = new Date(dateStr)
-  const now = new Date()
-  const diffMs = due.getTime() - now.getTime()
-  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24))
-  const isOverdue = diffDays < 0
+  const due = new Date(dateStr);
+  const now = new Date();
+  const diffMs = due.getTime() - now.getTime();
+  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+  const isOverdue = diffDays < 0;
 
-  if (diffDays === 0) return { text: "Today", isOverdue: false }
-  if (diffDays === 1) return { text: "Tomorrow", isOverdue: false }
-  if (diffDays === -1) return { text: "Yesterday", isOverdue: true }
-  if (isOverdue) return { text: `${Math.abs(diffDays)}d ago`, isOverdue: true }
-  if (diffDays <= 7) return { text: `${diffDays}d left`, isOverdue: false }
-  return { text: due.toLocaleDateString("en-US", { month: "short", day: "numeric" }), isOverdue: false }
+  if (diffDays === 0) return { text: "Today", isOverdue: false };
+  if (diffDays === 1) return { text: "Tomorrow", isOverdue: false };
+  if (diffDays === -1) return { text: "Yesterday", isOverdue: true };
+  if (isOverdue) return { text: `${Math.abs(diffDays)}d ago`, isOverdue: true };
+  if (diffDays <= 7) return { text: `${diffDays}d left`, isOverdue: false };
+  return {
+    text: due.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+    isOverdue: false,
+  };
 }
 
 function getInitials(name: string): string {
@@ -39,25 +43,22 @@ function getInitials(name: string): string {
     .map((n) => n[0])
     .join("")
     .toUpperCase()
-    .slice(0, 2)
+    .slice(0, 2);
 }
 
 export function KanbanCard({ card, isDragging }: KanbanCardProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-  } = useSortable({ id: card.id, data: { columnId: card.id } })
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+    id: card.id,
+    data: { columnId: card.id },
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-  }
+  };
 
-  const priority = priorityConfig[card.priority] ?? priorityConfig.medium
-  const dueDate = card.dueDate ? formatDueDate(card.dueDate) : null
+  const priority = priorityConfig[card.priority] ?? priorityConfig.medium;
+  const dueDate = card.dueDate ? formatDueDate(card.dueDate) : null;
 
   return (
     <div
@@ -82,7 +83,12 @@ export function KanbanCard({ card, isDragging }: KanbanCardProps) {
         </div>
       </div>
       <div className="flex items-center gap-2 flex-wrap">
-        <span className={cn("inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-semibold", priority.color)}>
+        <span
+          className={cn(
+            "inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-semibold",
+            priority.color,
+          )}
+        >
           {priority.label}
         </span>
         {card.assignee && (
@@ -94,18 +100,23 @@ export function KanbanCard({ card, isDragging }: KanbanCardProps) {
           </span>
         )}
         {dueDate && (
-          <span className={cn("ml-auto text-[11px]", dueDate.isOverdue ? "text-red-500 font-medium" : "text-muted-foreground")}>
+          <span
+            className={cn(
+              "ml-auto text-[11px]",
+              dueDate.isOverdue ? "text-red-500 font-medium" : "text-muted-foreground",
+            )}
+          >
             {dueDate.text}
           </span>
         )}
       </div>
     </div>
-  )
+  );
 }
 
 export function KanbanCardOverlay({ card }: { card: KanbanCardData }) {
-  const priority = priorityConfig[card.priority] ?? priorityConfig.medium
-  const dueDate = card.dueDate ? formatDueDate(card.dueDate) : null
+  const priority = priorityConfig[card.priority] ?? priorityConfig.medium;
+  const dueDate = card.dueDate ? formatDueDate(card.dueDate) : null;
 
   return (
     <div className="flex flex-col gap-2 rounded-lg border bg-card p-3 shadow-lg rotate-2 scale-105">
@@ -116,7 +127,12 @@ export function KanbanCardOverlay({ card }: { card: KanbanCardData }) {
         </div>
       </div>
       <div className="flex items-center gap-2 flex-wrap">
-        <span className={cn("inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-semibold", priority.color)}>
+        <span
+          className={cn(
+            "inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-semibold",
+            priority.color,
+          )}
+        >
           {priority.label}
         </span>
         {card.assignee && (
@@ -125,11 +141,16 @@ export function KanbanCardOverlay({ card }: { card: KanbanCardData }) {
           </span>
         )}
         {dueDate && (
-          <span className={cn("ml-auto text-[11px]", dueDate.isOverdue ? "text-red-500 font-medium" : "text-muted-foreground")}>
+          <span
+            className={cn(
+              "ml-auto text-[11px]",
+              dueDate.isOverdue ? "text-red-500 font-medium" : "text-muted-foreground",
+            )}
+          >
             {dueDate.text}
           </span>
         )}
       </div>
     </div>
-  )
+  );
 }

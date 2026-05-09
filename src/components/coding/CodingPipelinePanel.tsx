@@ -1,19 +1,25 @@
-"use client"
+"use client";
 
-import { useState, useCallback } from "react"
-import useSWR from "swr"
+import { useCallback, useState } from "react";
+
 import {
-  GitBranch,
+  AlertTriangle,
   ChevronRight,
-  FileText,
-  PencilRuler,
   Code2,
   FileCheck,
-  AlertTriangle,
-} from "lucide-react"
-import type { CodingPipelineNode, CodingPipelineResponse, PipelineNodeStatus } from "@/types/factory"
-import { PipelineNode } from "@/components/ui/PipelineNode"
-import { Skeleton } from "@/components/ui/skeleton"
+  FileText,
+  GitBranch,
+  PencilRuler,
+} from "lucide-react";
+import useSWR from "swr";
+
+import { PipelineNode } from "@/components/ui/PipelineNode";
+import { Skeleton } from "@/components/ui/skeleton";
+import type {
+  CodingPipelineNode,
+  CodingPipelineResponse,
+  PipelineNodeStatus,
+} from "@/types/factory";
 
 const pipelineStatusConfig: Record<PipelineNodeStatus, { label: string; className: string }> = {
   done: {
@@ -32,48 +38,50 @@ const pipelineStatusConfig: Record<PipelineNodeStatus, { label: string; classNam
     label: "失败",
     className: "bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-400",
   },
-}
+};
 
 function PipelineStatusBadge({ status }: { status: PipelineNodeStatus }) {
-  const cfg = pipelineStatusConfig[status]
+  const cfg = pipelineStatusConfig[status];
   return (
     <span
       className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${cfg.className}`}
     >
-      <span className={`size-1.5 rounded-full ${status === "done" ? "bg-emerald-500" : status === "running" ? "bg-blue-500" : status === "failed" ? "bg-red-500" : "bg-muted-foreground/40"}`} />
+      <span
+        className={`size-1.5 rounded-full ${status === "done" ? "bg-emerald-500" : status === "running" ? "bg-blue-500" : status === "failed" ? "bg-red-500" : "bg-muted-foreground/40"}`}
+      />
       {cfg.label}
     </span>
-  )
+  );
 }
 
 const fetcher = (url: string): Promise<CodingPipelineResponse> =>
-  fetch(url).then((res) => res.json())
+  fetch(url).then((res) => res.json());
 
 const detailTabs = [
   { key: "plan" as const, label: "Plan", icon: FileText },
   { key: "design" as const, label: "Design", icon: PencilRuler },
   { key: "code" as const, label: "Code", icon: Code2 },
   { key: "report" as const, label: "Report", icon: FileCheck },
-]
+];
 
 function NodeDetail({ node }: { node: CodingPipelineNode }) {
   const [activeTab, setActiveTab] = useState<"plan" | "design" | "code" | "report">(() => {
     // Default to first available detail tab
     for (const tab of detailTabs) {
-      if (node.details[tab.key]) return tab.key
+      if (node.details[tab.key]) return tab.key;
     }
-    return "plan"
-  })
+    return "plan";
+  });
 
-  const content = node.details[activeTab]
+  const content = node.details[activeTab];
 
   return (
     <div className="bg-muted/30 border rounded-lg">
       {/* Tab bar */}
       <div className="flex border-b bg-muted/20 rounded-t-lg">
         {detailTabs.map((tab) => {
-          const hasContent = !!node.details[tab.key]
-          const Icon = tab.icon
+          const hasContent = !!node.details[tab.key];
+          const Icon = tab.icon;
           return (
             <button
               key={tab.key}
@@ -90,7 +98,7 @@ function NodeDetail({ node }: { node: CodingPipelineNode }) {
               <Icon className="size-3.5" />
               {tab.label}
             </button>
-          )
+          );
         })}
       </div>
 
@@ -108,21 +116,21 @@ function NodeDetail({ node }: { node: CodingPipelineNode }) {
         )}
       </div>
     </div>
-  )
+  );
 }
 
 export function CodingPipelinePanel() {
   const { data, error, isLoading } = useSWR<CodingPipelineResponse>(
     "/api/v1/coding/pipeline",
     fetcher,
-    { refreshInterval: 15000 }
-  )
+    { refreshInterval: 15000 },
+  );
 
-  const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const handleNodeClick = useCallback((nodeId: string) => {
-    setExpandedId((prev) => (prev === nodeId ? null : nodeId))
-  }, [])
+    setExpandedId((prev) => (prev === nodeId ? null : nodeId));
+  }, []);
 
   if (isLoading) {
     return (
@@ -140,7 +148,7 @@ export function CodingPipelinePanel() {
           ))}
         </div>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -154,13 +162,13 @@ export function CodingPipelinePanel() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
-  if (!data) return null
+  if (!data) return null;
 
-  const { nodes, currentStep, totalSteps } = data
-  const progressPct = Math.round((currentStep / totalSteps) * 100)
+  const { nodes, currentStep, totalSteps } = data;
+  const progressPct = Math.round((currentStep / totalSteps) * 100);
 
   return (
     <div className="space-y-6">
@@ -196,10 +204,7 @@ export function CodingPipelinePanel() {
         <div className="flex items-start gap-0 overflow-x-auto pb-2">
           {nodes.map((node, i) => (
             <div key={node.id} className="flex items-center shrink-0">
-              <button
-                onClick={() => handleNodeClick(node.id)}
-                className="focus:outline-none"
-              >
+              <button onClick={() => handleNodeClick(node.id)} className="focus:outline-none">
                 <PipelineNode
                   label={node.label}
                   status={node.status}
@@ -231,22 +236,23 @@ export function CodingPipelinePanel() {
       </div>
 
       {/* Expanded detail */}
-      {expandedId && (() => {
-        const activeNode = nodes.find((n) => n.id === expandedId)
-        if (!activeNode) return null
-        return (
-          <div className="rounded-xl border bg-card shadow-sm p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <PipelineStatusBadge status={activeNode.status} />
-              <div>
-                <h3 className="font-semibold">{activeNode.label}</h3>
-                <p className="text-xs text-muted-foreground">{activeNode.description}</p>
+      {expandedId &&
+        (() => {
+          const activeNode = nodes.find((n) => n.id === expandedId);
+          if (!activeNode) return null;
+          return (
+            <div className="rounded-xl border bg-card shadow-sm p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <PipelineStatusBadge status={activeNode.status} />
+                <div>
+                  <h3 className="font-semibold">{activeNode.label}</h3>
+                  <p className="text-xs text-muted-foreground">{activeNode.description}</p>
+                </div>
               </div>
+              <NodeDetail node={activeNode} />
             </div>
-            <NodeDetail node={activeNode} />
-          </div>
-        )
-      })()}
+          );
+        })()}
     </div>
-  )
+  );
 }

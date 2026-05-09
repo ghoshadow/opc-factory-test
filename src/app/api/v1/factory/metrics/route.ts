@@ -1,22 +1,22 @@
-import { NextResponse } from "next/server"
+import { NextResponse } from "next/server";
 
 export interface FactoryMetrics {
-  activeLines: { count: number; names: string[] }
-  throughput: { value: number; unit: string; trend: "up" | "down" | "stable"; trendValue: number }
-  weeklyDelivery: { value: number; trend: "up" | "down" | "stable"; trendValue: number }
-  avgCycleTime: { value: number; unit: string; trend: "up" | "down" | "stable" }
-  autoPassRate: { value: number; unit: string; trend: "up" | "down" | "stable" }
-  opcInterventions: { value: number }
-  capacityUtilization: { value: number; unit: string; trend: "up" | "down" | "stable" }
-  tokenConsumption: { value: number; unit: string; costUSD: number }
-  repoInventory: { count: number; trend: "up" | "down" | "stable" }
+  activeLines: { count: number; names: string[] };
+  throughput: { value: number; unit: string; trend: "up" | "down" | "stable"; trendValue: number };
+  weeklyDelivery: { value: number; trend: "up" | "down" | "stable"; trendValue: number };
+  avgCycleTime: { value: number; unit: string; trend: "up" | "down" | "stable" };
+  autoPassRate: { value: number; unit: string; trend: "up" | "down" | "stable" };
+  opcInterventions: { value: number };
+  capacityUtilization: { value: number; unit: string; trend: "up" | "down" | "stable" };
+  tokenConsumption: { value: number; unit: string; costUSD: number };
+  repoInventory: { count: number; trend: "up" | "down" | "stable" };
 }
 
 function generateMetrics(): FactoryMetrics {
-  const throughputBase = 12
-  const weeklyBase = 7
-  const throughputDelta = Math.round((Math.random() * 4 - 1) * 10) / 10
-  const weeklyDelta = Math.round((Math.random() * 3 - 1) * 10) / 10
+  const throughputBase = 12;
+  const weeklyBase = 7;
+  const throughputDelta = Math.round((Math.random() * 4 - 1) * 10) / 10;
+  const weeklyDelta = Math.round((Math.random() * 3 - 1) * 10) / 10;
 
   return {
     activeLines: { count: 4, names: ["需求产线", "编码产线", "测试产线", "SRE产线"] },
@@ -37,9 +37,9 @@ function generateMetrics(): FactoryMetrics {
     capacityUtilization: { value: 82, unit: "%", trend: "up" },
     tokenConsumption: { value: 3.4, unit: "M tok/day", costUSD: 12.8 },
     repoInventory: { count: 7, trend: "up" },
-  }
+  };
 }
 
 export async function GET() {
-  return NextResponse.json(generateMetrics())
+  return NextResponse.json(generateMetrics());
 }

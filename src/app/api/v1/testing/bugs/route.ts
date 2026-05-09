@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server"
-import type { Bug, BugTriageResponse, BugPriority } from "@/types/factory"
+import { NextResponse } from "next/server";
+
+import type { Bug, BugPriority, BugTriageResponse } from "@/types/factory";
 
 const bugs: Bug[] = [
   {
@@ -31,9 +32,7 @@ const bugs: Bug[] = [
       { id: "AC-12", type: "ac", label: "验收标准", title: "会话有效期自动续期" },
       { id: "SPEC-07", type: "spec", label: "Spec", title: "统一认证与授权" },
     ],
-    similarBugs: [
-      { id: "BUG-110", title: "OAuth 回调 URL 校验失败", similarity: 0.65 },
-    ],
+    similarBugs: [{ id: "BUG-110", title: "OAuth 回调 URL 校验失败", similarity: 0.65 }],
   },
   {
     id: "BUG-103",
@@ -64,9 +63,7 @@ const bugs: Bug[] = [
       { id: "AC-05", type: "ac", label: "验收标准", title: "筛选状态持久化" },
       { id: "SPEC-11", type: "spec", label: "Spec", title: "数据列表通用组件" },
     ],
-    similarBugs: [
-      { id: "BUG-115", title: "搜索关键词在翻页后清除", similarity: 0.91 },
-    ],
+    similarBugs: [{ id: "BUG-115", title: "搜索关键词在翻页后清除", similarity: 0.91 }],
   },
   {
     id: "BUG-105",
@@ -94,9 +91,7 @@ const bugs: Bug[] = [
       { id: "AC-03", type: "ac", label: "验收标准", title: "响应式布局规范" },
       { id: "SPEC-03", type: "spec", label: "Spec", title: "UI 组件库规范" },
     ],
-    similarBugs: [
-      { id: "BUG-112", title: "iOS Safari 底部安全区未适配", similarity: 0.55 },
-    ],
+    similarBugs: [{ id: "BUG-112", title: "iOS Safari 底部安全区未适配", similarity: 0.55 }],
   },
   {
     id: "BUG-107",
@@ -110,9 +105,7 @@ const bugs: Bug[] = [
       { id: "AC-30", type: "ac", label: "验收标准", title: "连接异常自动告警" },
       { id: "SPEC-25", type: "spec", label: "Spec", title: "实时通信基础设施" },
     ],
-    similarBugs: [
-      { id: "BUG-119", title: "WebSocket 心跳超时导致假死", similarity: 0.83 },
-    ],
+    similarBugs: [{ id: "BUG-119", title: "WebSocket 心跳超时导致假死", similarity: 0.83 }],
   },
   {
     id: "BUG-108",
@@ -126,9 +119,7 @@ const bugs: Bug[] = [
       { id: "AC-12", type: "ac", label: "验收标准", title: "权限变更实时生效" },
       { id: "SPEC-07", type: "spec", label: "Spec", title: "统一认证与授权" },
     ],
-    similarBugs: [
-      { id: "BUG-102", title: "用户认证 Token 过期未自动刷新", similarity: 0.61 },
-    ],
+    similarBugs: [{ id: "BUG-102", title: "用户认证 Token 过期未自动刷新", similarity: 0.61 }],
   },
   {
     id: "BUG-109",
@@ -144,46 +135,46 @@ const bugs: Bug[] = [
     ],
     similarBugs: [],
   },
-]
+];
 
 // Sort by priority: P0 first, then P1, P2, P3
-const priorityOrder: Record<BugPriority, number> = { P0: 0, P1: 1, P2: 2, P3: 3 }
+const priorityOrder: Record<BugPriority, number> = { P0: 0, P1: 1, P2: 2, P3: 3 };
 
 function sortByPriority(bugList: Bug[]): Bug[] {
-  return [...bugList].sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority])
+  return [...bugList].sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
 }
 
 export async function GET() {
-  const sorted = sortByPriority(bugs)
+  const sorted = sortByPriority(bugs);
   const response: BugTriageResponse = {
     bugs: sorted,
     total: sorted.length,
-  }
-  return NextResponse.json(response)
+  };
+  return NextResponse.json(response);
 }
 
 export async function PATCH(request: Request) {
   try {
-    const body = await request.json()
-    const { id, priority } = body as { id: string; priority: BugPriority }
+    const body = await request.json();
+    const { id, priority } = body as { id: string; priority: BugPriority };
 
     if (!id || !priority) {
-      return NextResponse.json({ error: "Missing id or priority" }, { status: 400 })
+      return NextResponse.json({ error: "Missing id or priority" }, { status: 400 });
     }
 
     if (!["P0", "P1", "P2", "P3"].includes(priority)) {
-      return NextResponse.json({ error: "Invalid priority" }, { status: 400 })
+      return NextResponse.json({ error: "Invalid priority" }, { status: 400 });
     }
 
-    const bug = bugs.find((b) => b.id === id)
+    const bug = bugs.find((b) => b.id === id);
     if (!bug) {
-      return NextResponse.json({ error: "Bug not found" }, { status: 404 })
+      return NextResponse.json({ error: "Bug not found" }, { status: 404 });
     }
 
-    bug.priority = priority as BugPriority
-    const sorted = sortByPriority(bugs)
-    return NextResponse.json({ bugs: sorted, total: sorted.length } as BugTriageResponse)
+    bug.priority = priority as BugPriority;
+    const sorted = sortByPriority(bugs);
+    return NextResponse.json({ bugs: sorted, total: sorted.length } as BugTriageResponse);
   } catch {
-    return NextResponse.json({ error: "Invalid request body" }, { status: 400 })
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 }

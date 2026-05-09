@@ -1,30 +1,31 @@
-"use client"
+"use client";
 
-import { RefreshCw } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { RefreshCw } from "lucide-react";
+
+import { cn } from "@/lib/utils";
 
 interface RefreshTimestampProps {
-  timestamp: string
-  onRefresh: () => void
-  isLoading: boolean
+  timestamp: string;
+  onRefresh: () => void;
+  isLoading: boolean;
 }
 
 function formatTime(iso: string): string {
-  const d = new Date(iso)
+  const d = new Date(iso);
   return d.toLocaleTimeString("zh-CN", {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
-  })
+  });
 }
 
 function formatDate(iso: string): string {
-  const d = new Date(iso)
+  const d = new Date(iso);
   return d.toLocaleDateString("zh-CN", {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
-  })
+  });
 }
 
 export function RefreshTimestamp({ timestamp, onRefresh, isLoading }: RefreshTimestampProps) {
@@ -43,5 +44,5 @@ export function RefreshTimestamp({ timestamp, onRefresh, isLoading }: RefreshTim
         <span>刷新</span>
       </button>
     </div>
-  )
+  );
 }

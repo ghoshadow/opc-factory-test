@@ -1,48 +1,52 @@
-"use client"
+"use client";
 
-import { useState, useCallback } from "react"
-import useSWR from "swr"
+import { useCallback, useState } from "react";
+
 import {
-  ClipboardCheck,
-  ChevronRight,
-  GitBranch,
-  Network,
-  Clock,
-  CheckCircle,
-  XCircle,
   AlertCircle,
   ArrowRight,
+  CheckCircle,
+  ChevronRight,
+  ClipboardCheck,
+  Clock,
   FileCode,
-} from "lucide-react"
-import type { PlanData, PlanReviewResponse, PlanTask } from "@/types/coding"
-import { Skeleton } from "@/components/ui/skeleton"
+  GitBranch,
+  Network,
+  XCircle,
+} from "lucide-react";
+import useSWR from "swr";
 
-const fetcher = (url: string): Promise<PlanReviewResponse> =>
-  fetch(url).then((res) => res.json())
+import { Skeleton } from "@/components/ui/skeleton";
+import type { PlanData, PlanReviewResponse, PlanTask } from "@/types/coding";
+
+const fetcher = (url: string): Promise<PlanReviewResponse> => fetch(url).then((res) => res.json());
 
 const statusConfig = {
   pending: {
     label: "待审",
     icon: AlertCircle,
-    className: "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border-amber-200 dark:border-amber-800",
+    className:
+      "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border-amber-200 dark:border-amber-800",
   },
   approved: {
     label: "已确认",
     icon: CheckCircle,
-    className: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800",
+    className:
+      "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800",
   },
   rejected: {
     label: "已打回",
     icon: XCircle,
-    className: "bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-400 border-red-200 dark:border-red-800",
+    className:
+      "bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-400 border-red-200 dark:border-red-800",
   },
-}
+};
 
 // ─── Task Tree ──────────────────────────────────────────────
 
 function TaskRow({ task, depth = 0 }: { task: PlanTask; depth?: number }) {
-  const [expanded, setExpanded] = useState(depth < 1)
-  const hasChildren = task.children && task.children.length > 0
+  const [expanded, setExpanded] = useState(depth < 1);
+  const hasChildren = task.children && task.children.length > 0;
 
   return (
     <div>
@@ -73,7 +77,7 @@ function TaskRow({ task, depth = 0 }: { task: PlanTask; depth?: number }) {
         </div>
       )}
     </div>
-  )
+  );
 }
 
 // ─── API Table ──────────────────────────────────────────────
@@ -84,7 +88,7 @@ const methodColors: Record<string, string> = {
   PUT: "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400",
   PATCH: "bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-400",
   DELETE: "bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-400",
-}
+};
 
 // ─── Confirm Dialog ─────────────────────────────────────────
 
@@ -94,12 +98,12 @@ function ConfirmDialog({
   onConfirm,
   plan,
 }: {
-  open: boolean
-  onClose: () => void
-  onConfirm: () => void
-  plan: PlanData
+  open: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  plan: PlanData;
 }) {
-  if (!open) return null
+  if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -117,7 +121,8 @@ function ConfirmDialog({
         <div className="bg-muted/40 rounded-lg p-3 space-y-1">
           <p className="text-sm font-medium">{plan.title}</p>
           <p className="text-xs text-muted-foreground">
-            {plan.tasks.length} 个任务 · {plan.workload.storyPoints} SP · {plan.workload.totalPersonHours}h
+            {plan.tasks.length} 个任务 · {plan.workload.storyPoints} SP ·{" "}
+            {plan.workload.totalPersonHours}h
           </p>
         </div>
         <div className="flex items-center justify-end gap-3">
@@ -136,7 +141,7 @@ function ConfirmDialog({
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 // ─── Reject Dialog ──────────────────────────────────────────
@@ -147,29 +152,29 @@ function RejectDialog({
   onConfirm,
   plan,
 }: {
-  open: boolean
-  onClose: () => void
-  onConfirm: (reason: string) => void
-  plan: PlanData
+  open: boolean;
+  onClose: () => void;
+  onConfirm: (reason: string) => void;
+  plan: PlanData;
 }) {
-  const [reason, setReason] = useState("")
-  const [error, setError] = useState("")
+  const [reason, setReason] = useState("");
+  const [error, setError] = useState("");
 
-  if (!open) return null
+  if (!open) return null;
 
   const handleSubmit = () => {
     if (!reason.trim()) {
-      setError("驳回必须填写修改意见")
-      return
+      setError("驳回必须填写修改意见");
+      return;
     }
-    onConfirm(reason.trim())
-  }
+    onConfirm(reason.trim());
+  };
 
   const handleClose = () => {
-    setReason("")
-    setError("")
-    onClose()
-  }
+    setReason("");
+    setError("");
+    onClose();
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -196,8 +201,8 @@ function RejectDialog({
             placeholder="请填写驳回原因及修改建议..."
             value={reason}
             onChange={(e) => {
-              setReason(e.target.value)
-              if (error) setError("")
+              setReason(e.target.value);
+              if (error) setError("");
             }}
           />
           {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
@@ -218,7 +223,7 @@ function RejectDialog({
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 // ─── Main Panel ─────────────────────────────────────────────
@@ -227,60 +232,60 @@ export function PlanReviewPanel() {
   const { data, error, isLoading, mutate } = useSWR<PlanReviewResponse>(
     "/api/v1/coding/plan",
     fetcher,
-    { refreshInterval: 30000 }
-  )
+    { refreshInterval: 30000 },
+  );
 
-  const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [confirmOpen, setConfirmOpen] = useState(false)
-  const [rejectOpen, setRejectOpen] = useState(false)
-  const [updating, setUpdating] = useState(false)
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [rejectOpen, setRejectOpen] = useState(false);
+  const [updating, setUpdating] = useState(false);
 
-  const selectedPlan = data?.plans.find((p) => p.id === selectedId) ?? null
+  const selectedPlan = data?.plans.find((p) => p.id === selectedId) ?? null;
 
   // Set default selection when data loads
   if (!selectedId && data && data.plans.length > 0) {
     // Use microtask to avoid render-phase setState warning
-    queueMicrotask(() => setSelectedId(data.plans[0].id))
+    queueMicrotask(() => setSelectedId(data.plans[0].id));
   }
 
   const handleApprove = useCallback(async () => {
-    if (!selectedPlan) return
-    setUpdating(true)
+    if (!selectedPlan) return;
+    setUpdating(true);
     try {
       const res = await fetch("/api/v1/coding/plan", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: selectedPlan.id, action: "approve" }),
-      })
+      });
       if (res.ok) {
-        await mutate()
-        setConfirmOpen(false)
+        await mutate();
+        setConfirmOpen(false);
       }
     } finally {
-      setUpdating(false)
+      setUpdating(false);
     }
-  }, [selectedPlan, mutate])
+  }, [selectedPlan, mutate]);
 
   const handleReject = useCallback(
     async (reason: string) => {
-      if (!selectedPlan) return
-      setUpdating(true)
+      if (!selectedPlan) return;
+      setUpdating(true);
       try {
         const res = await fetch("/api/v1/coding/plan", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ id: selectedPlan.id, action: "reject", reason }),
-        })
+        });
         if (res.ok) {
-          await mutate()
-          setRejectOpen(false)
+          await mutate();
+          setRejectOpen(false);
         }
       } finally {
-        setUpdating(false)
+        setUpdating(false);
       }
     },
-    [selectedPlan, mutate]
-  )
+    [selectedPlan, mutate],
+  );
 
   // ── Loading ──
   if (isLoading) {
@@ -297,7 +302,7 @@ export function PlanReviewPanel() {
           <Skeleton className="h-24 w-full rounded-lg" />
         </div>
       </div>
-    )
+    );
   }
 
   // ── Error ──
@@ -312,13 +317,13 @@ export function PlanReviewPanel() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
-  if (!data || data.plans.length === 0) return null
+  if (!data || data.plans.length === 0) return null;
 
   // ── Plan selector ──
-  const currentCfg = selectedPlan ? statusConfig[selectedPlan.status] : null
+  const currentCfg = selectedPlan ? statusConfig[selectedPlan.status] : null;
 
   return (
     <div className="rounded-xl border bg-card shadow-sm p-6 space-y-5">
@@ -364,7 +369,9 @@ export function PlanReviewPanel() {
               <XCircle className="size-4 text-red-500 mt-0.5 shrink-0" />
               <div>
                 <p className="text-sm font-semibold text-red-700 dark:text-red-400">驳回原因</p>
-                <p className="text-sm text-red-600/80 dark:text-red-400/80">{selectedPlan.rejectionReason}</p>
+                <p className="text-sm text-red-600/80 dark:text-red-400/80">
+                  {selectedPlan.rejectionReason}
+                </p>
               </div>
             </div>
           )}
@@ -451,7 +458,10 @@ export function PlanReviewPanel() {
           >
             <div className="space-y-2">
               {selectedPlan.workload.breakdown.map((item, i) => (
-                <div key={i} className="flex items-center gap-3 text-sm py-1.5 px-3 bg-muted/30 rounded-md">
+                <div
+                  key={i}
+                  className="flex items-center gap-3 text-sm py-1.5 px-3 bg-muted/30 rounded-md"
+                >
                   <span className="flex-1">{item.task}</span>
                   <span className="text-xs text-muted-foreground tabular-nums">{item.hours}h</span>
                   <div className="w-24 h-1.5 rounded-full bg-muted overflow-hidden">
@@ -505,7 +515,7 @@ export function PlanReviewPanel() {
         </>
       )}
     </div>
-  )
+  );
 }
 
 // ─── Helpers ────────────────────────────────────────────────
@@ -516,10 +526,10 @@ function SectionCard({
   subtitle,
   children,
 }: {
-  icon: React.ComponentType<{ className?: string }>
-  title: string
-  subtitle: string
-  children: React.ReactNode
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  subtitle: string;
+  children: React.ReactNode;
 }) {
   return (
     <div className="rounded-lg border bg-card/50 p-4 space-y-3">
@@ -530,14 +540,14 @@ function SectionCard({
       </div>
       {children}
     </div>
-  )
+  );
 }
 
 function countTasks(tasks: PlanTask[]): number {
-  let count = 0
+  let count = 0;
   for (const t of tasks) {
-    count += 1
-    if (t.children) count += t.children.length
+    count += 1;
+    if (t.children) count += t.children.length;
   }
-  return count
+  return count;
 }

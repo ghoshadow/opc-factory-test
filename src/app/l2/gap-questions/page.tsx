@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { GapQuestions } from "@/components/requirement/GapQuestions"
+import { GapQuestions } from "@/components/requirement/GapQuestions";
 
 export default function GapQuestionsPage() {
   return (
@@ -14,5 +14,5 @@ export default function GapQuestionsPage() {
 
       <GapQuestions specId="spec-001" />
     </div>
-  )
+  );
 }

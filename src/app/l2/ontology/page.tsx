@@ -1,4 +1,4 @@
-import { OntologyManager } from "@/components/ontology/OntologyManager"
+import { OntologyManager } from "@/components/ontology/OntologyManager";
 
 export default function OntologyPage() {
   return (
@@ -13,5 +13,5 @@ export default function OntologyPage() {
         <OntologyManager />
       </div>
     </div>
-  )
+  );
 }

@@ -1,62 +1,61 @@
-"use client"
+"use client";
 
-import { useState, useCallback } from "react"
-import useSWR, { useSWRConfig } from "swr"
-import { BookOpen } from "lucide-react"
-import type { Runbook, RunbookListResponse } from "@/types/factory"
-import { RunbookList } from "@/components/sre/RunbookList"
-import { RunbookEditor } from "@/components/sre/RunbookEditor"
-import { TroubleshootTree } from "@/components/sre/TroubleshootTree"
-import { Skeleton } from "@/components/ui/skeleton"
+import { useCallback, useState } from "react";
 
-const fetcher = (url: string): Promise<RunbookListResponse> =>
-  fetch(url).then((res) => res.json())
+import { BookOpen } from "lucide-react";
+import useSWR, { useSWRConfig } from "swr";
 
-type ViewMode = "list" | "editor" | "detail"
+import { RunbookEditor } from "@/components/sre/RunbookEditor";
+import { RunbookList } from "@/components/sre/RunbookList";
+import { TroubleshootTree } from "@/components/sre/TroubleshootTree";
+import type { Runbook, RunbookListResponse } from "@/types/factory";
+
+const fetcher = (url: string): Promise<RunbookListResponse> => fetch(url).then((res) => res.json());
+
+type ViewMode = "list" | "editor" | "detail";
 
 export default function RunbooksPage() {
-  const [selected, setSelected] = useState<Runbook | null>(null)
-  const [viewMode, setViewMode] = useState<ViewMode>("list")
-  const { mutate } = useSWRConfig()
+  const [selected, setSelected] = useState<Runbook | null>(null);
+  const [viewMode, setViewMode] = useState<ViewMode>("list");
+  const { mutate } = useSWRConfig();
 
   const handleSelect = useCallback((runbook: Runbook) => {
-    setSelected(runbook)
-    setViewMode("detail")
-  }, [])
+    setSelected(runbook);
+    setViewMode("detail");
+  }, []);
 
   const handleCreateNew = useCallback(() => {
-    setSelected(null)
-    setViewMode("editor")
-  }, [])
+    setSelected(null);
+    setViewMode("editor");
+  }, []);
 
   const handleBack = useCallback(() => {
-    setViewMode("list")
-    setSelected(null)
-  }, [])
+    setViewMode("list");
+    setSelected(null);
+  }, []);
 
   const handleSaved = useCallback(() => {
-    mutate("/api/v1/sre/runbooks")
-    setViewMode("list")
-    setSelected(null)
-  }, [mutate])
+    mutate("/api/v1/sre/runbooks");
+    setViewMode("list");
+    setSelected(null);
+  }, [mutate]);
 
   const handleEdit = useCallback(() => {
     if (selected) {
-      setViewMode("editor")
+      setViewMode("editor");
     }
-  }, [selected])
+  }, [selected]);
 
   // Refetch runbook data for detail view
   const { data } = useSWR<RunbookListResponse>(
     viewMode === "detail" ? "/api/v1/sre/runbooks" : null,
     fetcher,
-    { refreshInterval: 30000 }
-  )
+    { refreshInterval: 30000 },
+  );
 
   // Find latest version of selected runbook
-  const latestRunbook = selected && data
-    ? data.runbooks.find((r) => r.id === selected.id) ?? selected
-    : selected
+  const latestRunbook =
+    selected && data ? (data.runbooks.find((r) => r.id === selected.id) ?? selected) : selected;
 
   return (
     <div className="space-y-6 h-[calc(100vh-6rem)] flex flex-col">
@@ -92,7 +91,7 @@ export default function RunbooksPage() {
                 <BookOpen className="size-12 text-muted-foreground/20 mx-auto" />
                 <p className="text-sm text-muted-foreground">选择一个 Runbook 查看详情</p>
                 <p className="text-xs text-muted-foreground/60">
-                  或点击"新建 Runbook"创建运维手册
+                  或点击&ldquo;新建 Runbook&rdquo;创建运维手册
                 </p>
               </div>
             </div>
@@ -102,6 +101,7 @@ export default function RunbooksPage() {
         {viewMode === "editor" && (
           <div className="h-full">
             <RunbookEditor
+              key={latestRunbook?.id ?? "new"}
               runbook={latestRunbook}
               onBack={handleBack}
               onSaved={handleSaved}
@@ -143,7 +143,8 @@ export default function RunbooksPage() {
               <section>
                 <p className="text-sm text-muted-foreground">{latestRunbook.description}</p>
                 <p className="text-xs text-muted-foreground/70 mt-2">
-                  创建于 {new Date(latestRunbook.createdAt).toLocaleDateString("zh-CN")} · 更新于 {new Date(latestRunbook.updatedAt).toLocaleDateString("zh-CN")}
+                  创建于 {new Date(latestRunbook.createdAt).toLocaleDateString("zh-CN")} · 更新于{" "}
+                  {new Date(latestRunbook.updatedAt).toLocaleDateString("zh-CN")}
                 </p>
               </section>
 
@@ -234,5 +235,5 @@ export default function RunbooksPage() {
         )}
       </div>
     </div>
-  )
+  );
 }

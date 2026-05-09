@@ -1,15 +1,15 @@
-import { NextResponse } from "next/server"
+import { NextResponse } from "next/server";
 
 interface WipLine {
-  key: string
-  name: string
-  count: number
-  cssVar: string
+  key: string;
+  name: string;
+  count: number;
+  cssVar: string;
 }
 
-interface WipResponse {
-  lines: WipLine[]
-  total: number
+export interface WipResponse {
+  lines: WipLine[];
+  total: number;
 }
 
 const wipData: WipResponse = {
@@ -20,8 +20,8 @@ const wipData: WipResponse = {
     { key: "sre", name: "SRE 产线", count: 3, cssVar: "--chart-4" },
   ],
   total: 46,
-}
+};
 
 export async function GET() {
-  return NextResponse.json(wipData)
+  return NextResponse.json(wipData);
 }

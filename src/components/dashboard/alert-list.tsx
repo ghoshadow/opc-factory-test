@@ -1,21 +1,25 @@
-"use client"
+"use client";
 
-import { AlertTriangle, AlertCircle, Info } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { AlertCircle, AlertTriangle, Info } from "lucide-react";
+
+import { cn } from "@/lib/utils";
 
 interface Alert {
-  id: string
-  type: "warning" | "error" | "info"
-  message: string
-  source: string
-  timestamp: string
+  id: string;
+  type: "warning" | "error" | "info";
+  message: string;
+  source: string;
+  timestamp: string;
 }
 
 interface AlertListProps {
-  alerts: Alert[]
+  alerts: Alert[];
 }
 
-const typeConfig: Record<Alert["type"], { icon: typeof AlertTriangle; label: string; color: string; bg: string }> = {
+const typeConfig: Record<
+  Alert["type"],
+  { icon: typeof AlertTriangle; label: string; color: string; bg: string }
+> = {
   warning: {
     icon: AlertTriangle,
     label: "警告",
@@ -34,17 +38,17 @@ const typeConfig: Record<Alert["type"], { icon: typeof AlertTriangle; label: str
     color: "text-blue-600 dark:text-blue-400",
     bg: "bg-blue-50 dark:bg-blue-950/40",
   },
-}
+};
 
 function relativeTime(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime()
-  const mins = Math.floor(diff / 60000)
-  if (mins < 1) return "刚刚"
-  if (mins < 60) return `${mins} 分钟前`
-  const hours = Math.floor(mins / 60)
-  if (hours < 24) return `${hours} 小时前`
-  const days = Math.floor(hours / 24)
-  return `${days} 天前`
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "刚刚";
+  if (mins < 60) return `${mins} 分钟前`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours} 小时前`;
+  const days = Math.floor(hours / 24);
+  return `${days} 天前`;
 }
 
 export function AlertList({ alerts }: AlertListProps) {
@@ -54,7 +58,7 @@ export function AlertList({ alerts }: AlertListProps) {
         <h3 className="text-sm font-semibold text-foreground">告警列表</h3>
         <p className="mt-4 text-sm text-muted-foreground text-center">暂无告警</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -66,14 +70,11 @@ export function AlertList({ alerts }: AlertListProps) {
 
       <div className="space-y-3">
         {alerts.map((alert) => {
-          const cfg = typeConfig[alert.type]
-          const Icon = cfg.icon
+          const cfg = typeConfig[alert.type];
+          const Icon = cfg.icon;
 
           return (
-            <div
-              key={alert.id}
-              className="flex items-start gap-3 rounded-lg border p-3 text-sm"
-            >
+            <div key={alert.id} className="flex items-start gap-3 rounded-lg border p-3 text-sm">
               <span className={cn("mt-0.5 flex-shrink-0", cfg.color)}>
                 <Icon className="size-4" />
               </span>
@@ -88,9 +89,9 @@ export function AlertList({ alerts }: AlertListProps) {
                 </div>
               </div>
             </div>
-          )
+          );
         })}
       </div>
     </div>
-  )
+  );
 }

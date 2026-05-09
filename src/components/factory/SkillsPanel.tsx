@@ -1,43 +1,44 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import useSWR from "swr"
-import { cn } from "@/lib/utils"
-import { Skeleton } from "@/components/ui/skeleton"
-import type { ProductionLine, Skill, SkillsResponse } from "@/types/factory"
-import { Package, Plus, Check, X } from "lucide-react"
+import { useState } from "react";
+
+import { Check, Package, Plus, X } from "lucide-react";
+import useSWR from "swr";
+
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
+import type { ProductionLine, Skill, SkillsResponse } from "@/types/factory";
 
 const lines: { key: ProductionLine; label: string }[] = [
   { key: "requirements", label: "需求" },
   { key: "coding", label: "编码" },
   { key: "testing", label: "测试" },
   { key: "sre", label: "SRE" },
-]
+];
 
-const fetcher = (url: string): Promise<SkillsResponse> =>
-  fetch(url).then((res) => res.json())
+const fetcher = (url: string): Promise<SkillsResponse> => fetch(url).then((res) => res.json());
 
 export function SkillsPanel() {
-  const [activeLine, setActiveLine] = useState<ProductionLine>("requirements")
+  const [activeLine, setActiveLine] = useState<ProductionLine>("requirements");
 
   const { data, error, isLoading, mutate } = useSWR<SkillsResponse>(
     `/api/v1/skills?line=${activeLine}`,
     fetcher,
-  )
+  );
 
   const handleToggle = async (skillId: string, currentStatus: string) => {
-    const action = currentStatus === "installed" ? "uninstall" : "install"
+    const action = currentStatus === "installed" ? "uninstall" : "install";
 
     const res = await fetch("/api/v1/skills/install", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ skillId, action }),
-    })
+    });
 
     if (res.ok) {
-      mutate()
+      mutate();
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -47,9 +48,7 @@ export function SkillsPanel() {
           <Package className="size-5 text-muted-foreground" />
           工装管理
         </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          管理各产线的可用工装，按需安装与卸载
-        </p>
+        <p className="mt-1 text-sm text-muted-foreground">管理各产线的可用工装，按需安装与卸载</p>
       </div>
 
       <div className="flex gap-6">
@@ -89,36 +88,30 @@ export function SkillsPanel() {
           {data && data.skills.length > 0 && (
             <div className="space-y-3">
               {data.skills.map((skill) => (
-                <SkillCard
-                  key={skill.id}
-                  skill={skill}
-                  onToggle={handleToggle}
-                />
+                <SkillCard key={skill.id} skill={skill} onToggle={handleToggle} />
               ))}
             </div>
           )}
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 function SkillCard({
   skill,
   onToggle,
 }: {
-  skill: Skill
-  onToggle: (id: string, status: string) => void
+  skill: Skill;
+  onToggle: (id: string, status: string) => void;
 }) {
-  const isInstalled = skill.status === "installed"
+  const isInstalled = skill.status === "installed";
 
   return (
     <div
       className={cn(
         "flex items-center justify-between rounded-xl border bg-card p-4 shadow-sm transition-all",
-        isInstalled
-          ? "border-emerald-200 dark:border-emerald-800"
-          : "border-border",
+        isInstalled ? "border-emerald-200 dark:border-emerald-800" : "border-border",
       )}
     >
       <div className="min-w-0 flex-1">
@@ -142,9 +135,7 @@ function SkillCard({
             )}
           </span>
         </div>
-        <p className="mt-1 text-sm text-muted-foreground truncate">
-          {skill.description}
-        </p>
+        <p className="mt-1 text-sm text-muted-foreground truncate">{skill.description}</p>
       </div>
 
       <button
@@ -170,7 +161,7 @@ function SkillCard({
         )}
       </button>
     </div>
-  )
+  );
 }
 
 function SkillsSkeleton() {
@@ -189,5 +180,5 @@ function SkillsSkeleton() {
         </div>
       ))}
     </div>
-  )
+  );
 }

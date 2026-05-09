@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { SpecEditor } from "@/components/requirement/SpecEditor"
+import { SpecEditor } from "@/components/requirement/SpecEditor";
 
 export default function SpecEditorPage() {
   return (
@@ -16,5 +16,5 @@ export default function SpecEditorPage() {
       {/* Editor */}
       <SpecEditor specId="spec-001" />
     </div>
-  )
+  );
 }

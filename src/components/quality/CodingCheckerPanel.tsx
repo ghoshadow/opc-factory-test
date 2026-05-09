@@ -1,14 +1,18 @@
-"use client"
+"use client";
 
-import useSWR from "swr"
-import { Check, X, AlertTriangle, Shield, ExternalLink } from "lucide-react"
-import type { CodingCheckerResponse, CodingCheckerItem, CheckerItemStatus } from "@/types/factory"
-import { Skeleton } from "@/components/ui/skeleton"
+import { AlertTriangle, Check, ExternalLink, Shield, X } from "lucide-react";
+import useSWR from "swr";
+
+import { Skeleton } from "@/components/ui/skeleton";
+import type { CheckerItemStatus, CodingCheckerItem, CodingCheckerResponse } from "@/types/factory";
 
 const fetcher = (url: string): Promise<CodingCheckerResponse> =>
-  fetch(url).then((res) => res.json())
+  fetch(url).then((res) => res.json());
 
-const statusConfig: Record<CheckerItemStatus, { icon: typeof Check; label: string; cardBorder: string; badgeClass: string; iconClass: string }> = {
+const statusConfig: Record<
+  CheckerItemStatus,
+  { icon: typeof Check; label: string; cardBorder: string; badgeClass: string; iconClass: string }
+> = {
   pass: {
     icon: Check,
     label: "通过",
@@ -30,11 +34,11 @@ const statusConfig: Record<CheckerItemStatus, { icon: typeof Check; label: strin
     badgeClass: "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400",
     iconClass: "text-amber-500",
   },
-}
+};
 
 function CheckerCard({ item }: { item: CodingCheckerItem }) {
-  const cfg = statusConfig[item.status]
-  const Icon = cfg.icon
+  const cfg = statusConfig[item.status];
+  const Icon = cfg.icon;
 
   return (
     <div className={`rounded-xl border bg-card p-5 shadow-sm ${cfg.cardBorder}`}>
@@ -46,7 +50,9 @@ function CheckerCard({ item }: { item: CodingCheckerItem }) {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <h3 className="text-sm font-semibold">{item.name}</h3>
-              <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium ${cfg.badgeClass}`}>
+              <span
+                className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium ${cfg.badgeClass}`}
+              >
                 {cfg.label}
               </span>
             </div>
@@ -67,15 +73,15 @@ function CheckerCard({ item }: { item: CodingCheckerItem }) {
         </div>
       )}
     </div>
-  )
+  );
 }
 
 export function CodingCheckerPanel() {
   const { data, error, isLoading } = useSWR<CodingCheckerResponse>(
     "/api/v1/quality/checker/coding/latest",
     fetcher,
-    { refreshInterval: 30000 }
-  )
+    { refreshInterval: 30000 },
+  );
 
   if (isLoading) {
     return (
@@ -87,7 +93,7 @@ export function CodingCheckerPanel() {
           <Skeleton key={i} className="h-24 w-full rounded-lg" />
         ))}
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -101,14 +107,14 @@ export function CodingCheckerPanel() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
-  if (!data) return null
+  if (!data) return null;
 
-  const passCount = data.items.filter((i) => i.status === "pass").length
-  const failCount = data.items.filter((i) => i.status === "fail").length
-  const warnCount = data.items.filter((i) => i.status === "warning").length
+  const passCount = data.items.filter((i) => i.status === "pass").length;
+  const failCount = data.items.filter((i) => i.status === "fail").length;
+  const warnCount = data.items.filter((i) => i.status === "warning").length;
 
   return (
     <div className="rounded-xl border bg-card shadow-sm p-6 space-y-5">
@@ -167,9 +173,7 @@ export function CodingCheckerPanel() {
               <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">
                 可以合并 — 四项检查全部通过
               </p>
-              <p className="text-xs text-emerald-600/70 dark:text-emerald-400/70">
-                允许合并 PR
-              </p>
+              <p className="text-xs text-emerald-600/70 dark:text-emerald-400/70">允许合并 PR</p>
             </div>
           </div>
         ) : (
@@ -193,5 +197,5 @@ export function CodingCheckerPanel() {
         )}
       </div>
     </div>
-  )
+  );
 }

@@ -1,4 +1,4 @@
-import { DeliveryGatePanel } from "@/components/quality/DeliveryGatePanel"
+import { DeliveryGatePanel } from "@/components/quality/DeliveryGatePanel";
 
 export default function DeliveryGatePage() {
   return (
@@ -13,5 +13,5 @@ export default function DeliveryGatePage() {
         <DeliveryGatePanel />
       </div>
     </div>
-  )
+  );
 }

@@ -1,20 +1,21 @@
-"use client"
+"use client";
 
-import useSWR from "swr"
-import { Share2 } from "lucide-react"
-import type { DecomposePipelineResponse } from "@/types/factory"
-import { DecomposeGraph } from "@/components/quality/DecomposeGraph"
-import { Skeleton } from "@/components/ui/skeleton"
+import { Share2 } from "lucide-react";
+import useSWR from "swr";
+
+import { DecomposeGraph } from "@/components/quality/DecomposeGraph";
+import { Skeleton } from "@/components/ui/skeleton";
+import type { DecomposePipelineResponse } from "@/types/factory";
 
 const fetcher = (url: string): Promise<DecomposePipelineResponse> =>
-  fetch(url).then((res) => res.json())
+  fetch(url).then((res) => res.json());
 
 export default function PipelinePage() {
   const { data, error, isLoading } = useSWR<DecomposePipelineResponse>(
     "/api/v1/quality/pipeline",
     fetcher,
     { refreshInterval: 30000 },
-  )
+  );
 
   return (
     <div className="space-y-6">
@@ -40,9 +41,7 @@ export default function PipelinePage() {
             <Share2 className="size-5 text-destructive/60" />
             <div>
               <p className="text-sm font-medium text-destructive">加载失败</p>
-              <p className="text-xs text-muted-foreground">
-                无法获取流水线分解数据，请稍后重试
-              </p>
+              <p className="text-xs text-muted-foreground">无法获取流水线分解数据，请稍后重试</p>
             </div>
           </div>
         </div>
@@ -50,5 +49,5 @@ export default function PipelinePage() {
         <DecomposeGraph data={data} />
       ) : null}
     </div>
-  )
+  );
 }

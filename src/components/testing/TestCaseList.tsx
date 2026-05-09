@@ -1,89 +1,111 @@
-"use client"
+"use client";
 
-import { useState, useCallback } from "react"
-import useSWR from "swr"
+import { useCallback, useState } from "react";
+
 import {
-  FlaskConical,
+  CheckCircle2,
   ChevronRight,
   Clock,
+  FileText,
+  FlaskConical,
+  Image,
   Loader2,
-  CheckCircle2,
-  XCircle,
   Play,
   PlayCircle,
-  Image,
-  FileText,
-} from "lucide-react"
-import type {
-  TestCasesResponse,
-  TestScenario,
-  AcceptanceCriterion,
-  TestStep,
-  TestCaseStatus,
-  TestStepStatus,
-  ExecuteResponse,
-} from "@/types/factory"
-import { Skeleton } from "@/components/ui/skeleton"
+  XCircle,
+} from "lucide-react";
+import useSWR from "swr";
 
-const fetcher = (url: string): Promise<TestCasesResponse> =>
-  fetch(url).then((res) => res.json())
+import { Skeleton } from "@/components/ui/skeleton";
+import type {
+  AcceptanceCriteria,
+  ExecuteResponse,
+  TestCasesResponse,
+  TestCaseStatus,
+  TestScenario,
+  TestStep,
+  TestStepStatus,
+} from "@/types/factory";
+
+const fetcher = (url: string): Promise<TestCasesResponse> => fetch(url).then((res) => res.json());
 
 const statusConfig: Record<TestStepStatus, { icon: typeof Clock; label: string; color: string }> = {
   pending: { icon: Clock, label: "待执行", color: "text-muted-foreground" },
   running: { icon: Loader2, label: "执行中", color: "text-blue-500 animate-spin" },
   passed: { icon: CheckCircle2, label: "通过", color: "text-emerald-500" },
   failed: { icon: XCircle, label: "失败", color: "text-red-500" },
-}
+};
 
 function scenarioStatus(scenario: TestScenario): TestCaseStatus {
-  const allSteps = scenario.acceptanceCriteria.flatMap((ac) => ac.steps)
-  if (allSteps.some((s) => s.status === "running")) return "running"
-  const nonPending = allSteps.filter((s) => s.status !== "pending")
-  if (nonPending.length === 0) return "pending"
-  if (nonPending.every((s) => s.status === "passed")) return "passed"
-  if (nonPending.some((s) => s.status === "failed")) return "failed"
-  return "pending"
+  const allSteps = scenario.acceptanceCriteria.flatMap((ac) => ac.steps);
+  if (allSteps.some((s) => s.status === "running")) return "running";
+  const nonPending = allSteps.filter((s) => s.status !== "pending");
+  if (nonPending.length === 0) return "pending";
+  if (nonPending.every((s) => s.status === "passed")) return "pass";
+  if (nonPending.some((s) => s.status === "failed")) return "fail";
+  return "pending";
 }
 
-function acStatus(ac: AcceptanceCriterion): TestCaseStatus {
-  if (ac.steps.some((s) => s.status === "running")) return "running"
-  const nonPending = ac.steps.filter((s) => s.status !== "pending")
-  if (nonPending.length === 0) return "pending"
-  if (nonPending.every((s) => s.status === "passed")) return "passed"
-  if (nonPending.some((s) => s.status === "failed")) return "failed"
-  return "pending"
+function acStatus(ac: AcceptanceCriteria): TestCaseStatus {
+  if (ac.steps.some((s) => s.status === "running")) return "running";
+  const nonPending = ac.steps.filter((s) => s.status !== "pending");
+  if (nonPending.length === 0) return "pending";
+  if (nonPending.every((s) => s.status === "passed")) return "pass";
+  if (nonPending.some((s) => s.status === "failed")) return "fail";
+  return "pending";
 }
 
-const caseStatusBadge: Record<TestCaseStatus, { icon: typeof Clock; label: string; className: string }> = {
-  pending: { icon: Clock, label: "待执行", className: "bg-gray-100 text-gray-600 dark:bg-gray-900/40 dark:text-gray-400" },
-  running: { icon: Loader2, label: "执行中", className: "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400" },
-  passed: { icon: CheckCircle2, label: "通过", className: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400" },
-  failed: { icon: XCircle, label: "失败", className: "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400" },
-}
+const caseStatusBadge: Record<
+  TestCaseStatus,
+  { icon: typeof Clock; label: string; className: string }
+> = {
+  pending: {
+    icon: Clock,
+    label: "待执行",
+    className: "bg-gray-100 text-gray-600 dark:bg-gray-900/40 dark:text-gray-400",
+  },
+  running: {
+    icon: Loader2,
+    label: "执行中",
+    className: "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400",
+  },
+  pass: {
+    icon: CheckCircle2,
+    label: "通过",
+    className: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400",
+  },
+  fail: {
+    icon: XCircle,
+    label: "失败",
+    className: "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400",
+  },
+};
 
 function StepIcon({ status }: { status: TestStepStatus }) {
-  const cfg = statusConfig[status]
-  const Icon = cfg.icon
-  return <Icon className={`size-4 shrink-0 ${cfg.color}`} />
+  const cfg = statusConfig[status];
+  const Icon = cfg.icon;
+  return <Icon className={`size-4 shrink-0 ${cfg.color}`} />;
 }
 
 function CaseStatusBadge({ status }: { status: TestCaseStatus }) {
-  const cfg = caseStatusBadge[status]
-  const Icon = cfg.icon
+  const cfg = caseStatusBadge[status];
+  const Icon = cfg.icon;
   return (
-    <span className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium ${cfg.className}`}>
+    <span
+      className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium ${cfg.className}`}
+    >
       <Icon className={`size-3 ${status === "running" ? "animate-spin" : ""}`} />
       {cfg.label}
     </span>
-  )
+  );
 }
 
 interface StepDetailProps {
-  step: TestStep
+  step: TestStep;
 }
 
 function StepDetail({ step }: StepDetailProps) {
-  if (step.status !== "failed") return null
+  if (step.status !== "failed") return null;
 
   return (
     <div className="ml-8 mt-2 p-3 rounded-lg bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 space-y-2">
@@ -120,103 +142,109 @@ function StepDetail({ step }: StepDetailProps) {
         </div>
       )}
     </div>
-  )
+  );
 }
 
 export function TestCaseList() {
   const { data, error, isLoading, mutate } = useSWR<TestCasesResponse>(
     "/api/v1/testing/cases",
     fetcher,
-    { refreshInterval: 15000 }
-  )
+    { refreshInterval: 15000 },
+  );
 
-  const [expandedScenarios, setExpandedScenarios] = useState<Set<string>>(new Set())
-  const [expandedACs, setExpandedACs] = useState<Set<string>>(new Set())
-  const [executing, setExecuting] = useState<Set<string>>(new Set())
-  const [batchRunning, setBatchRunning] = useState(false)
-  const [batchProgress, setBatchProgress] = useState({ done: 0, total: 0 })
+  const [expandedScenarios, setExpandedScenarios] = useState<Set<string>>(new Set());
+  const [expandedACs, setExpandedACs] = useState<Set<string>>(new Set());
+  const [executing, setExecuting] = useState<Set<string>>(new Set());
+  const [batchRunning, setBatchRunning] = useState(false);
+  const [batchProgress, setBatchProgress] = useState({ done: 0, total: 0 });
 
   const toggleScenario = useCallback((id: string) => {
     setExpandedScenarios((prev) => {
-      const next = new Set(prev)
-      if (next.has(id)) next.delete(id)
-      else next.add(id)
-      return next
-    })
-  }, [])
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
 
   const toggleAC = useCallback((id: string) => {
     setExpandedACs((prev) => {
-      const next = new Set(prev)
-      if (next.has(id)) next.delete(id)
-      else next.add(id)
-      return next
-    })
-  }, [])
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
 
-  const executeSingle = useCallback(async (scenarioId: string, acId: string) => {
-    const key = `${scenarioId}/${acId}`
-    setExecuting((prev) => new Set(prev).add(key))
-    try {
-      const res = await fetch("/api/v1/testing/execute", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ scenarioId, acId }),
-      })
-      if (!res.ok) return
-      const result: ExecuteResponse = await res.json()
+  const executeSingle = useCallback(
+    async (scenarioId: string, acId: string) => {
+      const key = `${scenarioId}/${acId}`;
+      setExecuting((prev) => new Set(prev).add(key));
+      try {
+        const res = await fetch("/api/v1/testing/execute", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ scenarioId, acId }),
+        });
+        if (!res.ok) return;
+        const result: ExecuteResponse = await res.json();
 
-      // Update local data optimistically
-      mutate((prev) => {
-        if (!prev) return prev
-        return {
-          ...prev,
-          scenarios: prev.scenarios.map((s) => {
-            if (s.id !== scenarioId) return s
-            return {
-              ...s,
-              acceptanceCriteria: s.acceptanceCriteria.map((ac) => {
-                if (ac.id !== acId) return ac
-                return { ...ac, steps: result.results }
-              }),
-            }
-          }),
-        }
-      }, false)
-    } finally {
-      setExecuting((prev) => {
-        const next = new Set(prev)
-        next.delete(key)
-        return next
-      })
-    }
-  }, [mutate])
+        // Update local data optimistically
+        mutate((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            scenarios: prev.scenarios.map((s) => {
+              if (s.id !== scenarioId) return s;
+              return {
+                ...s,
+                acceptanceCriteria: s.acceptanceCriteria.map((ac) => {
+                  if (ac.id !== acId) return ac;
+                  return { ...ac, steps: result.results };
+                }),
+              };
+            }),
+          };
+        }, false);
+      } finally {
+        setExecuting((prev) => {
+          const next = new Set(prev);
+          next.delete(key);
+          return next;
+        });
+      }
+    },
+    [mutate],
+  );
 
-  const executeScenario = useCallback(async (scenario: TestScenario) => {
-    setExpandedScenarios((prev) => new Set(prev).add(scenario.id))
-    for (const ac of scenario.acceptanceCriteria) {
-      setExpandedACs((prev) => new Set(prev).add(ac.id))
-      await executeSingle(scenario.id, ac.id)
-    }
-  }, [executeSingle])
+  const executeScenario = useCallback(
+    async (scenario: TestScenario) => {
+      setExpandedScenarios((prev) => new Set(prev).add(scenario.id));
+      for (const ac of scenario.acceptanceCriteria) {
+        setExpandedACs((prev) => new Set(prev).add(ac.id));
+        await executeSingle(scenario.id, ac.id);
+      }
+    },
+    [executeSingle],
+  );
 
   const executeAll = useCallback(async () => {
-    if (!data) return
-    setBatchRunning(true)
+    if (!data) return;
+    setBatchRunning(true);
     const allACs = data.scenarios.flatMap((s) =>
-      s.acceptanceCriteria.map((ac) => ({ scenarioId: s.id, acId: ac.id }))
-    )
-    setBatchProgress({ done: 0, total: allACs.length })
+      s.acceptanceCriteria.map((ac) => ({ scenarioId: s.id, acId: ac.id })),
+    );
+    setBatchProgress({ done: 0, total: allACs.length });
 
     for (const { scenarioId, acId } of allACs) {
-      setExpandedScenarios((prev) => new Set(prev).add(scenarioId))
-      setExpandedACs((prev) => new Set(prev).add(acId))
-      await executeSingle(scenarioId, acId)
-      setBatchProgress((prev) => ({ done: prev.done + 1, total: prev.total }))
+      setExpandedScenarios((prev) => new Set(prev).add(scenarioId));
+      setExpandedACs((prev) => new Set(prev).add(acId));
+      await executeSingle(scenarioId, acId);
+      setBatchProgress((prev) => ({ done: prev.done + 1, total: prev.total }));
     }
 
-    setBatchRunning(false)
-  }, [data, executeSingle])
+    setBatchRunning(false);
+  }, [data, executeSingle]);
 
   if (isLoading) {
     return (
@@ -233,7 +261,7 @@ export function TestCaseList() {
           </div>
         ))}
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -247,7 +275,7 @@ export function TestCaseList() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   if (!data || data.scenarios.length === 0) {
@@ -261,44 +289,44 @@ export function TestCaseList() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   const totalSteps = data.scenarios.reduce(
     (sum, s) => sum + s.acceptanceCriteria.reduce((a, ac) => a + ac.steps.length, 0),
-    0
-  )
+    0,
+  );
   const executedSteps = data.scenarios.reduce(
     (sum, s) =>
       sum +
       s.acceptanceCriteria.reduce(
         (a, ac) => a + ac.steps.filter((st) => st.status !== "pending").length,
-        0
+        0,
       ),
-    0
-  )
+    0,
+  );
   const passedSteps = data.scenarios.reduce(
     (sum, s) =>
       sum +
       s.acceptanceCriteria.reduce(
         (a, ac) => a + ac.steps.filter((st) => st.status === "passed").length,
-        0
+        0,
       ),
-    0
-  )
+    0,
+  );
   const failedSteps = data.scenarios.reduce(
     (sum, s) =>
       sum +
       s.acceptanceCriteria.reduce(
         (a, ac) => a + ac.steps.filter((st) => st.status === "failed").length,
-        0
+        0,
       ),
-    0
-  )
+    0,
+  );
 
   const anyRunning = data.scenarios.some((s) =>
-    s.acceptanceCriteria.some((ac) => ac.steps.some((st) => st.status === "running"))
-  )
+    s.acceptanceCriteria.some((ac) => ac.steps.some((st) => st.status === "running")),
+  );
 
   return (
     <div className="rounded-xl border bg-card shadow-sm p-6 space-y-5">
@@ -361,14 +389,11 @@ export function TestCaseList() {
       {/* Scenario tree */}
       <div className="space-y-2">
         {data.scenarios.map((scenario) => {
-          const sStatus = scenarioStatus(scenario)
-          const isExpanded = expandedScenarios.has(scenario.id)
+          const sStatus = scenarioStatus(scenario);
+          const isExpanded = expandedScenarios.has(scenario.id);
 
           return (
-            <div
-              key={scenario.id}
-              className="rounded-lg border bg-muted/20 overflow-hidden"
-            >
+            <div key={scenario.id} className="rounded-lg border bg-muted/20 overflow-hidden">
               {/* Scenario header */}
               <div className="flex items-center gap-3 px-4 py-3">
                 <button
@@ -382,12 +407,8 @@ export function TestCaseList() {
                 </button>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs font-mono text-muted-foreground">
-                      {scenario.id}
-                    </span>
-                    <span className="text-sm font-semibold truncate">
-                      {scenario.name}
-                    </span>
+                    <span className="text-xs font-mono text-muted-foreground">{scenario.id}</span>
+                    <span className="text-sm font-semibold truncate">{scenario.name}</span>
                     <CaseStatusBadge status={sStatus} />
                   </div>
                   <p className="text-xs text-muted-foreground mt-0.5">
@@ -414,9 +435,9 @@ export function TestCaseList() {
               {isExpanded && (
                 <div className="border-t divide-y">
                   {scenario.acceptanceCriteria.map((ac) => {
-                    const aStatus = acStatus(ac)
-                    const isACExpanded = expandedACs.has(ac.id)
-                    const isACExecuting = executing.has(`${scenario.id}/${ac.id}`)
+                    const aStatus = acStatus(ac);
+                    const isACExpanded = expandedACs.has(ac.id);
+                    const isACExecuting = executing.has(`${scenario.id}/${ac.id}`);
 
                     return (
                       <div key={ac.id} className="bg-background">
@@ -432,12 +453,8 @@ export function TestCaseList() {
                             />
                           </button>
                           <div className="flex-1 min-w-0 flex items-center gap-2">
-                            <span className="text-xs font-mono text-muted-foreground">
-                              {ac.id}
-                            </span>
-                            <span className="text-sm font-medium truncate">
-                              {ac.title}
-                            </span>
+                            <span className="text-xs font-mono text-muted-foreground">{ac.id}</span>
+                            <span className="text-sm font-medium truncate">{ac.title}</span>
                             <CaseStatusBadge status={aStatus} />
                           </div>
                           <button
@@ -504,14 +521,14 @@ export function TestCaseList() {
                           </div>
                         )}
                       </div>
-                    )
+                    );
                   })}
                 </div>
               )}
             </div>
-          )
+          );
         })}
       </div>
     </div>
-  )
+  );
 }

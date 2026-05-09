@@ -1,10 +1,14 @@
-"use client"
+"use client";
 
-import { AlertTriangle, Zap, Info, Bug, BarChart3, FileCode2, GitBranch, Hash } from "lucide-react"
-import type { TocoReportData, TocoSeverity, TocoFinding } from "@/types/factory"
-import { Skeleton } from "@/components/ui/skeleton"
+import { AlertTriangle, BarChart3, Bug, FileCode2, GitBranch, Hash, Info, Zap } from "lucide-react";
 
-const severityConfig: Record<TocoSeverity, { icon: typeof AlertTriangle; label: string; rowClass: string; badgeClass: string }> = {
+import { Skeleton } from "@/components/ui/skeleton";
+import type { TocoFinding, TocoReportData, TocoSeverity } from "@/types/factory";
+
+const severityConfig: Record<
+  TocoSeverity,
+  { icon: typeof AlertTriangle; label: string; rowClass: string; badgeClass: string }
+> = {
   critical: {
     icon: Bug,
     label: "严重",
@@ -29,11 +33,11 @@ const severityConfig: Record<TocoSeverity, { icon: typeof AlertTriangle; label: 
     rowClass: "border-border",
     badgeClass: "bg-muted text-muted-foreground",
   },
-}
+};
 
 function FindingRow({ finding }: { finding: TocoFinding }) {
-  const cfg = severityConfig[finding.severity]
-  const Icon = cfg.icon
+  const cfg = severityConfig[finding.severity];
+  const Icon = cfg.icon;
 
   return (
     <div className={`flex items-start gap-3 rounded-lg border p-3 ${cfg.rowClass}`}>
@@ -43,7 +47,9 @@ function FindingRow({ finding }: { finding: TocoFinding }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-xs font-medium">{finding.title}</span>
-          <span className={`inline-flex items-center rounded px-1.5 py-0.5 text-xs font-medium ${cfg.badgeClass}`}>
+          <span
+            className={`inline-flex items-center rounded px-1.5 py-0.5 text-xs font-medium ${cfg.badgeClass}`}
+          >
             {cfg.label}
           </span>
           <span className="text-xs text-muted-foreground">{finding.category}</span>
@@ -52,7 +58,7 @@ function FindingRow({ finding }: { finding: TocoFinding }) {
         <p className="text-xs font-mono text-muted-foreground/60 mt-1">{finding.lineRef}</p>
       </div>
     </div>
-  )
+  );
 }
 
 export function TocoReport({ data, isLoading }: { data?: TocoReportData; isLoading?: boolean }) {
@@ -69,7 +75,7 @@ export function TocoReport({ data, isLoading }: { data?: TocoReportData; isLoadi
           <Skeleton key={i} className="h-14 w-full rounded-lg" />
         ))}
       </div>
-    )
+    );
   }
 
   if (!data) {
@@ -80,10 +86,10 @@ export function TocoReport({ data, isLoading }: { data?: TocoReportData; isLoadi
           <p className="text-sm text-muted-foreground">暂无 TocoAgent 分析报告</p>
         </div>
       </div>
-    )
+    );
   }
 
-  const { metrics, findings } = data
+  const { metrics, findings } = data;
 
   return (
     <div className="rounded-xl border bg-card shadow-sm p-6 space-y-4">
@@ -99,14 +105,18 @@ export function TocoReport({ data, isLoading }: { data?: TocoReportData; isLoadi
             <FileCode2 className="size-3" />
             总行数
           </div>
-          <p className="text-lg font-semibold tabular-nums">{metrics.totalLines.toLocaleString()}</p>
+          <p className="text-lg font-semibold tabular-nums">
+            {metrics.totalLines.toLocaleString()}
+          </p>
         </div>
         <div className="rounded-lg border bg-muted/30 p-3 text-center">
           <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground mb-1">
             <GitBranch className="size-3" />
             变更行数
           </div>
-          <p className="text-lg font-semibold tabular-nums text-amber-600">+{metrics.changedLines}</p>
+          <p className="text-lg font-semibold tabular-nums text-amber-600">
+            +{metrics.changedLines}
+          </p>
         </div>
         <div className="rounded-lg border bg-muted/30 p-3 text-center">
           <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground mb-1">
@@ -120,8 +130,11 @@ export function TocoReport({ data, isLoading }: { data?: TocoReportData; isLoadi
             <Hash className="size-3" />
             复杂度Δ
           </div>
-          <p className={`text-lg font-semibold tabular-nums ${metrics.complexityDelta <= 0 ? "text-emerald-600" : "text-red-600"}`}>
-            {metrics.complexityDelta > 0 ? "+" : ""}{metrics.complexityDelta}
+          <p
+            className={`text-lg font-semibold tabular-nums ${metrics.complexityDelta <= 0 ? "text-emerald-600" : "text-red-600"}`}
+          >
+            {metrics.complexityDelta > 0 ? "+" : ""}
+            {metrics.complexityDelta}
           </p>
         </div>
       </div>
@@ -129,14 +142,12 @@ export function TocoReport({ data, isLoading }: { data?: TocoReportData; isLoadi
       {/* Findings */}
       {findings.length > 0 && (
         <div className="space-y-2">
-          <p className="text-xs font-medium text-muted-foreground">
-            发现 {findings.length} 个问题
-          </p>
+          <p className="text-xs font-medium text-muted-foreground">发现 {findings.length} 个问题</p>
           {findings.map((f) => (
             <FindingRow key={f.id} finding={f} />
           ))}
         </div>
       )}
     </div>
-  )
+  );
 }

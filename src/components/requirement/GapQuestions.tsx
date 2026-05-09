@@ -1,16 +1,35 @@
-"use client"
+"use client";
 
-import { useState, useCallback } from "react"
-import useSWR from "swr"
-import { AlertTriangle, CheckCircle2, HelpCircle, Loader2, Send, RotateCcw, ChevronUp, FileText } from "lucide-react"
-import type { GapQuestion, GapAnswer, GapAnswersResponse, GapSubmitResponse, GapSeverity } from "@/types/requirement"
-import { Skeleton } from "@/components/ui/skeleton"
-import { EmptyState } from "@/components/ui/EmptyState"
+import { useCallback, useState } from "react";
 
-const fetcher = (url: string): Promise<GapAnswersResponse> =>
-  fetch(url).then((res) => res.json())
+import {
+  AlertTriangle,
+  CheckCircle2,
+  ChevronUp,
+  FileText,
+  HelpCircle,
+  Loader2,
+  RotateCcw,
+  Send,
+} from "lucide-react";
+import useSWR from "swr";
 
-const severityConfig: Record<GapSeverity, { label: string; barClass: string; badgeClass: string; iconClass: string }> = {
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Skeleton } from "@/components/ui/skeleton";
+import type {
+  GapAnswer,
+  GapAnswersResponse,
+  GapQuestion,
+  GapSeverity,
+  GapSubmitResponse,
+} from "@/types/requirement";
+
+const fetcher = (url: string): Promise<GapAnswersResponse> => fetch(url).then((res) => res.json());
+
+const severityConfig: Record<
+  GapSeverity,
+  { label: string; barClass: string; badgeClass: string; iconClass: string }
+> = {
   critical: {
     label: "严重",
     barClass: "bg-red-500",
@@ -29,20 +48,22 @@ const severityConfig: Record<GapSeverity, { label: string; barClass: string; bad
     badgeClass: "bg-blue-100 text-blue-700 border-blue-200",
     iconClass: "text-blue-400",
   },
-}
+};
 
 function SeverityBadge({ severity }: { severity: GapSeverity }) {
-  const cfg = severityConfig[severity]
+  const cfg = severityConfig[severity];
   return (
-    <span className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-semibold ${cfg.badgeClass}`}>
+    <span
+      className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-semibold ${cfg.badgeClass}`}
+    >
       {cfg.label}
     </span>
-  )
+  );
 }
 
 function SeverityBar({ severity }: { severity: GapSeverity }) {
-  const cfg = severityConfig[severity]
-  return <div className={`w-1 self-stretch rounded-full shrink-0 ${cfg.barClass}`} />
+  const cfg = severityConfig[severity];
+  return <div className={`w-1 self-stretch rounded-full shrink-0 ${cfg.barClass}`} />;
 }
 
 function QuestionCard({
@@ -51,12 +72,12 @@ function QuestionCard({
   onChange,
   disabled,
 }: {
-  question: GapQuestion
-  answer: string
-  onChange: (questionId: string, value: string) => void
-  disabled: boolean
+  question: GapQuestion;
+  answer: string;
+  onChange: (questionId: string, value: string) => void;
+  disabled: boolean;
 }) {
-  const cfg = severityConfig[question.severity]
+  const cfg = severityConfig[question.severity];
 
   return (
     <div className="flex gap-0 rounded-lg border bg-card overflow-hidden">
@@ -91,65 +112,65 @@ function QuestionCard({
         )}
       </div>
     </div>
-  )
+  );
 }
 
 interface GapQuestionsProps {
-  specId: string
+  specId: string;
 }
 
 export function GapQuestions({ specId }: GapQuestionsProps) {
   const { data, error, isLoading } = useSWR<GapAnswersResponse>(
     `/api/v1/specs/${specId}/gap-answers`,
     fetcher,
-  )
+  );
 
-  const [answers, setAnswers] = useState<Record<string, string>>({})
-  const [submitting, setSubmitting] = useState(false)
-  const [result, setResult] = useState<GapSubmitResponse | null>(null)
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [submitting, setSubmitting] = useState(false);
+  const [result, setResult] = useState<GapSubmitResponse | null>(null);
 
   const handleAnswerChange = useCallback((questionId: string, value: string) => {
-    setAnswers((prev) => ({ ...prev, [questionId]: value }))
+    setAnswers((prev) => ({ ...prev, [questionId]: value }));
     // Clear result when user changes answers
-    setResult(null)
-  }, [])
+    setResult(null);
+  }, []);
 
   const answeredCount = data
     ? data.questions.filter((q) => (answers[q.id]?.length ?? 0) > 0).length
-    : 0
-  const totalCount = data?.questions.length ?? 0
-  const allAnswered = totalCount > 0 && answeredCount === totalCount
+    : 0;
+  const totalCount = data?.questions.length ?? 0;
+  const allAnswered = totalCount > 0 && answeredCount === totalCount;
 
   const handleSubmit = useCallback(async () => {
-    if (!data || !allAnswered) return
-    setSubmitting(true)
+    if (!data || !allAnswered) return;
+    setSubmitting(true);
     try {
       const answerList: GapAnswer[] = data.questions.map((q) => ({
         questionId: q.id,
         answer: answers[q.id] ?? "",
-      }))
+      }));
       const res = await fetch(`/api/v1/specs/${specId}/gap-answers`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ answers: answerList }),
-      })
+      });
       if (res.ok) {
-        const json: GapSubmitResponse = await res.json()
-        setResult(json)
+        const json: GapSubmitResponse = await res.json();
+        setResult(json);
       }
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
-  }, [data, answers, allAnswered, specId])
+  }, [data, answers, allAnswered, specId]);
 
   const handleReset = useCallback(() => {
-    setAnswers({})
-    setResult(null)
-  }, [])
+    setAnswers({});
+    setResult(null);
+  }, []);
 
   // Loading state
   if (isLoading) {
-    return <GapQuestionsSkeleton />
+    return <GapQuestionsSkeleton />;
   }
 
   // Error state
@@ -164,10 +185,10 @@ export function GapQuestions({ specId }: GapQuestionsProps) {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
-  if (!data) return null
+  if (!data) return null;
 
   // Empty state — no gaps
   if (data.questions.length === 0) {
@@ -177,7 +198,7 @@ export function GapQuestions({ specId }: GapQuestionsProps) {
         title="无需补充"
         description="当前 Spec 成熟度已达阈值，无需补充问题"
       />
-    )
+    );
   }
 
   return (
@@ -217,9 +238,7 @@ export function GapQuestions({ specId }: GapQuestionsProps) {
       {result && (
         <div
           className={`rounded-lg border p-4 ${
-            result.passed
-              ? "border-emerald-200 bg-emerald-50"
-              : "border-amber-200 bg-amber-50"
+            result.passed ? "border-emerald-200 bg-emerald-50" : "border-amber-200 bg-amber-50"
           }`}
         >
           {result.passed ? (
@@ -301,7 +320,7 @@ export function GapQuestions({ specId }: GapQuestionsProps) {
         </button>
       )}
     </div>
-  )
+  );
 }
 
 function GapQuestionsSkeleton() {
@@ -330,5 +349,5 @@ function GapQuestionsSkeleton() {
         <Skeleton className="h-9 w-36 rounded-md" />
       </div>
     </div>
-  )
+  );
 }

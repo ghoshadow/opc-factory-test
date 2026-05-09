@@ -1,15 +1,17 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { ChevronRight, ChevronDown, CircleDot, ArrowRight, CheckCircle2 } from "lucide-react"
-import type { TroubleshootNode } from "@/types/factory"
+import { useState } from "react";
+
+import { ArrowRight, CheckCircle2, ChevronDown, ChevronRight, CircleDot } from "lucide-react";
+
+import type { TroubleshootNode } from "@/types/factory";
 
 interface TroubleshootTreeProps {
-  nodes: TroubleshootNode[]
+  nodes: TroubleshootNode[];
 }
 
 function TreeNode({ node, depth = 0 }: { node: TroubleshootNode; depth?: number }) {
-  const [expanded, setExpanded] = useState(true)
+  const [expanded, setExpanded] = useState(true);
 
   return (
     <div className="relative">
@@ -55,7 +57,10 @@ function TreeNode({ node, depth = 0 }: { node: TroubleshootNode; depth?: number 
                       <p className="text-xs font-medium text-muted-foreground">排查步骤:</p>
                       <ol className="space-y-0.5">
                         {node.steps.map((step, i) => (
-                          <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                          <li
+                            key={i}
+                            className="flex items-start gap-2 text-sm text-muted-foreground"
+                          >
                             <span className="text-xs font-mono text-muted-foreground/60 mt-0.5 shrink-0">
                               {i + 1}.
                             </span>
@@ -71,8 +76,12 @@ function TreeNode({ node, depth = 0 }: { node: TroubleshootNode; depth?: number 
                     <div className="flex items-start gap-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 px-3 py-2">
                       <CheckCircle2 className="size-4 text-emerald-500 mt-0.5 shrink-0" />
                       <div>
-                        <p className="text-xs font-medium text-emerald-700 dark:text-emerald-400">解决方案</p>
-                        <p className="text-sm text-emerald-700/80 dark:text-emerald-400/80">{node.solution}</p>
+                        <p className="text-xs font-medium text-emerald-700 dark:text-emerald-400">
+                          解决方案
+                        </p>
+                        <p className="text-sm text-emerald-700/80 dark:text-emerald-400/80">
+                          {node.solution}
+                        </p>
                       </div>
                     </div>
                   )}
@@ -96,7 +105,7 @@ function TreeNode({ node, depth = 0 }: { node: TroubleshootNode; depth?: number 
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export function TroubleshootTree({ nodes }: TroubleshootTreeProps) {
@@ -107,7 +116,7 @@ export function TroubleshootTree({ nodes }: TroubleshootTreeProps) {
         <p className="text-sm text-muted-foreground">暂无排障节点</p>
         <p className="text-xs text-muted-foreground/70 mt-1">编辑 Runbook 添加排障树节点</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -116,5 +125,5 @@ export function TroubleshootTree({ nodes }: TroubleshootTreeProps) {
         <TreeNode key={node.id} node={node} />
       ))}
     </div>
-  )
+  );
 }

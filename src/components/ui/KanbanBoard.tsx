@@ -1,34 +1,39 @@
-"use client"
+"use client";
 
-import { useState, useCallback, useRef, useEffect } from "react"
+import { useCallback, useEffect, useRef, useState } from "react";
+
 import {
+  closestCorners,
   DndContext,
   DragOverlay,
-  closestCorners,
   PointerSensor,
   useSensor,
   useSensors,
-  type DragStartEvent,
   type DragEndEvent,
-} from "@dnd-kit/core"
-import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
-import { cn } from "@/lib/utils"
-import { KanbanCard, KanbanCardOverlay } from "./KanbanCard"
-import type { KanbanBoardProps, KanbanCard as KanbanCardData, KanbanColumn } from "@/types/kanban"
+  type DragStartEvent,
+} from "@dnd-kit/core";
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+
+import { cn } from "@/lib/utils";
+import type { KanbanBoardProps, KanbanCard as KanbanCardData, KanbanColumn } from "@/types/kanban";
+
+import { KanbanCard, KanbanCardOverlay } from "./KanbanCard";
 
 const priorityOrder: Record<string, number> = {
   urgent: 0,
   high: 1,
   medium: 2,
   low: 3,
-}
+};
 
 function sortCards(cards: KanbanCardData[]): KanbanCardData[] {
-  return [...cards].sort((a, b) => (priorityOrder[a.priority] ?? 99) - (priorityOrder[b.priority] ?? 99))
+  return [...cards].sort(
+    (a, b) => (priorityOrder[a.priority] ?? 99) - (priorityOrder[b.priority] ?? 99),
+  );
 }
 
 function findColumnByCardId(columns: KanbanColumn[], cardId: string): KanbanColumn | undefined {
-  return columns.find((col) => col.cards.some((c) => c.id === cardId))
+  return columns.find((col) => col.cards.some((c) => c.id === cardId));
 }
 
 function ColumnDropZone({
@@ -36,13 +41,13 @@ function ColumnDropZone({
   activeId,
   activeColumnId,
 }: {
-  column: KanbanColumn
-  activeId: string | null
-  activeColumnId: string | null
+  column: KanbanColumn;
+  activeId: string | null;
+  activeColumnId: string | null;
 }) {
-  const isDropTarget = activeId !== null && activeColumnId !== column.id
+  const isDropTarget = activeId !== null && activeColumnId !== column.id;
 
-  const sorted = sortCards(column.cards)
+  const sorted = sortCards(column.cards);
 
   return (
     <div
@@ -71,82 +76,90 @@ function ColumnDropZone({
         </div>
       </SortableContext>
     </div>
-  )
+  );
 }
 
 export function KanbanBoard({ columns, onCardMove }: KanbanBoardProps) {
-  const [activeId, setActiveId] = useState<string | null>(null)
-  const columnsRef = useRef(columns)
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const columnsRef = useRef(columns);
   useEffect(() => {
-    columnsRef.current = columns
-  }, [columns])
+    columnsRef.current = columns;
+  }, [columns]);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-  )
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
   const activeCard = activeId
-    ? columns.flatMap((c) => c.cards).find((c) => c.id === activeId) ?? null
-    : null
+    ? (columns.flatMap((c) => c.cards).find((c) => c.id === activeId) ?? null)
+    : null;
 
-  const activeColumnId = activeId
-    ? findColumnByCardId(columns, activeId)?.id ?? null
-    : null
+  const activeColumnId = activeId ? (findColumnByCardId(columns, activeId)?.id ?? null) : null;
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
-    setActiveId(event.active.id as string)
-  }, [])
+    setActiveId(event.active.id as string);
+  }, []);
 
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
-      setActiveId(null)
+      setActiveId(null);
 
-      const { active, over } = event
-      if (!over) return
+      const { active, over } = event;
+      if (!over) return;
 
-      const cardId = active.id as string
-      const fromColumn = findColumnByCardId(columnsRef.current, cardId)
-      if (!fromColumn) return
+      const cardId = active.id as string;
+      const fromColumn = findColumnByCardId(columnsRef.current, cardId);
+      if (!fromColumn) return;
 
       // Determine target column: try over element's column, then check all columns
-      let toColumn: KanbanColumn | undefined
+      let toColumn: KanbanColumn | undefined;
 
       // Check if the over element is a card in a column
-      toColumn = findColumnByCardId(columnsRef.current, over.id as string)
+      toColumn = findColumnByCardId(columnsRef.current, over.id as string);
 
       // If over is a column container itself (data attr match)
       if (!toColumn && typeof over.id === "string") {
-        toColumn = columnsRef.current.find((c) => c.id === over.id)
+        toColumn = columnsRef.current.find((c) => c.id === over.id);
       }
 
       // Walk up DOM to find the column
       if (!toColumn) {
-        const target = document.getElementById(over.id as string) || document.querySelector(`[data-id="${over.id}"]`)
+        const target =
+          document.getElementById(over.id as string) ||
+          document.querySelector(`[data-id="${over.id}"]`);
         if (target) {
-          const columnEl = target.closest("[data-column-id]") as HTMLElement | null
+          const columnEl = target.closest("[data-column-id]") as HTMLElement | null;
           if (columnEl) {
-            toColumn = columnsRef.current.find((c) => c.id === columnEl.dataset.columnId)
+            toColumn = columnsRef.current.find((c) => c.id === columnEl.dataset.columnId);
           }
         }
       }
 
       if (toColumn && fromColumn.id !== toColumn.id) {
-        onCardMove(cardId, fromColumn.id, toColumn.id)
+        onCardMove(cardId, fromColumn.id, toColumn.id);
       }
     },
     [onCardMove],
-  )
+  );
 
   return (
-    <DndContext sensors={sensors} collisionDetection={closestCorners} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCorners}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+    >
       <div className="grid grid-cols-4 gap-4 w-full">
         {columns.map((column) => (
-          <ColumnDropZone key={column.id} column={column} activeId={activeId} activeColumnId={activeColumnId} />
+          <ColumnDropZone
+            key={column.id}
+            column={column}
+            activeId={activeId}
+            activeColumnId={activeColumnId}
+          />
         ))}
       </div>
       <DragOverlay dropAnimation={null}>
         {activeCard ? <KanbanCardOverlay card={activeCard} /> : null}
       </DragOverlay>
     </DndContext>
-  )
+  );
 }

@@ -1,38 +1,40 @@
-"use client"
+"use client";
 
-import { Suspense, useMemo } from "react"
-import { useSearchParams } from "next/navigation"
-import Link from "next/link"
-import { ArrowLeft, AlertTriangle, Plus, Minus } from "lucide-react"
-import useSWR from "swr"
-import { diffLines } from "diff"
-import type { SpecVersionsResponse } from "@/types/factory"
-import { Skeleton } from "@/components/ui/skeleton"
-import { cn } from "@/lib/utils"
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useMemo } from "react";
+
+import { diffLines } from "diff";
+import { AlertTriangle, ArrowLeft, Minus, Plus } from "lucide-react";
+import useSWR from "swr";
+
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
+import type { SpecVersionsResponse } from "@/types/factory";
 
 const fetcher = (url: string): Promise<SpecVersionsResponse> =>
-  fetch(url).then((res) => res.json())
+  fetch(url).then((res) => res.json());
 
 function SpecDiffContent() {
-  const searchParams = useSearchParams()
-  const specId = searchParams.get("specId") ?? ""
-  const v1 = Number(searchParams.get("v1"))
-  const v2 = Number(searchParams.get("v2"))
+  const searchParams = useSearchParams();
+  const specId = searchParams.get("specId") ?? "";
+  const v1 = Number(searchParams.get("v1"));
+  const v2 = Number(searchParams.get("v2"));
 
   const { data, error, isLoading } = useSWR<SpecVersionsResponse>(
     specId ? `/api/v1/specs/${specId}/versions` : null,
     fetcher,
-  )
+  );
 
-  const version1 = data?.versions.find((v) => v.version === v1)
-  const version2 = data?.versions.find((v) => v.version === v2)
+  const version1 = data?.versions.find((v) => v.version === v1);
+  const version2 = data?.versions.find((v) => v.version === v2);
 
   const diffResult = useMemo(() => {
-    const oldContent = version1?.content ?? ""
-    const newContent = version2?.content ?? ""
-    if (!oldContent && !newContent) return null
-    return diffLines(oldContent, newContent)
-  }, [version1?.content, version2?.content])
+    const oldContent = version1?.content ?? "";
+    const newContent = version2?.content ?? "";
+    if (!oldContent && !newContent) return null;
+    return diffLines(oldContent, newContent);
+  }, [version1?.content, version2?.content]);
 
   if (!specId || isNaN(v1) || isNaN(v2)) {
     return (
@@ -49,12 +51,10 @@ function SpecDiffContent() {
         <div className="flex flex-col items-center justify-center rounded-lg border py-12 text-center">
           <AlertTriangle className="mb-2 size-8 text-muted-foreground/40" />
           <p className="text-sm font-medium text-muted-foreground">参数无效</p>
-          <p className="text-xs text-muted-foreground mt-1">
-            请指定有效的 specId 和版本号
-          </p>
+          <p className="text-xs text-muted-foreground mt-1">请指定有效的 specId 和版本号</p>
         </div>
       </div>
-    )
+    );
   }
 
   if (isLoading) {
@@ -69,7 +69,7 @@ function SpecDiffContent() {
           <Skeleton className="h-4 w-full" />
         </div>
       </div>
-    )
+    );
   }
 
   if (error || !version1 || !version2) {
@@ -87,16 +87,14 @@ function SpecDiffContent() {
         <div className="flex flex-col items-center justify-center rounded-lg border py-12 text-center">
           <AlertTriangle className="mb-2 size-8 text-muted-foreground/40" />
           <p className="text-sm font-medium text-muted-foreground">无法加载版本数据</p>
-          <p className="text-xs text-muted-foreground mt-1">
-            请检查版本号是否正确
-          </p>
+          <p className="text-xs text-muted-foreground mt-1">请检查版本号是否正确</p>
         </div>
       </div>
-    )
+    );
   }
 
-  const oldContent = version1.content
-  const newContent = version2.content
+  const oldContent = version1.content;
+  const newContent = version2.content;
 
   // Neither has content — empty state
   if (!oldContent && !newContent) {
@@ -122,16 +120,16 @@ function SpecDiffContent() {
           <p className="text-sm text-muted-foreground">两个版本均无内容快照，无法展示差异</p>
         </div>
       </div>
-    )
+    );
   }
 
   // Stats
-  let addedLines = 0
-  let removedLines = 0
+  let addedLines = 0;
+  let removedLines = 0;
   if (diffResult) {
     for (const change of diffResult) {
-      if (change.added) addedLines += change.count ?? 0
-      if (change.removed) removedLines += change.count ?? 0
+      if (change.added) addedLines += change.count ?? 0;
+      if (change.removed) removedLines += change.count ?? 0;
     }
   }
 
@@ -159,12 +157,10 @@ function SpecDiffContent() {
       {diffResult && (
         <div className="flex items-center gap-4 text-sm">
           <span className="inline-flex items-center gap-1 text-green-700 dark:text-green-400">
-            <Plus className="size-3.5" />
-            +{addedLines} 行新增
+            <Plus className="size-3.5" />+{addedLines} 行新增
           </span>
           <span className="inline-flex items-center gap-1 text-red-700 dark:text-red-400">
-            <Minus className="size-3.5" />
-            -{removedLines} 行删除
+            <Minus className="size-3.5" />-{removedLines} 行删除
           </span>
         </div>
       )}
@@ -191,9 +187,9 @@ function SpecDiffContent() {
         <div className="rounded-lg border bg-card overflow-hidden">
           <div className="divide-y divide-border/50 font-mono text-sm leading-relaxed">
             {diffResult.map((change, i) => {
-              const lines = change.value.split("\n")
+              const lines = change.value.split("\n");
               // Remove trailing empty string from split
-              if (lines[lines.length - 1] === "") lines.pop()
+              if (lines[lines.length - 1] === "") lines.pop();
 
               return lines.map((line, j) => (
                 <div
@@ -212,7 +208,7 @@ function SpecDiffContent() {
                   </span>
                   <span className="whitespace-pre-wrap break-all">{line}</span>
                 </div>
-              ))
+              ));
             })}
           </div>
         </div>
@@ -243,7 +239,7 @@ function SpecDiffContent() {
         </div>
       )}
     </div>
-  )
+  );
 }
 
 export default function SpecDiffPage() {
@@ -264,5 +260,5 @@ export default function SpecDiffPage() {
     >
       <SpecDiffContent />
     </Suspense>
-  )
+  );
 }

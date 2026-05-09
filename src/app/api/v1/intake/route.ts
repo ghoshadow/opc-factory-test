@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from "next/server"
-import type { IntakeItem, IntakePriority, IntakeStatus, IntakeType } from "@/types/requirement"
+import { NextRequest, NextResponse } from "next/server";
+
+import type { IntakeItem, IntakePriority, IntakeStatus, IntakeType } from "@/types/requirement";
 
 const mockItems: IntakeItem[] = [
   {
@@ -74,35 +75,35 @@ const mockItems: IntakeItem[] = [
     submittedAt: "2026-05-04T13:00:00Z",
     description: "标准化 SWR 数据获取模式，统一错误处理和 Loading 状态。",
   },
-]
+];
 
 const priorityOrder: Record<IntakePriority, number> = {
   P0: 0,
   P1: 1,
   P2: 2,
   P3: 3,
-}
+};
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url)
-  const status = searchParams.get("status")
-  const type = searchParams.get("type")
-  const priority = searchParams.get("priority")
+  const { searchParams } = new URL(request.url);
+  const status = searchParams.get("status");
+  const type = searchParams.get("type");
+  const priority = searchParams.get("priority");
 
-  let filtered = [...mockItems]
+  let filtered = [...mockItems];
 
   if (status) {
-    filtered = filtered.filter((item) => item.status === status)
+    filtered = filtered.filter((item) => item.status === status);
   }
   if (type) {
-    filtered = filtered.filter((item) => item.type === type)
+    filtered = filtered.filter((item) => item.type === type);
   }
   if (priority) {
-    filtered = filtered.filter((item) => item.priority === priority)
+    filtered = filtered.filter((item) => item.priority === priority);
   }
 
   // Sort by priority: P0 > P1 > P2 > P3
-  filtered.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority])
+  filtered.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
 
-  return NextResponse.json({ items: filtered, total: filtered.length })
+  return NextResponse.json({ items: filtered, total: filtered.length });
 }

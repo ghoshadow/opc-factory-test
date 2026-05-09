@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { FileText, Clock } from "lucide-react"
+import { Clock, FileText } from "lucide-react";
 
 export default function MaturityPage() {
   return (
@@ -23,5 +23,5 @@ export default function MaturityPage() {
         </p>
       </div>
     </div>
-  )
+  );
 }

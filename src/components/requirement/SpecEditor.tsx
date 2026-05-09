@@ -1,28 +1,40 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useCallback, useRef } from "react"
-import useSWR from "swr"
-import { cn } from "@/lib/utils"
-import type { MetaSpec, ACItem, DataContract, DataContractField, ChangeRecord } from "@/types/spec"
-import { Eye, Edit3, Save, Loader2, GitBranch, BookOpen, CheckSquare, Database, Palette } from "lucide-react"
+import { useCallback, useEffect, useRef, useState } from "react";
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json())
+import {
+  BookOpen,
+  CheckSquare,
+  Database,
+  Edit3,
+  Eye,
+  GitBranch,
+  Loader2,
+  Palette,
+  Save,
+} from "lucide-react";
+import useSWR from "swr";
 
-type TabKey = "userStory" | "acceptanceCriteria" | "dataContract" | "uxDraft"
+import { cn } from "@/lib/utils";
+import type { ACItem, ChangeRecord, DataContract, DataContractField, MetaSpec } from "@/types/spec";
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
+type TabKey = "userStory" | "acceptanceCriteria" | "dataContract" | "uxDraft";
 
 const TABS: { key: TabKey; label: string; icon: typeof BookOpen }[] = [
   { key: "userStory", label: "User Story", icon: BookOpen },
   { key: "acceptanceCriteria", label: "验收标准 (AC)", icon: CheckSquare },
   { key: "dataContract", label: "数据契约", icon: Database },
   { key: "uxDraft", label: "UX 雏形", icon: Palette },
-]
+];
 
-function debounce(fn: (...args: any[]) => void, ms: number) {
-  let timer: ReturnType<typeof setTimeout>
-  return (...args: any[]) => {
-    clearTimeout(timer)
-    timer = setTimeout(() => fn(...args), ms)
-  }
+function debounce<T extends unknown[]>(fn: (...args: T) => void, ms: number) {
+  let timer: ReturnType<typeof setTimeout>;
+  return (...args: T) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), ms);
+  };
 }
 
 function markdownPreview(text: string): string {
@@ -40,27 +52,27 @@ function markdownPreview(text: string): string {
     .replace(/\n\n/g, "</p><p class='mb-2'>")
     .replace(/\n/g, "<br>")
     .replace(/^(.+)$/gm, (match: string) => {
-      if (match.startsWith("<")) return match
-      return match
-    })
+      if (match.startsWith("<")) return match;
+      return match;
+    });
 }
 
 function acToMarkdown(items: ACItem[]): string {
   return items
     .map(
       (ac) =>
-        `### ${ac.id}\n\n- **Given** ${ac.given}\n- **When** ${ac.when}\n- **Then** ${ac.then}`
+        `### ${ac.id}\n\n- **Given** ${ac.given}\n- **When** ${ac.when}\n- **Then** ${ac.then}`,
     )
-    .join("\n\n---\n\n")
+    .join("\n\n---\n\n");
 }
 
 function contractToMarkdown(contract: DataContract): string {
   const inputs = contract.inputs
     .map((f) => `| ${f.name} | ${f.type} | ${f.required ? "是" : "否"} | ${f.constraint || "—"} |`)
-    .join("\n")
+    .join("\n");
   const outputs = contract.outputs
     .map((f) => `| ${f.name} | ${f.type} | ${f.required ? "是" : "否"} | ${f.constraint || "—"} |`)
-    .join("\n")
+    .join("\n");
 
   return [
     "## 输入字段",
@@ -74,99 +86,107 @@ function contractToMarkdown(contract: DataContract): string {
     "| 字段 | 类型 | 必填 | 约束 |",
     "|------|------|------|------|",
     outputs || "| — | — | — | — |",
-  ].join("\n")
+  ].join("\n");
 }
 
 interface SpecEditorProps {
-  specId: string
+  specId: string;
 }
 
 export function SpecEditor({ specId }: SpecEditorProps) {
-  const { data: spec, error, isLoading, mutate } = useSWR<MetaSpec>(
-    `/api/v1/specs/${specId}`,
-    fetcher
-  )
+  const {
+    data: spec,
+    error,
+    isLoading,
+    mutate,
+  } = useSWR<MetaSpec>(`/api/v1/specs/${specId}`, fetcher);
 
-  const [activeTab, setActiveTab] = useState<TabKey>("userStory")
-  const [preview, setPreview] = useState(false)
-  const [saving, setSaving] = useState(false)
-  const [savedVersion, setSavedVersion] = useState<number | null>(null)
+  const [activeTab, setActiveTab] = useState<TabKey>("userStory");
+  const [preview, setPreview] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [savedVersion, setSavedVersion] = useState<number | null>(null);
 
   // Local editable state
-  const [localStory, setLocalStory] = useState("")
-  const [localAC, setLocalAC] = useState<ACItem[]>([])
-  const [localInputs, setLocalInputs] = useState<DataContractField[]>([])
-  const [localOutputs, setLocalOutputs] = useState<DataContractField[]>([])
-  const [localUX, setLocalUX] = useState("")
-  const [dirty, setDirty] = useState(false)
+  const [localStory, setLocalStory] = useState(spec?.userStory ?? "");
+  const [localAC, setLocalAC] = useState<ACItem[]>(spec?.acceptanceCriteria ?? []);
+  const [localInputs, setLocalInputs] = useState<DataContractField[]>(
+    spec?.dataContract.inputs ?? [],
+  );
+  const [localOutputs, setLocalOutputs] = useState<DataContractField[]>(
+    spec?.dataContract.outputs ?? [],
+  );
+  const [localUX, setLocalUX] = useState(spec?.uxDraft ?? "");
+  const [dirty, setDirty] = useState(false);
 
-  // Initialize local state from fetched data
+  // Track spec version to detect new data arriving after initial render
+  const initVersion = useRef<number | null>(null);
   useEffect(() => {
-    if (spec) {
-      setLocalStory(spec.userStory)
-      setLocalAC(spec.acceptanceCriteria)
-      setLocalInputs(spec.dataContract.inputs)
-      setLocalOutputs(spec.dataContract.outputs)
-      setLocalUX(spec.uxDraft)
-      setSavedVersion(spec.version)
-      setDirty(false)
+    if (spec && initVersion.current !== spec.version) {
+      initVersion.current = spec.version;
+      setLocalStory(spec.userStory);
+      setLocalAC(spec.acceptanceCriteria);
+      setLocalInputs(spec.dataContract.inputs);
+      setLocalOutputs(spec.dataContract.outputs);
+      setLocalUX(spec.uxDraft);
+      setSavedVersion(spec.version);
+      setDirty(false);
     }
-  }, [spec])
+  }, [spec]);
 
   const doSave = useCallback(
     async (payload: Partial<MetaSpec>) => {
-      setSaving(true)
+      setSaving(true);
       try {
         const res = await fetch(`/api/v1/specs/${specId}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
-        })
-        if (!res.ok) throw new Error("Save failed")
-        const updated = await res.json()
-        setSavedVersion(updated.version)
-        setDirty(false)
-        mutate(updated, false)
+        });
+        if (!res.ok) throw new Error("Save failed");
+        const updated = await res.json();
+        setSavedVersion(updated.version);
+        setDirty(false);
+        mutate(updated, false);
       } catch (e) {
-        console.error("Auto-save failed:", e)
+        console.error("Auto-save failed:", e);
       } finally {
-        setSaving(false)
+        setSaving(false);
       }
     },
-    [specId, mutate]
-  )
+    [specId, mutate],
+  );
 
   const debouncedSave = useRef(
-    debounce((payload: Partial<MetaSpec>) => doSave(payload), 2000)
-  ).current
+    debounce((payload: Partial<MetaSpec>) => doSave(payload), 2000),
+  ).current;
 
   const save = useCallback(
     (payload: Partial<MetaSpec>) => {
-      setDirty(true)
-      debouncedSave(payload)
+      setDirty(true);
+      debouncedSave(payload);
     },
-    [debouncedSave]
-  )
+    [debouncedSave],
+  );
 
   const handleStoryChange = useCallback(
     (value: string) => {
-      setLocalStory(value)
-      save({ userStory: value })
+      setLocalStory(value);
+      save({ userStory: value });
     },
-    [save]
-  )
+    [save],
+  );
 
   const handleACChange = useCallback(
     (index: number, field: keyof ACItem, value: string) => {
       setLocalAC((prev) => {
-        const next = [...prev]
-        next[index] = { ...next[index], [field]: value }
-        save({ acceptanceCriteria: next })
-        return next
-      })
+        const next = [...prev];
+        next[index] = { ...next[index], [field]: value };
+        save({ acceptanceCriteria: next });
+        return next;
+      });
     },
-    [save]
-  )
+    [save],
+  );
 
   const addACItem = useCallback(() => {
     const newItem: ACItem = {
@@ -174,48 +194,48 @@ export function SpecEditor({ specId }: SpecEditorProps) {
       given: "",
       when: "",
       then: "",
-    }
+    };
     setLocalAC((prev) => {
-      const next = [...prev, newItem]
-      save({ acceptanceCriteria: next })
-      return next
-    })
-  }, [save])
+      const next = [...prev, newItem];
+      save({ acceptanceCriteria: next });
+      return next;
+    });
+  }, [save]);
 
   const removeACItem = useCallback(
     (index: number) => {
       setLocalAC((prev) => {
-        const next = prev.filter((_, i) => i !== index)
-        save({ acceptanceCriteria: next })
-        return next
-      })
+        const next = prev.filter((_, i) => i !== index);
+        save({ acceptanceCriteria: next });
+        return next;
+      });
     },
-    [save]
-  )
+    [save],
+  );
 
   const handleInputFieldChange = useCallback(
     (index: number, field: keyof DataContractField, value: string | boolean) => {
       setLocalInputs((prev) => {
-        const next = [...prev]
-        next[index] = { ...next[index], [field]: value }
-        save({ dataContract: { inputs: next, outputs: localOutputs } })
-        return next
-      })
+        const next = [...prev];
+        next[index] = { ...next[index], [field]: value };
+        save({ dataContract: { inputs: next, outputs: localOutputs } });
+        return next;
+      });
     },
-    [save, localOutputs]
-  )
+    [save, localOutputs],
+  );
 
   const handleOutputFieldChange = useCallback(
     (index: number, field: keyof DataContractField, value: string | boolean) => {
       setLocalOutputs((prev) => {
-        const next = [...prev]
-        next[index] = { ...next[index], [field]: value }
-        save({ dataContract: { inputs: localInputs, outputs: next } })
-        return next
-      })
+        const next = [...prev];
+        next[index] = { ...next[index], [field]: value };
+        save({ dataContract: { inputs: localInputs, outputs: next } });
+        return next;
+      });
     },
-    [save, localInputs]
-  )
+    [save, localInputs],
+  );
 
   const addField = useCallback(
     (target: "inputs" | "outputs") => {
@@ -224,67 +244,65 @@ export function SpecEditor({ specId }: SpecEditorProps) {
         type: "",
         required: false,
         constraint: "",
-      }
+      };
       if (target === "inputs") {
         setLocalInputs((prev) => {
-          const next = [...prev, newField]
-          save({ dataContract: { inputs: next, outputs: localOutputs } })
-          return next
-        })
+          const next = [...prev, newField];
+          save({ dataContract: { inputs: next, outputs: localOutputs } });
+          return next;
+        });
       } else {
         setLocalOutputs((prev) => {
-          const next = [...prev, newField]
-          save({ dataContract: { inputs: localInputs, outputs: next } })
-          return next
-        })
+          const next = [...prev, newField];
+          save({ dataContract: { inputs: localInputs, outputs: next } });
+          return next;
+        });
       }
     },
-    [save, localInputs, localOutputs]
-  )
+    [save, localInputs, localOutputs],
+  );
 
   const removeField = useCallback(
     (target: "inputs" | "outputs", index: number) => {
       if (target === "inputs") {
         setLocalInputs((prev) => {
-          const next = prev.filter((_, i) => i !== index)
-          save({ dataContract: { inputs: next, outputs: localOutputs } })
-          return next
-        })
+          const next = prev.filter((_, i) => i !== index);
+          save({ dataContract: { inputs: next, outputs: localOutputs } });
+          return next;
+        });
       } else {
         setLocalOutputs((prev) => {
-          const next = prev.filter((_, i) => i !== index)
-          save({ dataContract: { inputs: localInputs, outputs: next } })
-          return next
-        })
+          const next = prev.filter((_, i) => i !== index);
+          save({ dataContract: { inputs: localInputs, outputs: next } });
+          return next;
+        });
       }
     },
-    [save, localInputs, localOutputs]
-  )
+    [save, localInputs, localOutputs],
+  );
 
   const handleUXChange = useCallback(
     (value: string) => {
-      setLocalUX(value)
-      save({ uxDraft: value })
+      setLocalUX(value);
+      save({ uxDraft: value });
     },
-    [save]
-  )
+    [save],
+  );
 
   const renderPreviewContent = () => {
     switch (activeTab) {
       case "userStory":
-        return markdownPreview(localStory)
+        return markdownPreview(localStory);
       case "acceptanceCriteria":
-        return markdownPreview(acToMarkdown(localAC))
+        return markdownPreview(acToMarkdown(localAC));
       case "dataContract":
-        return markdownPreview(
-          contractToMarkdown({ inputs: localInputs, outputs: localOutputs })
-        )
+        return markdownPreview(contractToMarkdown({ inputs: localInputs, outputs: localOutputs }));
       case "uxDraft":
-        return markdownPreview(localUX)
+        return markdownPreview(localUX);
       default:
-        return ""
+        return "";
     }
-  }
+  };
 
   if (isLoading) {
     return (
@@ -292,7 +310,7 @@ export function SpecEditor({ specId }: SpecEditorProps) {
         <Loader2 className="size-6 animate-spin text-muted-foreground" />
         <span className="ml-2 text-muted-foreground">加载 Spec...</span>
       </div>
-    )
+    );
   }
 
   if (error || !spec) {
@@ -302,7 +320,7 @@ export function SpecEditor({ specId }: SpecEditorProps) {
           {error ? "加载 Spec 失败，请稍后重试" : "Spec 未找到"}
         </p>
       </div>
-    )
+    );
   }
 
   return (
@@ -312,16 +330,19 @@ export function SpecEditor({ specId }: SpecEditorProps) {
         <div className="flex items-center gap-3">
           <h2 className="text-lg font-semibold">{spec.id}</h2>
           <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
-            <GitBranch className="size-3" />
-            v{savedVersion ?? spec.version}
+            <GitBranch className="size-3" />v{savedVersion ?? spec.version}
           </span>
           <span
             className={cn(
               "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium",
-              spec.status === "draft" && "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
-              spec.status === "ready_for_review" && "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-              spec.status === "in_review" && "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
-              spec.status === "signed_off" && "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+              spec.status === "draft" &&
+                "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
+              spec.status === "ready_for_review" &&
+                "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+              spec.status === "in_review" &&
+                "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
+              spec.status === "signed_off" &&
+                "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
             )}
           >
             {spec.status === "draft" && "草稿"}
@@ -356,14 +377,14 @@ export function SpecEditor({ specId }: SpecEditorProps) {
           <button
             key={tab.key}
             onClick={() => {
-              setActiveTab(tab.key)
-              setPreview(false)
+              setActiveTab(tab.key);
+              setPreview(false);
             }}
             className={cn(
               "flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors",
               activeTab === tab.key
                 ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
+                : "text-muted-foreground hover:text-foreground",
             )}
           >
             <tab.icon className="size-3.5" />
@@ -385,7 +406,7 @@ export function SpecEditor({ specId }: SpecEditorProps) {
               "inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
               preview
                 ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:text-foreground"
+                : "text-muted-foreground hover:text-foreground",
             )}
           >
             {preview ? (
@@ -425,14 +446,9 @@ export function SpecEditor({ specId }: SpecEditorProps) {
               {activeTab === "acceptanceCriteria" && (
                 <div className="space-y-4">
                   {localAC.map((ac, i) => (
-                    <div
-                      key={ac.id}
-                      className="rounded-lg border bg-muted/30 p-4 space-y-3"
-                    >
+                    <div key={ac.id} className="rounded-lg border bg-muted/30 p-4 space-y-3">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-medium text-muted-foreground">
-                          {ac.id}
-                        </span>
+                        <span className="text-xs font-medium text-muted-foreground">{ac.id}</span>
                         {localAC.length > 1 && (
                           <button
                             onClick={() => removeACItem(i)}
@@ -443,42 +459,30 @@ export function SpecEditor({ specId }: SpecEditorProps) {
                         )}
                       </div>
                       <div>
-                        <label className="text-xs font-medium text-muted-foreground">
-                          Given
-                        </label>
+                        <label className="text-xs font-medium text-muted-foreground">Given</label>
                         <textarea
                           value={ac.given}
-                          onChange={(e) =>
-                            handleACChange(i, "given", e.target.value)
-                          }
+                          onChange={(e) => handleACChange(i, "given", e.target.value)}
                           placeholder="给定前置条件..."
                           className="mt-1 w-full rounded border bg-background px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-ring"
                           rows={2}
                         />
                       </div>
                       <div>
-                        <label className="text-xs font-medium text-muted-foreground">
-                          When
-                        </label>
+                        <label className="text-xs font-medium text-muted-foreground">When</label>
                         <textarea
                           value={ac.when}
-                          onChange={(e) =>
-                            handleACChange(i, "when", e.target.value)
-                          }
+                          onChange={(e) => handleACChange(i, "when", e.target.value)}
                           placeholder="当用户执行操作..."
                           className="mt-1 w-full rounded border bg-background px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-ring"
                           rows={2}
                         />
                       </div>
                       <div>
-                        <label className="text-xs font-medium text-muted-foreground">
-                          Then
-                        </label>
+                        <label className="text-xs font-medium text-muted-foreground">Then</label>
                         <textarea
                           value={ac.then}
-                          onChange={(e) =>
-                            handleACChange(i, "then", e.target.value)
-                          }
+                          onChange={(e) => handleACChange(i, "then", e.target.value)}
                           placeholder="预期的结果..."
                           className="mt-1 w-full rounded border bg-background px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-ring"
                           rows={2}
@@ -683,10 +687,7 @@ export function SpecEditor({ specId }: SpecEditorProps) {
           </h3>
           <div className="space-y-2">
             {spec.changeTrace.map((ct: ChangeRecord, i: number) => (
-              <div
-                key={i}
-                className="flex items-start gap-3 rounded-lg border bg-card p-3"
-              >
+              <div key={i} className="flex items-start gap-3 rounded-lg border bg-card p-3">
                 <span
                   className={cn(
                     "mt-0.5 inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium",
@@ -695,7 +696,7 @@ export function SpecEditor({ specId }: SpecEditorProps) {
                     ct.source === "gap_agent" &&
                       "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
                     ct.source === "revision_engine" &&
-                      "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+                      "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
                   )}
                 >
                   {ct.source === "review_board" && "Review Board"}
@@ -715,5 +716,5 @@ export function SpecEditor({ specId }: SpecEditorProps) {
         </div>
       )}
     </div>
-  )
+  );
 }

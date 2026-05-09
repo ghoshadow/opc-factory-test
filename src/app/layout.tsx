@@ -3,9 +3,10 @@ import { Geist, Inter } from "next/font/google";
 
 import "./globals.css";
 
+import { Toaster } from "sonner";
+
 import { AppShell } from "@/components/layout/AppShell";
 import { cn } from "@/lib/utils";
-import { Toaster } from "sonner";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 

@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { FileText, Clock } from "lucide-react"
+import { Clock, FileText } from "lucide-react";
 
 export default function SpecQueuePage() {
   return (
@@ -9,9 +9,7 @@ export default function SpecQueuePage() {
         <FileText className="size-6 text-primary" />
         <div>
           <h1 className="text-2xl font-bold tracking-tight">需求队列</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            待处理的需求文档队列与优先级管理
-          </p>
+          <p className="text-sm text-muted-foreground mt-1">待处理的需求文档队列与优先级管理</p>
         </div>
       </div>
 
@@ -23,5 +21,5 @@ export default function SpecQueuePage() {
         </p>
       </div>
     </div>
-  )
+  );
 }
