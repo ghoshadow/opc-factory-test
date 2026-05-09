@@ -64,3 +64,30 @@ export interface SreCheckerResponse {
   allPass: boolean
   canRelease: boolean
 }
+
+// Skills types
+export type ProductionLine = "requirements" | "coding" | "testing" | "sre"
+
+export type SkillStatus = "installed" | "available"
+
+export interface Skill {
+  id: string
+  name: string
+  description: string
+  line: ProductionLine
+  status: SkillStatus
+}
+
+export interface SkillsResponse {
+  skills: Skill[]
+}
+
+export interface InstallSkillRequest {
+  skillId: string
+  action: "install" | "uninstall"
+}
+
+export interface InstallSkillResponse {
+  skillId: string
+  status: SkillStatus
+}
