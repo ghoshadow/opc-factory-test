@@ -398,3 +398,42 @@ export interface PipelineResponse {
   nodes: PipelineStageNode[]
   totalNodes: number
 }
+
+// Bug Reflow types (SRE → Intake)
+export type ReflowStatus = "open" | "reflowed_to_intake" | "coding_in_progress" | "fixed"
+
+export interface ReflowTimelineEntry {
+  id: string
+  status: ReflowStatus
+  label: string
+  description: string
+  timestamp: string
+}
+
+export interface ReflowBug {
+  id: string
+  title: string
+  description: string
+  priority: BugPriority
+  module: string
+  status: ReflowStatus
+  source: string
+  createdAt: string
+  timeline: ReflowTimelineEntry[]
+}
+
+export interface ReflowBugListResponse {
+  bugs: ReflowBug[]
+  total: number
+}
+
+export interface ReflowRequest {
+  title: string
+  description: string
+}
+
+export interface ReflowStatusResponse {
+  bugId: string
+  status: ReflowStatus
+  timeline: ReflowTimelineEntry[]
+}
