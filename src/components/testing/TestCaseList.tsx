@@ -55,6 +55,8 @@ function acStatus(ac: AcceptanceCriterion): TestCaseStatus {
 }
 
 const caseStatusBadge: Record<TestCaseStatus, { icon: typeof Clock; label: string; className: string }> = {
+  pass: { icon: CheckCircle2, label: "通过", className: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400" },
+  fail: { icon: XCircle, label: "失败", className: "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400" },
   pending: { icon: Clock, label: "待执行", className: "bg-gray-100 text-gray-600 dark:bg-gray-900/40 dark:text-gray-400" },
   running: { icon: Loader2, label: "执行中", className: "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400" },
   passed: { icon: CheckCircle2, label: "通过", className: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400" },
@@ -461,7 +463,7 @@ export function TestCaseList() {
                             {ac.steps.map((step) => (
                               <div key={step.id}>
                                 <div className="flex items-start gap-3 px-10 py-2.5 hover:bg-muted/30 transition-colors">
-                                  <StepIcon status={step.status} />
+                                  <StepIcon status={step.status as TestStepStatus} />
                                   <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2">
                                       <span className="text-xs font-mono text-muted-foreground">
@@ -492,10 +494,10 @@ export function TestCaseList() {
                                   </div>
                                   <span
                                     className={`text-xs shrink-0 mt-0.5 ${
-                                      statusConfig[step.status].color
+                                      statusConfig[step.status as TestStepStatus].color
                                     }`}
                                   >
-                                    {statusConfig[step.status].label}
+                                    {statusConfig[step.status as TestStepStatus].label}
                                   </span>
                                 </div>
                                 <StepDetail step={step} />

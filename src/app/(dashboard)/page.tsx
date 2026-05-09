@@ -4,7 +4,7 @@ import useSWR from "swr"
 import { RefreshCw, Factory, FileText, GitPullRequest, Rocket, Activity, CheckCircle2 } from "lucide-react"
 import { MetricCard } from "@/components/ui/MetricCard"
 import { WipStats } from "@/components/factory/WipStats"
-import { LineStatusGrid } from "@/components/factory/LineStatusGrid"
+import { LineStatusGrid } from "@/components/dashboard/line-status-grid"
 import { AlertList } from "@/components/dashboard/alert-list"
 import { DashboardSkeleton } from "@/components/dashboard/dashboard-skeleton"
 import { RefreshTimestamp } from "@/components/dashboard/refresh-timestamp"
@@ -165,7 +165,7 @@ export default function DashboardPage() {
       {/* Line status grid */}
       <div>
         <h2 className="mb-4 text-lg font-semibold text-foreground">产线状态</h2>
-        <LineStatusGrid lines={lines} />
+        <LineStatusGrid data={lines} />
       </div>
 
       {/* Refresh timestamp */}

@@ -235,13 +235,10 @@ export function PlanReviewPanel() {
   const [rejectOpen, setRejectOpen] = useState(false)
   const [updating, setUpdating] = useState(false)
 
-  const selectedPlan = data?.plans.find((p) => p.id === selectedId) ?? null
-
-  // Set default selection when data loads
-  if (!selectedId && data && data.plans.length > 0) {
-    // Use microtask to avoid render-phase setState warning
-    queueMicrotask(() => setSelectedId(data.plans[0].id))
-  }
+  const selectedPlan =
+    selectedId
+      ? (data?.plans.find((p) => p.id === selectedId) ?? data?.plans[0] ?? null)
+      : (data?.plans[0] ?? null)
 
   const handleApprove = useCallback(async () => {
     if (!selectedPlan) return
@@ -342,7 +339,7 @@ export function PlanReviewPanel() {
           )}
           <select
             className="rounded-md border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-            value={selectedId ?? ""}
+            value={selectedPlan?.id ?? ""}
             onChange={(e) => setSelectedId(e.target.value)}
           >
             {data.plans.map((p) => (

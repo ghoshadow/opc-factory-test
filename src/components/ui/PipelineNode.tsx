@@ -56,9 +56,6 @@ export function PipelineNode({
     >
       <span className={cn("mb-1.5 size-2.5 rounded-full", cfg.dotColor)} />
       <span className="text-xs font-medium">{label}</span>
-      {cfg.icon && (
-        <span className="mt-1">{cfg.icon}</span>
-      )}
       {isActive && (
         <span className="absolute -bottom-2 rounded-full bg-primary px-2 py-px text-[10px] font-semibold text-primary-foreground">
           Active

@@ -7,7 +7,7 @@ import { StatusBadge } from "@/components/ui/StatusBadge"
 import { PipelineNode } from "@/components/ui/PipelineNode"
 import { DataTable } from "@/components/ui/DataTable"
 import { EmptyState } from "@/components/ui/EmptyState"
-import type { Deliverable } from "@/app/api/v1/factory/line-status/route"
+import type { DeliverableDetail } from "@/lib/types"
 
 export default function LineDetailPage() {
   const params = useParams()
@@ -66,7 +66,7 @@ export default function LineDetailPage() {
     {
       key: "status",
       header: "状态",
-      render: (item: Deliverable) => {
+      render: (item: DeliverableDetail) => {
         const statusLabel: Record<string, string> = {
           done: "已完成",
           in_progress: "进行中",
@@ -139,18 +139,20 @@ export default function LineDetailPage() {
       <section className="mb-8">
         <h2 className="mb-3 text-base font-semibold">Pipeline</h2>
         <div className="flex items-center gap-2 flex-wrap">
-          {line.pipeline.map((stage, i) => (
+          {(() => {
+            const stages = line.pipeline ?? line.pipelineSteps.map((s) => ({ name: s.label, status: "done" as const }))
+            return stages.map((stage, i) => (
             <div key={i} className="flex items-center gap-2">
               <PipelineNode
                 label={stage.name}
                 status={stage.status}
                 isActive={stage.status === "running"}
               />
-              {i < line.pipeline.length - 1 && (
+              {i < stages.length - 1 && (
                 <div className="w-6 h-px bg-border" />
               )}
             </div>
-          ))}
+          ))})()}
         </div>
       </section>
 
@@ -159,7 +161,7 @@ export default function LineDetailPage() {
         <h2 className="mb-3 text-base font-semibold">交付物</h2>
         <DataTable
           columns={deliverableColumns}
-          data={line.deliverables}
+          data={line.deliverables as unknown as DeliverableDetail[]}
           emptyMessage="暂无交付物"
         />
       </section>

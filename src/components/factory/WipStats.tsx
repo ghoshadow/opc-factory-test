@@ -19,14 +19,24 @@ interface WipResponse {
 const fetcher = (url: string): Promise<WipResponse> =>
   fetch(url).then((res) => res.json())
 
-export function WipStats() {
-  const { data, error, isLoading } = useSWR<WipResponse>(
-    "/api/v1/factory/wip",
+interface WipStatsProps {
+  data?: WipResponse
+}
+
+export function WipStats({ data: dataProp }: WipStatsProps = {}) {
+  const shouldFetch = !dataProp
+  const { data: swrData, error, isLoading } = useSWR<WipResponse>(
+    shouldFetch ? "/api/v1/factory/wip" : null,
     fetcher,
     { refreshInterval: 10000 }
   )
 
-  if (isLoading) {
+  const data = dataProp ?? swrData
+
+  const effectiveLoading = shouldFetch ? isLoading : false
+  const effectiveError = shouldFetch ? error : null
+
+  if (effectiveLoading) {
     return (
       <div className="rounded-xl border bg-card p-6 shadow-sm space-y-4">
         <Skeleton className="h-6 w-32" />
@@ -43,7 +53,7 @@ export function WipStats() {
     )
   }
 
-  if (error) {
+  if (effectiveError) {
     return (
       <div className="rounded-xl border bg-card p-6 shadow-sm">
         <p className="text-sm text-muted-foreground">Failed to load WIP stats</p>

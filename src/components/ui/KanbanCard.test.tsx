@@ -14,7 +14,7 @@ vi.mock("@dnd-kit/sortable", () => ({
 }))
 
 vi.mock("@dnd-kit/utilities", () => ({
-  CSS: { Transform: { toString: () => undefined } },
+  CSS: { Transform: { toString: () => "" } },
 }))
 
 function makeCard(overrides: Partial<KanbanCardData> = {}): KanbanCardData {
