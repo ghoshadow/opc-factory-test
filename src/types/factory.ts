@@ -135,6 +135,49 @@ export interface RunbookListResponse {
   total: number
 }
 
+// Alert Rule types
+export type AlertCondition = "gt" | "lt" | "gte" | "lte" | "eq" | "neq"
+
+export type AlertSeverity = "critical" | "warning" | "info"
+
+export type AlertRoutingTarget = "oncall" | "opc" | "auto_remediation"
+
+export interface AlertRoutingConfig {
+  target: AlertRoutingTarget
+  label: string
+  enabled: boolean
+}
+
+export interface AlertRule {
+  id: string
+  name: string
+  metric: string
+  condition: AlertCondition
+  threshold: number
+  severity: AlertSeverity
+  enabled: boolean
+  routing: AlertRoutingConfig[]
+  description: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface AlertRuleListResponse {
+  rules: AlertRule[]
+  total: number
+}
+
+export interface AlertRuleFormData {
+  name: string
+  metric: string
+  condition: AlertCondition
+  threshold: number
+  severity: AlertSeverity
+  enabled: boolean
+  routing: AlertRoutingConfig[]
+  description: string
+}
+
 // Pipeline flow types
 export type PipelineStageStatus = "waiting" | "running" | "done" | "failed"
 

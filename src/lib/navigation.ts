@@ -11,6 +11,7 @@ import {
   Play,
   TestTubeDiagonal,
   Columns3,
+  Bell,
   type LucideIcon,
 } from "lucide-react";
 
@@ -76,6 +77,7 @@ export const navigation: NavItem[] = [
     children: [
       { label: "Checker 门禁", icon: Shield, path: "/l5/checker" },
       { label: "Runbooks", icon: Activity, path: "/l5/runbooks" },
+      { label: "告警规则", icon: Bell, path: "/l5/alerts" },
     ],
   },
 ];
