@@ -10,11 +10,19 @@ export const productionLines: ProductionLine[] = [
     completed: 47,
     anomaly: "—",
     status: "NOMINAL",
+    throughput: 6,
+    cycleTime: 4.5,
     pipelineSteps: [
       { label: "需求提交" },
       { label: "Spec 产出" },
       { label: "成熟度评审" },
       { label: "交付" },
+    ],
+    pipeline: [
+      { name: "需求提交", status: "done" },
+      { name: "Spec 产出", status: "done" },
+      { name: "成熟度评审", status: "running" },
+      { name: "交付", status: "waiting" },
     ],
     deliverables: [
       { label: "Spec 文档" },
@@ -32,6 +40,8 @@ export const productionLines: ProductionLine[] = [
     completed: 35,
     anomaly: "F-2341 Silent Gap",
     status: "ATTENTION",
+    throughput: 4,
+    cycleTime: 8.2,
     pipelineSteps: [
       { label: "方案评审" },
       { label: "设计评审" },

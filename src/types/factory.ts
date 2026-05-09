@@ -18,6 +18,14 @@ export interface LineStatusData {
   nextMilestone?: string
 }
 
+export interface DeliverableDetail {
+  id: string
+  name: string
+  type: string
+  status: "done" | "in_progress" | "pending"
+  updatedAt: string
+}
+
 // Bug triage types
 export type BugPriority = "P0" | "P1" | "P2" | "P3"
 
@@ -407,15 +415,13 @@ export interface SpecVersionsResponse {
 }
 
 // Skills types
-export type ProductionLine = "requirements" | "coding" | "testing" | "sre"
-
 export type SkillStatus = "installed" | "available"
 
 export interface Skill {
   id: string
   name: string
   description: string
-  line: ProductionLine
+  line: LineId
   status: SkillStatus
 }
 

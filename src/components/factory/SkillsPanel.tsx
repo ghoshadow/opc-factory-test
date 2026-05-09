@@ -4,10 +4,10 @@ import { useState } from "react"
 import useSWR from "swr"
 import { cn } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
-import type { ProductionLine, Skill, SkillsResponse } from "@/types/factory"
+import type { LineId, Skill, SkillsResponse } from "@/types/factory"
 import { Package, Plus, Check, X } from "lucide-react"
 
-const lines: { key: ProductionLine; label: string }[] = [
+const lines: { key: LineId; label: string }[] = [
   { key: "requirements", label: "需求" },
   { key: "coding", label: "编码" },
   { key: "testing", label: "测试" },
@@ -18,7 +18,7 @@ const fetcher = (url: string): Promise<SkillsResponse> =>
   fetch(url).then((res) => res.json())
 
 export function SkillsPanel() {
-  const [activeLine, setActiveLine] = useState<ProductionLine>("requirements")
+  const [activeLine, setActiveLine] = useState<LineId>("requirements")
 
   const { data, error, isLoading, mutate } = useSWR<SkillsResponse>(
     `/api/v1/skills?line=${activeLine}`,

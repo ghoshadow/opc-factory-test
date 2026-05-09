@@ -1,7 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { LineStatus } from "@/lib/types";
-import type { LineStatusData } from "@/types/factory";
+import type { LineStatus, LineStatusData } from "@/types/factory";
 import { GitBranch, Code, TestTube, Server, CheckCircle2, AlertTriangle, XCircle, Pause } from "lucide-react";
 
 interface LineStatusGridProps {

@@ -12,8 +12,5 @@ export interface Deliverable {
 export type LineStatusResponse = typeof productionLines
 
 export async function GET() {
-  return NextResponse.json({
-    data: productionLines,
-    updatedAt: new Date().toISOString(),
-  });
+  return NextResponse.json(productionLines);
 }
