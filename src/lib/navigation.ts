@@ -62,7 +62,7 @@ export const navigation: NavItem[] = [
       { label: "测试产线", icon: GitBranch, path: "/l3/testing", children: [
         { label: "操作台", icon: GitBranch, path: "/l3/testing" },
         { label: "Bug 分诊", icon: GitBranch, path: "/l3/testing/bugs" },
-        { label: "工装管理", icon: GitBranch, path: "/l3/skills" },
+        { label: "Pipeline", icon: GitBranch, path: "/l3/testing/pipeline" },
       ]},
       { label: "SRE 产线", icon: GitBranch, path: "/l3/sre" },
     ],

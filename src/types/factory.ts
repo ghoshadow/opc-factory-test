@@ -91,3 +91,19 @@ export interface InstallSkillResponse {
   skillId: string
   status: SkillStatus
 }
+
+// Pipeline types (testing production line)
+export type PipelineNodeStatus = "waiting" | "running" | "done" | "failed"
+
+export interface PipelineStageNode {
+  id: string
+  label: string
+  status: PipelineNodeStatus
+  description: string
+  details: string[]
+}
+
+export interface PipelineResponse {
+  nodes: PipelineStageNode[]
+  totalNodes: number
+}
