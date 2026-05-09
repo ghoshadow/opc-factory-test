@@ -1,109 +1,68 @@
 "use client"
 
-import useSWR from "swr"
 import { cn } from "@/lib/utils"
-import { Skeleton } from "@/components/ui/skeleton"
+import { useWipStats } from "@/lib/api/factory"
 
-interface WipLine {
-  key: string
-  name: string
-  count: number
-  cssVar: string
-}
-
-interface WipResponse {
-  lines: WipLine[]
-  total: number
-}
-
-interface WipStatsProps {
-  data?: WipResponse
-  isLoading?: boolean
-  error?: unknown
-}
-
-const fetcher = (url: string): Promise<WipResponse> =>
-  fetch(url).then((res) => res.json())
-
-export function WipStats({ data: propData, isLoading: propLoading, error: propError }: WipStatsProps = {}) {
-  const hasProps = propData !== undefined || propLoading !== undefined || propError !== undefined
-
-  const { data: swrData, error: swrError, isLoading: swrLoading } = useSWR<WipResponse>(
-    hasProps ? null : "/api/v1/factory/wip",
-    fetcher,
-    { refreshInterval: 10000 }
-  )
-
-  const data = hasProps ? propData : swrData
-  const isLoading = hasProps ? (propLoading ?? false) : swrLoading
-  const error = hasProps ? propError : swrError
+export function WipStats() {
+  const { wip, isLoading, isError } = useWipStats()
 
   if (isLoading) {
     return (
-      <div className="rounded-xl border bg-card p-6 shadow-sm space-y-4">
-        <Skeleton className="h-6 w-32" />
+      <div className="rounded-xl border bg-card p-5 space-y-3">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="space-y-2">
-            <div className="flex justify-between">
-              <Skeleton className="h-4 w-20" />
-              <Skeleton className="h-4 w-16" />
-            </div>
-            <Skeleton className="h-3 w-full rounded-full" />
+          <div key={i} className="flex items-center gap-3">
+            <div className="h-4 w-20 rounded bg-muted animate-pulse" />
+            <div className="flex-1 h-6 rounded bg-muted animate-pulse" />
+            <div className="h-4 w-8 rounded bg-muted animate-pulse" />
           </div>
         ))}
       </div>
     )
   }
 
-  if (error) {
+  if (isError || !wip) {
     return (
-      <div className="rounded-xl border bg-card p-6 shadow-sm">
-        <p className="text-sm text-muted-foreground">Failed to load WIP stats</p>
+      <div className="rounded-xl border border-red-200 bg-red-50 p-5 text-center text-sm text-red-700 dark:border-red-800 dark:bg-red-950/20 dark:text-red-400">
+        Failed to load WIP stats. Please try again.
       </div>
     )
   }
 
-  if (!data) return null
+  const total = wip.reduce((sum, item) => sum + item.count, 0)
+  const maxCount = Math.max(...wip.map((item) => item.count))
 
-  const maxCount = Math.max(...data.lines.map((l) => l.count), 1)
+  const barColors: Record<string, string> = {
+    requirement: "bg-blue-500 dark:bg-blue-400",
+    coding: "bg-emerald-500 dark:bg-emerald-400",
+    testing: "bg-amber-500 dark:bg-amber-400",
+    sre: "bg-violet-500 dark:bg-violet-400",
+  }
 
   return (
-    <div className="rounded-xl border bg-card p-6 shadow-sm">
-      <div className="flex items-center justify-between mb-5">
-        <h3 className="text-sm font-semibold text-foreground">WIP 在制品统计</h3>
-        <span className="text-2xl font-bold tabular-nums">{data.total}</span>
+    <div className="rounded-xl border bg-card p-5">
+      <div className="flex items-baseline justify-between mb-4">
+        <div>
+          <span className="text-2xl font-semibold">{total}</span>
+          <span className="ml-1 text-sm text-muted-foreground">件在制品</span>
+        </div>
       </div>
-
-      <div className="space-y-4">
-        {data.lines.map((line) => {
-          const pct = data.total > 0 ? ((line.count / data.total) * 100).toFixed(1) : "0.0"
-          const barWidth = (line.count / maxCount) * 100
+      <div className="space-y-3">
+        {wip.map((item) => {
+          const pct = total > 0 ? Math.round((item.count / total) * 100) : 0
+          const widthPct = maxCount > 0 ? (item.count / maxCount) * 100 : 0
 
           return (
-            <div key={line.key} className="space-y-1.5">
+            <div key={item.lineId} className="space-y-1">
               <div className="flex items-center justify-between text-sm">
-                <span className="font-medium text-foreground">{line.name}</span>
-                <span className="tabular-nums text-muted-foreground">
-                  {line.count > 0 ? (
-                    <>
-                      <span className="font-semibold text-foreground">{line.count}</span>
-                      {" "}件 · {pct}%
-                    </>
-                  ) : (
-                    <span className="text-muted-foreground/60">待定</span>
-                  )}
+                <span className="font-medium">{item.name}</span>
+                <span className="text-muted-foreground">
+                  {item.count} 件 · {pct}%
                 </span>
               </div>
-              <div className="h-2.5 w-full rounded-full bg-muted overflow-hidden">
+              <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
                 <div
-                  className={cn(
-                    "h-full rounded-full transition-all duration-500",
-                    line.count === 0 && "w-0"
-                  )}
-                  style={{
-                    width: line.count > 0 ? `${barWidth}%` : "0%",
-                    backgroundColor: LINE_COLORS[line.key] ?? "#6B7280",
-                  }}
+                  className={cn("h-full rounded-full transition-all duration-500", barColors[item.lineId])}
+                  style={{ width: `${widthPct}%` }}
                 />
               </div>
             </div>

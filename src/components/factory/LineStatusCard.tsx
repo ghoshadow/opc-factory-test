@@ -1,69 +1,60 @@
 "use client"
 
-import { StatusBadge } from "@/components/ui/StatusBadge"
+import { useRouter } from "next/navigation"
+import { ArrowRight, Zap, Clock, Package } from "lucide-react"
 import { cn } from "@/lib/utils"
-import type { LineStatusData } from "@/types/factory"
+import { StatusBadge } from "@/components/ui/StatusBadge"
+import type { LineInfo } from "@/app/api/v1/factory/line-status/route"
 
 interface LineStatusCardProps {
-  data: LineStatusData
-  onClick: (id: string) => void
+  line: LineInfo
+  className?: string
 }
 
-export function LineStatusCard({ data, onClick }: LineStatusCardProps) {
-  const isAttention = data.status === "ATTENTION"
+export function LineStatusCard({ line, className }: LineStatusCardProps) {
+  const router = useRouter()
 
   return (
-    <button
-      type="button"
-      onClick={() => onClick(data.id)}
+    <div
       className={cn(
-        "group relative flex flex-col rounded-xl border bg-card p-6 text-left shadow-sm transition-all hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-        isAttention ? "border-amber-400 dark:border-amber-600" : "border-border",
+        "group rounded-xl border bg-card p-5 shadow-sm cursor-pointer transition-all hover:shadow-md hover:border-primary/30",
+        className,
       )}
+      onClick={() => router.push(`/lines/${line.id}`)}
     >
-      {/* Header: name + status */}
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-foreground">{data.name}</h3>
-        <StatusBadge status={data.status} />
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="font-semibold text-base">{line.name}</h3>
+        <StatusBadge status={line.status} />
       </div>
 
-      {/* OPC + function */}
-      <div className="mt-3 space-y-1">
-        <p className="text-sm text-muted-foreground">
-          <span className="font-medium text-foreground">OPC:</span> {data.opc}
-        </p>
-        <p className="text-sm text-muted-foreground">{data.function}</p>
-      </div>
-
-      {/* Metrics: WIP + completed */}
-      <div className="mt-4 grid grid-cols-2 gap-4">
-        <div>
-          <p className="text-xs text-muted-foreground">在制</p>
-          <p className="text-2xl font-semibold text-foreground">{data.wip}</p>
+      <div className="grid grid-cols-3 gap-3 mb-3">
+        <div className="flex items-center gap-1.5">
+          <Zap className="size-3.5 text-muted-foreground" />
+          <div>
+            <div className="text-lg font-semibold">{line.throughput}</div>
+            <div className="text-[10px] text-muted-foreground">feat/wk</div>
+          </div>
         </div>
-        <div>
-          <p className="text-xs text-muted-foreground">已完成</p>
-          <p className="text-2xl font-semibold text-foreground">{data.completed}</p>
+        <div className="flex items-center gap-1.5">
+          <Package className="size-3.5 text-muted-foreground" />
+          <div>
+            <div className="text-lg font-semibold">{line.wip}</div>
+            <div className="text-[10px] text-muted-foreground">WIP</div>
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <Clock className="size-3.5 text-muted-foreground" />
+          <div>
+            <div className="text-lg font-semibold">{line.cycleTime}</div>
+            <div className="text-[10px] text-muted-foreground">hr</div>
+          </div>
         </div>
       </div>
 
-      {/* Anomaly */}
-      <div className="mt-3">
-        <p className="text-xs text-muted-foreground">异常</p>
-        <p
-          className={cn(
-            "text-sm",
-            data.anomaly ? "font-medium text-amber-600 dark:text-amber-400" : "text-muted-foreground",
-          )}
-        >
-          {data.anomaly ?? "—"}
-        </p>
+      <div className="flex items-center gap-1 text-xs text-muted-foreground group-hover:text-primary transition-colors">
+        <span>查看详情</span>
+        <ArrowRight className="size-3 group-hover:translate-x-0.5 transition-transform" />
       </div>
-
-      {/* Hover indicator */}
-      <div className="mt-4 text-xs text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
-        点击查看详情 →
-      </div>
-    </button>
+    </div>
   )
 }

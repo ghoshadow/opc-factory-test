@@ -7,13 +7,15 @@ import { cn } from "@/lib/utils";
 type Trend = "up" | "down" | "stable";
 
 interface MetricCardProps {
-  label: string;
-  value: string | number;
-  unit?: string;
-  trend?: Trend;
-  trendValue?: string;
-  icon?: LucideIcon;
-  className?: string;
+  label: string
+  value: string | number
+  unit?: string
+  trend?: Trend
+  trendValue?: string | number
+  subtitle?: string
+  costUSD?: number
+  icon?: LucideIcon
+  className?: string
 }
 
 const trendConfig: Record<Trend, { icon: typeof ArrowUp; color: string; bg: string }> = {
@@ -30,17 +32,17 @@ const trendConfig: Record<Trend, { icon: typeof ArrowUp; color: string; bg: stri
   stable: { icon: Minus, color: "text-muted-foreground", bg: "bg-muted" },
 };
 
-export function MetricCard({
-  label,
-  value,
-  unit,
-  trend,
-  trendValue,
-  icon: Icon,
-  className,
-}: MetricCardProps) {
-  const trendCfg = trend ? trendConfig[trend] : null;
-  const TrendIcon = trendCfg?.icon;
+function formatTrendValue(trend: Trend, value: string | number): string {
+  if (typeof value === "number") {
+    const prefix = trend === "up" ? "+" : trend === "down" ? "-" : ""
+    return `${prefix}${value}`
+  }
+  return value
+}
+
+export function MetricCard({ label, value, unit, trend, trendValue, subtitle, costUSD, icon: Icon, className }: MetricCardProps) {
+  const trendCfg = trend ? trendConfig[trend] : null
+  const TrendIcon = trendCfg?.icon
 
   return (
     <div className={cn("rounded-xl border bg-card p-5 shadow-sm", className)}>
@@ -52,16 +54,20 @@ export function MetricCard({
         <span className="text-3xl font-semibold tracking-tight">{value}</span>
         {unit && <span className="text-sm text-muted-foreground">{unit}</span>}
       </div>
-      {trendCfg && TrendIcon && (
-        <div
-          className={cn(
-            "mt-3 inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium",
-            trendCfg.color,
-            trendCfg.bg,
+      {(trendCfg || subtitle) && (
+        <div className="mt-3 inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium">
+          {trendCfg && TrendIcon && (
+            <span className={cn("inline-flex items-center gap-1", trendCfg.color)}>
+              <TrendIcon className="size-3" />
+              {trendValue !== undefined && <span>{formatTrendValue(trend!, trendValue)}</span>}
+            </span>
           )}
-        >
-          <TrendIcon className="size-3" />
-          {trendValue && <span>{trendValue}</span>}
+          {subtitle && <span className="text-muted-foreground">{subtitle}</span>}
+        </div>
+      )}
+      {costUSD !== undefined && (
+        <div className="mt-1 text-xs text-muted-foreground">
+          ≈ ${costUSD.toFixed(2)} USD
         </div>
       )}
     </div>
