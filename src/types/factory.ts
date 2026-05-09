@@ -64,3 +64,23 @@ export interface SreCheckerResponse {
   allPass: boolean
   canRelease: boolean
 }
+
+// SRE Alert Rule types
+export type AlertRouting = "oncall" | "opc" | "auto"
+
+export interface AlertRule {
+  id: string
+  name: string
+  metric: string
+  condition: string
+  threshold: string
+  notifyTarget: string
+  routing: AlertRouting
+  enabled: boolean
+  description?: string
+}
+
+export interface AlertRuleListResponse {
+  rules: AlertRule[]
+  total: number
+}
