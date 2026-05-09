@@ -64,3 +64,32 @@ export interface SreCheckerResponse {
   allPass: boolean
   canRelease: boolean
 }
+
+// Runbook types
+export interface TroubleshootNode {
+  id: string
+  question: string
+  steps: string[]
+  solution: string
+  children?: TroubleshootNode[]
+}
+
+export interface Runbook {
+  id: string
+  name: string
+  description: string
+  service: string
+  version: number
+  startStopSteps: string[]
+  scaleSteps: string[]
+  troubleshootTree: TroubleshootNode[]
+  emergencyPlan: string
+  topologyExport: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface RunbookListResponse {
+  runbooks: Runbook[]
+  total: number
+}
