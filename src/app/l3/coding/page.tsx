@@ -212,7 +212,7 @@ export default function CodingOpsPage() {
             <PipelineFlow data={data.pipeline} />
           </div>
           <div ref={planReviewRef} id="plan-review" className="scroll-mt-20">
-            <PlanReviewPanel items={data.planReview} />
+            <PlanReviewPanel />
           </div>
           <div ref={designReviewRef} id="design-review" className="scroll-mt-20">
             <DesignReviewPanel items={data.designReview} />

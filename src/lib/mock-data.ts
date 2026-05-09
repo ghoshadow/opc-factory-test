@@ -2,7 +2,7 @@ import { ProductionLine } from "./types";
 
 export const productionLines: ProductionLine[] = [
   {
-    id: "requirement",
+    id: "requirements",
     name: "需求产线",
     opc: "陈",
     function: "Spec 产出与审核",
@@ -17,10 +17,10 @@ export const productionLines: ProductionLine[] = [
       { label: "交付" },
     ],
     deliverables: [
-      { label: "Spec 文档" },
-      { label: "本体条目" },
-      { label: "需求规格书" },
-      { label: "评审记录" },
+      { id: "d1", name: "Spec 文档", type: "文档", status: "done" as const, updatedAt: "2025-01-15" },
+      { id: "d2", name: "本体条目", type: "数据", status: "done" as const, updatedAt: "2025-01-14" },
+      { id: "d3", name: "需求规格书", type: "文档", status: "done" as const, updatedAt: "2025-01-13" },
+      { id: "d4", name: "评审记录", type: "记录", status: "done" as const, updatedAt: "2025-01-12" },
     ],
   },
   {
@@ -40,10 +40,10 @@ export const productionLines: ProductionLine[] = [
       { label: "交付" },
     ],
     deliverables: [
-      { label: "代码" },
-      { label: "测试用例" },
-      { label: "PR 记录" },
-      { label: "方案文档" },
+      { id: "d5", name: "代码", type: "代码", status: "in_progress" as const, updatedAt: "2025-01-15" },
+      { id: "d6", name: "测试用例", type: "测试", status: "done" as const, updatedAt: "2025-01-14" },
+      { id: "d7", name: "PR 记录", type: "记录", status: "done" as const, updatedAt: "2025-01-13" },
+      { id: "d8", name: "方案文档", type: "文档", status: "done" as const, updatedAt: "2025-01-12" },
     ],
   },
   {
@@ -63,10 +63,10 @@ export const productionLines: ProductionLine[] = [
       { label: "交付" },
     ],
     deliverables: [
-      { label: "测试用例" },
-      { label: "缺陷报告" },
-      { label: "覆盖报告" },
-      { label: "测试总结" },
+      { id: "d9", name: "测试用例", type: "测试", status: "done" as const, updatedAt: "2025-01-15" },
+      { id: "d10", name: "缺陷报告", type: "报告", status: "done" as const, updatedAt: "2025-01-14" },
+      { id: "d11", name: "覆盖报告", type: "报告", status: "done" as const, updatedAt: "2025-01-13" },
+      { id: "d12", name: "测试总结", type: "总结", status: "done" as const, updatedAt: "2025-01-12" },
     ],
   },
   {
@@ -86,10 +86,10 @@ export const productionLines: ProductionLine[] = [
       { label: "运维" },
     ],
     deliverables: [
-      { label: "部署配置" },
-      { label: "Runbook" },
-      { label: "告警规则" },
-      { label: "回滚方案" },
+      { id: "d13", name: "部署配置", type: "配置", status: "done" as const, updatedAt: "2025-01-15" },
+      { id: "d14", name: "Runbook", type: "文档", status: "done" as const, updatedAt: "2025-01-14" },
+      { id: "d15", name: "告警规则", type: "配置", status: "done" as const, updatedAt: "2025-01-13" },
+      { id: "d16", name: "回滚方案", type: "方案", status: "done" as const, updatedAt: "2025-01-12" },
     ],
   },
 ];

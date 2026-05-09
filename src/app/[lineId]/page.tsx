@@ -87,9 +87,9 @@ export default async function LineDetailPage({ params }: LineDetailPageProps) {
           <CardContent>
             <ul className="space-y-1.5 text-sm text-muted-foreground">
               {line.deliverables.map((d) => (
-                <li key={d.label} className="flex items-center gap-2">
+                <li key={d.name} className="flex items-center gap-2">
                   <span className="size-1.5 rounded-full bg-emerald-500" />
-                  {d.label}
+                  {d.name}
                 </li>
               ))}
             </ul>

@@ -1,7 +1,11 @@
-import { describe, it, expect, vi } from "vitest"
-import { render, screen } from "@testing-library/react"
+import { describe, it, expect, vi, afterEach } from "vitest"
+import { render, screen, cleanup } from "@testing-library/react"
 import { KanbanCard, KanbanCardOverlay } from "./KanbanCard"
 import type { KanbanCard as KanbanCardData } from "@/types/kanban"
+
+afterEach(() => {
+  cleanup()
+})
 
 vi.mock("@dnd-kit/sortable", () => ({
   useSortable: () => ({

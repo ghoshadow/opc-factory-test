@@ -1,20 +1,20 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { LineStatusData, LineStatus } from "@/lib/types";
+import { DashboardLineData, DashboardLineStatus } from "@/lib/types";
 import { GitBranch, Code, TestTube, Server, CheckCircle2, AlertTriangle, XCircle, Pause } from "lucide-react";
 
 interface LineStatusGridProps {
-  data: LineStatusData[];
+  data: DashboardLineData[];
 }
 
-const lineIcons: Record<LineStatusData["line"], typeof GitBranch> = {
-  requirement: GitBranch,
+const lineIcons: Record<DashboardLineData["line"], typeof GitBranch> = {
+  requirements: GitBranch,
   coding: Code,
   testing: TestTube,
   sre: Server,
 };
 
-const statusConfig: Record<LineStatus, { icon: typeof CheckCircle2; label: string; variant: "default" | "secondary" | "destructive" | "outline"; color: string }> = {
+const statusConfig: Record<DashboardLineStatus, { icon: typeof CheckCircle2; label: string; variant: "default" | "secondary" | "destructive" | "outline"; color: string }> = {
   healthy: { icon: CheckCircle2, label: "正常", variant: "default", color: "text-green-600" },
   degraded: { icon: AlertTriangle, label: "降级", variant: "secondary", color: "text-amber-600" },
   blocked: { icon: XCircle, label: "阻塞", variant: "destructive", color: "text-red-600" },

@@ -1,45 +1,70 @@
 import { NextResponse } from "next/server"
+import { productionLines } from "@/lib/mock-data"
+import type { LineStatusData } from "@/types/factory"
 
-export interface FactoryMetrics {
-  activeLines: { count: number; names: string[] }
-  throughput: { value: number; unit: string; trend: "up" | "down" | "stable"; trendValue: number }
-  weeklyDelivery: { value: number; trend: "up" | "down" | "stable"; trendValue: number }
-  avgCycleTime: { value: number; unit: string; trend: "up" | "down" | "stable" }
-  autoPassRate: { value: number; unit: string; trend: "up" | "down" | "stable" }
-  opcInterventions: { value: number }
-  capacityUtilization: { value: number; unit: string; trend: "up" | "down" | "stable" }
-  tokenConsumption: { value: number; unit: string; costUSD: number }
-  repoInventory: { count: number; trend: "up" | "down" | "stable" }
+interface Alert {
+  id: string
+  type: "warning" | "error" | "info"
+  message: string
+  source: string
+  timestamp: string
 }
 
-function generateMetrics(): FactoryMetrics {
-  const throughputBase = 12
-  const weeklyBase = 7
-  const throughputDelta = Math.round((Math.random() * 4 - 1) * 10) / 10
-  const weeklyDelta = Math.round((Math.random() * 3 - 1) * 10) / 10
+interface KpiData {
+  totalWip: number
+  totalCompleted: number
+  attentionLines: number
+  activeRequirements: number
+  pendingReviews: number
+  todayDeployments: number
+  systemHealth: number
+}
 
-  return {
-    activeLines: { count: 4, names: ["需求产线", "编码产线", "测试产线", "SRE产线"] },
-    throughput: {
-      value: throughputBase,
-      unit: "feat/wk",
-      trend: throughputDelta > 0 ? "up" : throughputDelta < 0 ? "down" : "stable",
-      trendValue: Math.abs(throughputDelta),
-    },
-    weeklyDelivery: {
-      value: weeklyBase,
-      trend: weeklyDelta > 0 ? "up" : weeklyDelta < 0 ? "down" : "stable",
-      trendValue: Math.abs(weeklyDelta),
-    },
-    avgCycleTime: { value: 2.4, unit: "hr", trend: "stable" },
-    autoPassRate: { value: 87, unit: "%", trend: "up" },
-    opcInterventions: { value: 3 },
-    capacityUtilization: { value: 82, unit: "%", trend: "up" },
-    tokenConsumption: { value: 3.4, unit: "M tok/day", costUSD: 12.8 },
-    repoInventory: { count: 7, trend: "up" },
-  }
+interface MetricsResponse {
+  timestamp: string
+  kpi: KpiData
+  alerts: Alert[]
+  lines: LineStatusData[]
+}
+
+const alerts: Alert[] = [
+  { id: "a1", type: "warning", message: "编码产线存在异常: F-2341 Silent Gap", source: "编码产线", timestamp: new Date().toISOString() },
+  { id: "a2", type: "info", message: "需求产线完成率超过 90%", source: "需求产线", timestamp: new Date().toISOString() },
+  { id: "a3", type: "error", message: "测试产线 Pipeline 执行超时", source: "测试产线", timestamp: new Date().toISOString() },
+]
+
+function getLines(): LineStatusData[] {
+  return productionLines.map((l) => ({
+    id: l.id,
+    name: l.name,
+    opc: l.opc,
+    function: l.function,
+    wip: l.wip,
+    completed: l.completed,
+    anomaly: l.anomaly === "—" ? null : l.anomaly,
+    status: l.status,
+  }))
 }
 
 export async function GET() {
-  return NextResponse.json(generateMetrics())
+  const now = new Date().toISOString()
+
+  const totalWip = productionLines.reduce((sum, l) => sum + l.wip, 0)
+  const totalCompleted = productionLines.reduce((sum, l) => sum + l.completed, 0)
+  const attentionLines = productionLines.filter((l) => l.status === "ATTENTION").length
+
+  return NextResponse.json({
+    timestamp: now,
+    kpi: {
+      totalWip,
+      totalCompleted,
+      attentionLines,
+      activeRequirements: 3,
+      pendingReviews: 5,
+      todayDeployments: 2,
+      systemHealth: attentionLines > 0 ? 66 : 88,
+    },
+    alerts,
+    lines: getLines(),
+  } satisfies MetricsResponse)
 }

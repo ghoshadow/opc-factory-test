@@ -1,10 +1,42 @@
 "use client"
 
 import { MetricCard } from "@/components/ui/MetricCard"
-import { useFactoryMetrics } from "@/lib/api/factory"
+import useSWR from "swr"
+
+interface Alert {
+  id: string
+  type: "warning" | "error" | "info"
+  message: string
+  source: string
+  timestamp: string
+}
+
+interface KpiData {
+  totalWip: number
+  totalCompleted: number
+  attentionLines: number
+  activeRequirements: number
+  pendingReviews: number
+  todayDeployments: number
+  systemHealth: number
+}
+
+interface MetricsResponse {
+  timestamp: string
+  kpi: KpiData
+  alerts: Alert[]
+  lines: unknown[]
+}
+
+const fetcher = (url: string): Promise<MetricsResponse> =>
+  fetch(url).then((res) => res.json())
 
 export function KpiGrid() {
-  const { metrics, isLoading, isError } = useFactoryMetrics()
+  const { data, error, isLoading } = useSWR<MetricsResponse>(
+    "/api/v1/factory/metrics",
+    fetcher,
+    { refreshInterval: 5000 }
+  )
 
   if (isLoading) {
     return (
@@ -19,7 +51,7 @@ export function KpiGrid() {
     )
   }
 
-  if (isError || !metrics) {
+  if (error || !data) {
     return (
       <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-center text-red-700 dark:border-red-800 dark:bg-red-950/20 dark:text-red-400">
         Failed to load metrics. Please try again.
@@ -27,78 +59,43 @@ export function KpiGrid() {
     )
   }
 
+  const { kpi } = data
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {/* Row 1 */}
       <MetricCard
-        label="在跑产线"
-        value={metrics.activeLines.count}
-        subtitle={metrics.activeLines.names.join(" / ")}
+        label="在制总量"
+        value={kpi.totalWip}
+        unit="项"
       />
-
       <MetricCard
-        label="吞吐量"
-        value={metrics.throughput.value}
-        unit={metrics.throughput.unit}
-        trend={metrics.throughput.trend}
-        trendValue={metrics.throughput.trendValue}
-        subtitle="环比上周"
+        label="已完成总量"
+        value={kpi.totalCompleted}
+        unit="项"
       />
-
       <MetricCard
-        label="本周交付"
-        value={metrics.weeklyDelivery.value}
-        unit="feat"
-        trend={metrics.weeklyDelivery.trend}
-        trendValue={metrics.weeklyDelivery.trendValue}
-        subtitle="环比上周"
+        label="需关注产线"
+        value={kpi.attentionLines}
+        unit="条"
       />
-
-      {/* Row 2 */}
       <MetricCard
-        label="平均交付周期"
-        value={metrics.avgCycleTime.value}
-        unit={metrics.avgCycleTime.unit}
-        trend={metrics.avgCycleTime.trend}
-        subtitle="环比趋势"
+        label="活跃需求"
+        value={kpi.activeRequirements}
+        unit="项"
       />
-
       <MetricCard
-        label="自动通过率"
-        value={metrics.autoPassRate.value}
-        unit={metrics.autoPassRate.unit}
-        trend={metrics.autoPassRate.trend}
-        subtitle="环比趋势"
+        label="待评审"
+        value={kpi.pendingReviews}
+        unit="项"
       />
-
       <MetricCard
-        label="OPC 人工介入"
-        value={metrics.opcInterventions.value}
+        label="今日部署"
+        value={kpi.todayDeployments}
         unit="次"
-        subtitle="本周累计"
       />
-
-      {/* Row 3 */}
       <MetricCard
-        label="产能利用率"
-        value={metrics.capacityUtilization.value}
-        unit={metrics.capacityUtilization.unit}
-        trend={metrics.capacityUtilization.trend}
-        subtitle="环比趋势"
-      />
-
-      <MetricCard
-        label="Token 能耗"
-        value={metrics.tokenConsumption.value}
-        unit={metrics.tokenConsumption.unit}
-        costUSD={metrics.tokenConsumption.costUSD}
-      />
-
-      <MetricCard
-        label="仓库库存"
-        value={metrics.repoInventory.count}
-        trend={metrics.repoInventory.trend}
-        subtitle="环比趋势"
+        label="系统健康度"
+        value={`${kpi.systemHealth}%`}
       />
     </div>
   )

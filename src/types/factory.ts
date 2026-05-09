@@ -398,3 +398,84 @@ export interface PipelineResponse {
   nodes: PipelineStageNode[]
   totalNodes: number
 }
+
+// Coding pipeline types
+export interface CodingPipelineNodeDetails {
+  plan: string
+  design?: string
+  code: string
+  report: string
+}
+
+export interface CodingPipelineNode {
+  id: string
+  label: string
+  description: string
+  status: PipelineNodeStatus
+  details: CodingPipelineNodeDetails
+}
+
+export interface CodingPipelineResponse {
+  nodes: CodingPipelineNode[]
+  currentStep: number
+  totalSteps: number
+}
+
+// Testing execute types
+export type TestStepStatus = "passed" | "failed" | "skipped" | "pending" | "running"
+
+export interface TestStep {
+  id: string
+  description: string
+  expectedResult: string
+  status: TestStepStatus
+  duration: number
+  actualResult?: string
+  errorDetail?: string
+  screenshot?: string
+  log?: string
+}
+
+export interface TestStepInput {
+  id: string
+  description: string
+  expectedResult: string
+  status: TestStepStatus
+  actualResult?: string
+  duration?: number
+  errorDetail?: string
+  screenshot?: string
+  log?: string
+}
+
+export interface AcceptanceCriterion {
+  id: string
+  title: string
+  steps: TestStepInput[]
+}
+
+export interface TestScenario {
+  id: string
+  name: string
+  feature: string
+  acceptanceCriteria: AcceptanceCriterion[]
+}
+
+export interface TestCasesResponse {
+  scenarios: TestScenario[]
+  total: number
+}
+
+export interface ExecuteRequest {
+  scenarioId?: string
+  acId?: string
+}
+
+export interface ExecuteResponse {
+  scenarioId: string
+  acId: string
+  results: TestStep[]
+  passed: number
+  failed: number
+  total: number
+}
