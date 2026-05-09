@@ -3,6 +3,7 @@ import { Inter, Geist } from "next/font/google";
 import "./globals.css";
 import { AppShell } from "@/components/layout/AppShell";
 import { cn } from "@/lib/utils";
+import { Toaster } from "sonner";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
@@ -22,6 +23,7 @@ export default function RootLayout({
     <html lang="zh-CN" className={cn("font-sans", geist.variable)}>
       <body className={inter.className}>
         <AppShell>{children}</AppShell>
+        <Toaster richColors />
       </body>
     </html>
   );
