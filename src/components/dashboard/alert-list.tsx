@@ -1,78 +1,96 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Alert as AlertType } from "@/lib/types";
-import { AlertTriangle, AlertCircle, Info, Clock } from "lucide-react";
+"use client"
 
-interface AlertListProps {
-  alerts: AlertType[];
+import { AlertTriangle, AlertCircle, Info } from "lucide-react"
+import { cn } from "@/lib/utils"
+
+interface Alert {
+  id: string
+  type: "warning" | "error" | "info"
+  message: string
+  source: string
+  timestamp: string
 }
 
-const typeConfig: Record<AlertType["type"], { icon: typeof AlertTriangle; variant: "destructive" | "default" | "secondary"; label: string }> = {
-  error: { icon: AlertCircle, variant: "destructive", label: "错误" },
-  warning: { icon: AlertTriangle, variant: "default", label: "警告" },
-  info: { icon: Info, variant: "secondary", label: "信息" },
-};
+interface AlertListProps {
+  alerts: Alert[]
+}
 
-function formatRelativeTime(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return "刚刚";
-  if (mins < 60) return `${mins}分钟前`;
-  const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours}小时前`;
-  return `${Math.floor(hours / 24)}天前`;
+const typeConfig: Record<Alert["type"], { icon: typeof AlertTriangle; label: string; color: string; bg: string }> = {
+  warning: {
+    icon: AlertTriangle,
+    label: "警告",
+    color: "text-amber-600 dark:text-amber-400",
+    bg: "bg-amber-50 dark:bg-amber-950/40",
+  },
+  error: {
+    icon: AlertCircle,
+    label: "错误",
+    color: "text-red-600 dark:text-red-400",
+    bg: "bg-red-50 dark:bg-red-950/40",
+  },
+  info: {
+    icon: Info,
+    label: "信息",
+    color: "text-blue-600 dark:text-blue-400",
+    bg: "bg-blue-50 dark:bg-blue-950/40",
+  },
+}
+
+function relativeTime(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime()
+  const mins = Math.floor(diff / 60000)
+  if (mins < 1) return "刚刚"
+  if (mins < 60) return `${mins} 分钟前`
+  const hours = Math.floor(mins / 60)
+  if (hours < 24) return `${hours} 小时前`
+  const days = Math.floor(hours / 24)
+  return `${days} 天前`
 }
 
 export function AlertList({ alerts }: AlertListProps) {
   if (alerts.length === 0) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">告警列表</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground text-center py-4">
-            当前无告警
-          </p>
-        </CardContent>
-      </Card>
-    );
+      <div className="rounded-xl border bg-card p-6 shadow-sm">
+        <h3 className="text-sm font-semibold text-foreground">告警列表</h3>
+        <p className="mt-4 text-sm text-muted-foreground text-center">暂无告警</p>
+      </div>
+    )
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">告警列表</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-3">
-          {alerts.map((alert) => {
-            const config = typeConfig[alert.type];
-            const Icon = config.icon;
-            return (
-              <div
-                key={alert.id}
-                className="flex items-start gap-3 rounded-lg border p-3 text-sm"
-              >
-                <Icon className="h-4 w-4 mt-0.5 shrink-0 text-muted-foreground" />
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium">{alert.message}</p>
-                  <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
-                    <Badge variant={config.variant} className="text-[10px] px-1.5 py-0">
-                      {config.label}
-                    </Badge>
-                    <span>{alert.source}</span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      {formatRelativeTime(alert.timestamp)}
-                    </span>
-                  </div>
+    <div className="rounded-xl border bg-card p-6 shadow-sm">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-sm font-semibold text-foreground">告警列表</h3>
+        <span className="text-xs text-muted-foreground tabular-nums">{alerts.length} 条</span>
+      </div>
+
+      <div className="space-y-3">
+        {alerts.map((alert) => {
+          const cfg = typeConfig[alert.type]
+          const Icon = cfg.icon
+
+          return (
+            <div
+              key={alert.id}
+              className="flex items-start gap-3 rounded-lg border p-3 text-sm"
+            >
+              <span className={cn("mt-0.5 flex-shrink-0", cfg.color)}>
+                <Icon className="size-4" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-foreground leading-snug">{alert.message}</p>
+                <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                  <span className={cn("rounded px-1.5 py-0.5 font-medium", cfg.bg, cfg.color)}>
+                    {cfg.label}
+                  </span>
+                  <span>{alert.source}</span>
+                  <span>{relativeTime(alert.timestamp)}</span>
                 </div>
               </div>
-            );
-          })}
-        </div>
-      </CardContent>
-    </Card>
-  );
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
 }
