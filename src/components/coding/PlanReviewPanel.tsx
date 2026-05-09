@@ -32,7 +32,7 @@ const statusConfig = {
     className: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800",
   },
   rejected: {
-    label: "已驳回",
+    label: "已打回",
     icon: XCircle,
     className: "bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-400 border-red-200 dark:border-red-800",
   },

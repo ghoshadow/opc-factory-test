@@ -117,10 +117,10 @@ describe("PlanReviewPanel", () => {
     expect(screen.getByText("已确认")).toBeInTheDocument()
   })
 
-  it("shows '已驳回' badge for rejected plan", () => {
+  it("shows '已打回' badge for rejected plan", () => {
     setSWR({ data: planData({ status: "rejected", rejectionReason: "r" }), isLoading: false })
     render(<PlanReviewPanel />)
-    expect(screen.getByText("已驳回")).toBeInTheDocument()
+    expect(screen.getByText("已打回")).toBeInTheDocument()
   })
 
   // ── Four sections (AC: Plan 内容完整展示 - 拆分/API/依赖/预估) ──
@@ -224,7 +224,7 @@ describe("PlanReviewPanel", () => {
     setSWR({ data: planData({ status: "rejected", rejectionReason: "工作量评估偏低" }), isLoading: false })
     render(<PlanReviewPanel />)
     // Verify rejected plan renders with status badge
-    expect(screen.getByText("已驳回")).toBeInTheDocument()
+    expect(screen.getByText("已打回")).toBeInTheDocument()
     // The rejectionReason text may not appear synchronously due to queueMicrotask
     // but it exists in the data model - verified by the badge above
   })
