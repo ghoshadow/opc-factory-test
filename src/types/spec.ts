@@ -18,11 +18,18 @@ export interface DataContract {
 }
 
 export interface ChangeRecord {
-  source: 'review_board' | 'gap_agent' | 'revision_engine'
+  source: 'review_board' | 'gap_agent' | 'revision_engine' | 'signoff'
   timestamp: string
   description: string
   versionFrom: number
   versionTo: number
+}
+
+export interface SignoffAction {
+  action: 'approve' | 'reject'
+  comment?: string
+  reviewerName: string
+  timestamp: string
 }
 
 export interface MetaSpec {
@@ -32,6 +39,6 @@ export interface MetaSpec {
   acceptanceCriteria: ACItem[]
   dataContract: DataContract
   uxDraft: string
-  status: 'draft' | 'ready_for_review' | 'in_review' | 'signed_off'
+  status: 'draft' | 'ready_for_review' | 'in_review' | 'signed_off' | 'rework'
   changeTrace: ChangeRecord[]
 }

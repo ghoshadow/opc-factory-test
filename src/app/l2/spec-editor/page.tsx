@@ -1,6 +1,7 @@
 "use client"
 
 import { SpecEditor } from "@/components/requirement/SpecEditor"
+import { SignoffPanel } from "@/components/requirement/SignoffPanel"
 
 export default function SpecEditorPage() {
   return (
@@ -15,6 +16,9 @@ export default function SpecEditorPage() {
 
       {/* Editor */}
       <SpecEditor specId="spec-001" />
+
+      {/* Signoff Panel */}
+      <SignoffPanel specId="spec-001" />
     </div>
   )
 }
