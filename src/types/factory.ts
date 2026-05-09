@@ -64,3 +64,19 @@ export interface SreCheckerResponse {
   allPass: boolean
   canRelease: boolean
 }
+
+// Maturity Judge types
+export interface MaturityDimension {
+  name: string
+  key: string
+  score: number
+  description: string
+}
+
+export interface MaturityResponse {
+  specId: string
+  specTitle: string
+  dimensions: MaturityDimension[]
+  threshold: number
+  verdict: "PASS" | "FAIL"
+}
