@@ -51,6 +51,7 @@ export const navigation: NavItem[] = [
       { label: "Toco 报告", icon: Zap, path: "/l3/coding/toco-report" },
       { label: "Plan Review", icon: FileText, path: "/l3/coding/plan-review" },
       { label: "Design Review", icon: Shield, path: "/l3/coding/design-review" },
+      { label: "安全重构", icon: Shield, path: "/l3/coding/refactor" },
       { label: "Pipeline 流程图", icon: GitBranch, path: "/l3/coding/pipeline-demo" },
       { label: "测试产线", icon: GitBranch, path: "/l3/testing" },
       { label: "测试流水线", icon: Play, path: "/l3/testing/pipeline" },

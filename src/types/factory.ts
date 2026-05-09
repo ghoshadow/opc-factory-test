@@ -542,3 +542,77 @@ export interface ObservabilityResponse {
   type: ObservabilityType
   data: MetricsData | LogsData | TraceData | SloData
 }
+
+// ─── Brownfield Refactor Types ──────────────────────────────
+
+export type RefactorPhase = "analyzing" | "refactoring" | "validating" | "complete"
+
+export interface RefactorChange {
+  id: string
+  file: string
+  description: string
+  before: string
+  after: string
+  linesChanged: number
+}
+
+export interface RefactorImpact {
+  id: string
+  area: string
+  description: string
+  severity: "low" | "medium" | "high"
+  affectedFiles: string[]
+}
+
+export interface RefactorRisk {
+  id: string
+  title: string
+  description: string
+  level: "low" | "medium" | "high"
+  mitigation: string
+}
+
+export interface CoverageData {
+  overall: number
+  target: number
+  byFile: { file: string; coverage: number }[]
+  updatedAt: string
+}
+
+export interface DeliverableItem {
+  type: "code" | "spec" | "doc" | "test_report"
+  label: string
+  description: string
+  status: "ready" | "pending"
+  detail: string
+}
+
+export interface RefactorPlan {
+  id: string
+  title: string
+  changes: RefactorChange[]
+  impacts: RefactorImpact[]
+  risks: RefactorRisk[]
+  estimatedHours: number
+}
+
+export interface RefactorStatusResponse {
+  id: string
+  plan: RefactorPlan
+  phase: RefactorPhase
+  progress: number
+  coverage: CoverageData | null
+  deliverables: DeliverableItem[]
+  startedAt: string | null
+  completedAt: string | null
+}
+
+export interface RefactorConfirmRequest {
+  action: "confirm" | "execute"
+}
+
+export interface RefactorConfirmResponse {
+  id: string
+  phase: RefactorPhase
+  message: string
+}
