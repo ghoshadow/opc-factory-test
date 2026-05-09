@@ -1,8 +1,9 @@
 "use client";
 
+import { Activity, Pause } from "lucide-react";
+
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import { Activity, Pause } from "lucide-react";
 
 type FactoryStatus = "running" | "paused";
 
@@ -38,7 +39,7 @@ export function TopBar({ status = "running" }: TopBarProps) {
         <div
           className={cn(
             "flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium",
-            cfg.color
+            cfg.color,
           )}
         >
           <Icon className={cn("h-3 w-3", cfg.pulse)} />

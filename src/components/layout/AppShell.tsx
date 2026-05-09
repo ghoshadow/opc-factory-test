@@ -2,8 +2,9 @@
 
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { TopBar } from "./TopBar";
+
 import { AppSidebar } from "./Sidebar";
+import { TopBar } from "./TopBar";
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -21,9 +22,7 @@ export function AppShell({ children }: AppShellProps) {
               <div className="flex items-center gap-2 px-4 py-2">
                 <SidebarTrigger />
               </div>
-              <div className="mx-auto max-w-[1440px] px-6 pb-6">
-                {children}
-              </div>
+              <div className="mx-auto max-w-[1440px] px-6 pb-6">{children}</div>
             </main>
           </div>
         </SidebarProvider>

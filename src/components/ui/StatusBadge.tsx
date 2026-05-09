@@ -1,15 +1,18 @@
-"use client"
+"use client";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
-type Status = "NOMINAL" | "ATTENTION" | "BLOCKED"
+type Status = "NOMINAL" | "ATTENTION" | "BLOCKED";
 
 interface StatusBadgeProps {
-  status: Status
-  className?: string
+  status: Status;
+  className?: string;
 }
 
-const statusConfig: Record<Status, { label: string; dotColor: string; textColor: string; bg: string }> = {
+const statusConfig: Record<
+  Status,
+  { label: string; dotColor: string; textColor: string; bg: string }
+> = {
   NOMINAL: {
     label: "Nominal",
     dotColor: "bg-emerald-500",
@@ -28,10 +31,10 @@ const statusConfig: Record<Status, { label: string; dotColor: string; textColor:
     textColor: "text-red-700 dark:text-red-400",
     bg: "bg-red-50 dark:bg-red-950/40",
   },
-}
+};
 
 export function StatusBadge({ status, className }: StatusBadgeProps) {
-  const cfg = statusConfig[status]
+  const cfg = statusConfig[status];
 
   return (
     <span
@@ -44,9 +47,11 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
     >
       <span className="relative flex size-2">
         <span className={cn("absolute inset-0 rounded-full", cfg.dotColor)} />
-        <span className={cn("absolute inset-0 animate-ping rounded-full opacity-75", cfg.dotColor)} />
+        <span
+          className={cn("absolute inset-0 animate-ping rounded-full opacity-75", cfg.dotColor)}
+        />
       </span>
       {cfg.label}
     </span>
-  )
+  );
 }

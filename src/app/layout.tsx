@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
-import { Inter, Geist } from "next/font/google";
+import { Geist, Inter } from "next/font/google";
+
 import "./globals.css";
+
 import { AppShell } from "@/components/layout/AppShell";
 import { cn } from "@/lib/utils";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 const inter = Inter({ subsets: ["latin"] });
 

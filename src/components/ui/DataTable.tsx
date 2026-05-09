@@ -1,27 +1,29 @@
-"use client"
+"use client";
 
-import { useState, useMemo } from "react"
-import { ArrowUpDown, ArrowUp, ArrowDown, Loader2 } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { useMemo, useState } from "react";
+
+import { ArrowDown, ArrowUp, ArrowUpDown, Loader2 } from "lucide-react";
+
+import { cn } from "@/lib/utils";
 
 interface Column<T> {
-  key: string
-  header: string
-  sortable?: boolean
-  render?: (item: T) => React.ReactNode
-  className?: string
+  key: string;
+  header: string;
+  sortable?: boolean;
+  render?: (item: T) => React.ReactNode;
+  className?: string;
 }
 
 interface DataTableProps<T> {
-  columns: Column<T>[]
-  data: T[]
-  onRowClick?: (item: T) => void
-  isLoading?: boolean
-  emptyMessage?: string
-  className?: string
+  columns: Column<T>[];
+  data: T[];
+  onRowClick?: (item: T) => void;
+  isLoading?: boolean;
+  emptyMessage?: string;
+  className?: string;
 }
 
-type SortState = { key: string; direction: "asc" | "desc" } | null
+type SortState = { key: string; direction: "asc" | "desc" } | null;
 
 export function DataTable<T extends object>({
   columns,
@@ -31,33 +33,36 @@ export function DataTable<T extends object>({
   emptyMessage = "No data available",
   className,
 }: DataTableProps<T>) {
-  const [sort, setSort] = useState<SortState>(null)
+  const [sort, setSort] = useState<SortState>(null);
 
   const sortedData = useMemo(() => {
-    if (!sort) return data
+    if (!sort) return data;
     return [...data].sort((a, b) => {
-      const aVal = (a as Record<string, unknown>)[sort.key]
-      const bVal = (b as Record<string, unknown>)[sort.key]
-      if (aVal == null || bVal == null) return 0
-      const cmp = aVal < bVal ? -1 : aVal > bVal ? 1 : 0
-      return sort.direction === "asc" ? cmp : -cmp
-    })
-  }, [data, sort])
+      const aVal = (a as Record<string, unknown>)[sort.key];
+      const bVal = (b as Record<string, unknown>)[sort.key];
+      if (aVal == null || bVal == null) return 0;
+      const cmp = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+      return sort.direction === "asc" ? cmp : -cmp;
+    });
+  }, [data, sort]);
 
   const handleSort = (key: string) => {
     setSort((prev) => {
-      if (prev?.key !== key) return { key, direction: "asc" }
-      if (prev.direction === "asc") return { key, direction: "desc" }
-      return null
-    })
-  }
+      if (prev?.key !== key) return { key, direction: "asc" };
+      if (prev.direction === "asc") return { key, direction: "desc" };
+      return null;
+    });
+  };
 
   const SortIcon = ({ columnKey }: { columnKey: string }) => {
-    if (sort?.key !== columnKey) return <ArrowUpDown className="ml-1 size-3 text-muted-foreground/50" />
-    return sort.direction === "asc"
-      ? <ArrowUp className="ml-1 size-3" />
-      : <ArrowDown className="ml-1 size-3" />
-  }
+    if (sort?.key !== columnKey)
+      return <ArrowUpDown className="ml-1 size-3 text-muted-foreground/50" />;
+    return sort.direction === "asc" ? (
+      <ArrowUp className="ml-1 size-3" />
+    ) : (
+      <ArrowDown className="ml-1 size-3" />
+    );
+  };
 
   if (isLoading) {
     return (
@@ -81,16 +86,21 @@ export function DataTable<T extends object>({
           ))}
         </div>
       </div>
-    )
+    );
   }
 
   if (data.length === 0) {
     return (
-      <div className={cn("flex flex-col items-center justify-center rounded-lg border py-12 text-center", className)}>
+      <div
+        className={cn(
+          "flex flex-col items-center justify-center rounded-lg border py-12 text-center",
+          className,
+        )}
+      >
         <Loader2 className="mb-2 size-8 text-muted-foreground/40" />
         <p className="text-sm text-muted-foreground">{emptyMessage}</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -128,7 +138,9 @@ export function DataTable<T extends object>({
             >
               {columns.map((col) => (
                 <td key={col.key} className={cn("px-4 py-3 text-sm", col.className)}>
-                  {col.render ? col.render(item) : String((item as Record<string, unknown>)[col.key] ?? "")}
+                  {col.render
+                    ? col.render(item)
+                    : String((item as Record<string, unknown>)[col.key] ?? "")}
                 </td>
               ))}
             </tr>
@@ -136,5 +148,5 @@ export function DataTable<T extends object>({
         </tbody>
       </table>
     </div>
-  )
+  );
 }
