@@ -1,0 +1,110 @@
+#!/usr/bin/env python3
+"""Plane CLI - 供 Claude Code Agent 在 workspace 中调用 Plane API"""
+import os, sys, json, argparse, urllib.request, urllib.error
+
+PLANE_ENDPOINT = os.environ.get("PLANE_ENDPOINT", "http://localhost:8000")
+PLANE_API_KEY = os.environ.get("PLANE_API_KEY") or "plane_api_de6f05b6d9934ac7829d0c9f88ee26e4"
+PLANE_WORKSPACE = os.environ.get("PLANE_WORKSPACE", "opc-factory")
+PLANE_PROJECT = os.environ.get("PLANE_PROJECT", "f792dd94-b808-4b0f-9a33-5b732d3bd2de")
+
+BASE = f"{PLANE_ENDPOINT}/api/v1/workspaces/{PLANE_WORKSPACE}/projects/{PLANE_PROJECT}"
+
+def _req(method, path, data=None):
+    url = f"{BASE}{path}"
+    body = json.dumps(data).encode() if data else None
+    req = urllib.request.Request(url, data=body, method=method)
+    req.add_header("Content-Type", "application/json")
+    req.add_header("X-Api-Key", PLANE_API_KEY)
+    try:
+        with urllib.request.urlopen(req) as resp:
+            return resp.status, json.loads(resp.read())
+    except urllib.error.HTTPError as e:
+        return e.code, e.read().decode()
+
+def get_state(state_name):
+    """Resolve state name to state ID"""
+    status, data = _req("GET", "/states/")
+    if status == 200:
+        for s in data.get("results", []):
+            if s["name"] == state_name:
+                return s["id"]
+    return None
+
+def get_issue(issue_id):
+    """Get issue details including current state"""
+    status, data = _req("GET", f"/work-items/{issue_id}/?expand=state")
+    if status == 200:
+        state = data.get("state", {})
+        if isinstance(state, dict):
+            print(f"State: {state.get('name', 'unknown')}")
+        else:
+            print(f"State: {state}")
+        print(f"Title: {data.get('name', 'N/A')}")
+        print(f"Priority: {data.get('priority', 'N/A')}")
+    else:
+        print(f"ERROR: {status} - {data}")
+        sys.exit(1)
+
+def get_comments(issue_id):
+    """List comments on an issue"""
+    status, data = _req("GET", f"/work-items/{issue_id}/comments/")
+    if status == 200:
+        for c in data.get("results", []):
+            print(f"[{c['id'][:8]}] {c.get('comment_html','')[:200]}")
+    else:
+        print(f"ERROR: {status} - {data}")
+        sys.exit(1)
+
+def update_state(issue_id, state_name):
+    state_id = get_state(state_name)
+    if not state_id:
+        print(f"ERROR: State '{state_name}' not found")
+        sys.exit(1)
+    status, data = _req("PATCH", f"/work-items/{issue_id}/", {"state": state_id})
+    if status in (200, 201):
+        print(f"OK: Issue state updated to '{state_name}'")
+    else:
+        print(f"ERROR: {status} - {data}")
+        sys.exit(1)
+
+def add_comment(issue_id, body):
+    html = f"<p>{body.replace(chr(10), '<br>')}</p>"
+    status, data = _req("POST", f"/work-items/{issue_id}/comments/", {"comment_html": html})
+    if status in (200, 201):
+        print(f"OK: Comment added")
+    else:
+        print(f"ERROR: {status} - {data}")
+        sys.exit(1)
+
+def main():
+    p = argparse.ArgumentParser(prog="plane")
+    sp = p.add_subparsers(dest="cmd")
+
+    s = sp.add_parser("state", help="Update issue state")
+    s.add_argument("issue_id", help="Plane issue UUID")
+    s.add_argument("state", help="New state name (e.g. 'In Progress', 'Human Review', 'Done')")
+
+    c = sp.add_parser("comment", help="Add comment to issue")
+    c.add_argument("issue_id", help="Plane issue UUID")
+    c.add_argument("body", help="Comment body (markdown)")
+
+    g = sp.add_parser("get", help="Get issue details (current state, title)")
+    g.add_argument("issue_id", help="Plane issue UUID")
+
+    l = sp.add_parser("comments", help="List issue comments")
+    l.add_argument("issue_id", help="Plane issue UUID")
+
+    args = p.parse_args()
+    if args.cmd == "state":
+        update_state(args.issue_id, args.state)
+    elif args.cmd == "comment":
+        add_comment(args.issue_id, args.body)
+    elif args.cmd == "get":
+        get_issue(args.issue_id)
+    elif args.cmd == "comments":
+        get_comments(args.issue_id)
+    else:
+        p.print_help()
+
+if __name__ == "__main__":
+    main()
