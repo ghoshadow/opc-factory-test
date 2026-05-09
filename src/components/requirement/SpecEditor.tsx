@@ -2,9 +2,10 @@
 
 import { useState, useEffect, useCallback, useRef } from "react"
 import useSWR from "swr"
+import Link from "next/link"
 import { cn } from "@/lib/utils"
 import type { MetaSpec, ACItem, DataContract, DataContractField, ChangeRecord } from "@/types/spec"
-import { Eye, Edit3, Save, Loader2, GitBranch, BookOpen, CheckSquare, Database, Palette } from "lucide-react"
+import { Eye, Edit3, Save, Loader2, GitBranch, BookOpen, CheckSquare, Database, Palette, History } from "lucide-react"
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
@@ -330,23 +331,32 @@ export function SpecEditor({ specId }: SpecEditorProps) {
             {spec.status === "signed_off" && "已签批"}
           </span>
         </div>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          {saving ? (
-            <>
-              <Loader2 className="size-3.5 animate-spin" />
-              保存中...
-            </>
-          ) : dirty ? (
-            <>
-              <Edit3 className="size-3.5" />
-              未保存
-            </>
-          ) : (
-            <>
-              <Save className="size-3.5" />
-              已保存
-            </>
-          )}
+        <div className="flex items-center gap-3">
+          <Link
+            href={`/l2/spec-editor/versions?specId=${specId}`}
+            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:border-muted-foreground/40 transition-colors"
+          >
+            <History className="size-3.5" />
+            版本历史
+          </Link>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            {saving ? (
+              <>
+                <Loader2 className="size-3.5 animate-spin" />
+                保存中...
+              </>
+            ) : dirty ? (
+              <>
+                <Edit3 className="size-3.5" />
+                未保存
+              </>
+            ) : (
+              <>
+                <Save className="size-3.5" />
+                已保存
+              </>
+            )}
+          </div>
         </div>
       </div>
 

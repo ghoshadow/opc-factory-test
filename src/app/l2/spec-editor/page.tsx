@@ -1,8 +1,14 @@
 "use client"
 
+import { Suspense } from "react"
+import { useSearchParams } from "next/navigation"
 import { SpecEditor } from "@/components/requirement/SpecEditor"
+import { Skeleton } from "@/components/ui/skeleton"
 
-export default function SpecEditorPage() {
+function SpecEditorContent() {
+  const searchParams = useSearchParams()
+  const specId = searchParams.get("specId") ?? "spec-001"
+
   return (
     <div className="space-y-6">
       {/* Page header */}
@@ -14,7 +20,23 @@ export default function SpecEditorPage() {
       </div>
 
       {/* Editor */}
-      <SpecEditor specId="spec-001" />
+      <SpecEditor specId={specId} />
     </div>
+  )
+}
+
+export default function SpecEditorPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="space-y-6">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-4 w-64" />
+          <Skeleton className="h-96 w-full rounded-xl" />
+        </div>
+      }
+    >
+      <SpecEditorContent />
+    </Suspense>
   )
 }
