@@ -64,3 +64,55 @@ export interface SreCheckerResponse {
   allPass: boolean
   canRelease: boolean
 }
+
+// Archaeology report types
+export type DebtType = "code_quality" | "security" | "deprecated_api" | "architecture" | "performance"
+export type DebtSeverity = "critical" | "high" | "medium" | "low"
+
+export interface FileNode {
+  name: string
+  type: "file" | "directory"
+  children?: FileNode[]
+  size?: number
+  language?: string
+}
+
+export interface DependencyNode {
+  name: string
+  type: "external" | "internal"
+  version?: string
+  usageCount: number
+  dependentModules: string[]
+}
+
+export interface TechDebtItem {
+  id: string
+  type: DebtType
+  severity: DebtSeverity
+  location: string
+  description: string
+  suggestion: string
+}
+
+export interface SpecDataContract {
+  inputs: { name: string; type: string; description: string }[]
+  outputs: { name: string; type: string; description: string }[]
+  sideEffects: string[]
+}
+
+export interface ReverseSpec {
+  userStory: string
+  acceptanceCriteria: string[]
+  dataContract: SpecDataContract
+  uxSketch: string
+}
+
+export interface ArchaeologyResponse {
+  id: string
+  repoName: string
+  analyzedAt: string
+  fileTree: FileNode
+  dependencyGraph: DependencyNode[]
+  techDebt: TechDebtItem[]
+  reverseSpec: ReverseSpec
+}
