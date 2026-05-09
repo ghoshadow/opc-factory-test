@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { WipStats as WipStatsType } from "@/lib/types";
+import { DashboardWipStats as WipStatsType } from "@/lib/types";
 import { GitBranch, Code, TestTube, Server } from "lucide-react";
 
 interface WipStatsProps {

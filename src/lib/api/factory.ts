@@ -33,7 +33,7 @@ export function useLineStatus() {
   )
 
   return {
-    lines: data,
+    lines: data?.data,
     isLoading,
     isError: !!error,
   }

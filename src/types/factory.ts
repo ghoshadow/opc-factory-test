@@ -1,6 +1,6 @@
 export type LineStatus = "NOMINAL" | "ATTENTION"
 
-export type LineId = "requirements" | "coding" | "testing" | "sre"
+export type LineId = "requirement" | "coding" | "testing" | "sre"
 
 export interface LineStatusData {
   id: LineId
@@ -357,7 +357,7 @@ export interface SpecVersionsResponse {
 }
 
 // Skills types
-export type ProductionLine = "requirements" | "coding" | "testing" | "sre"
+export type ProductionLine = "requirement" | "coding" | "testing" | "sre"
 
 export type SkillStatus = "installed" | "available"
 
@@ -397,4 +397,148 @@ export interface PipelineStageNode {
 export interface PipelineResponse {
   nodes: PipelineStageNode[]
   totalNodes: number
+}
+
+// Coding pipeline types
+export interface CodingPipelineNodeDetails {
+  plan: string
+  code: string
+  report: string
+  design?: string
+}
+
+export interface CodingPipelineNode {
+  id: string
+  label: string
+  description: string
+  status: PipelineNodeStatus
+  details: CodingPipelineNodeDetails
+}
+
+export interface CodingPipelineResponse {
+  nodes: CodingPipelineNode[]
+  currentStep: number
+  totalSteps: number
+}
+
+// Test case execution types
+export type TestStepStatus = "pending" | "running" | "passed" | "failed"
+
+export interface TestStep {
+  id: string
+  description: string
+  expectedResult: string
+  status: TestStepStatus
+  duration?: number
+  actualResult?: string
+  errorDetail?: string
+  screenshot?: string
+  log?: string
+}
+
+export interface AcceptanceCriterion {
+  id: string
+  title: string
+  steps: TestStep[]
+}
+
+export interface TestScenario {
+  id: string
+  name: string
+  feature: string
+  acceptanceCriteria: AcceptanceCriterion[]
+}
+
+export interface TestCasesResponse {
+  scenarios: TestScenario[]
+  total: number
+}
+
+export interface ExecuteRequest {
+  scenarioId?: string
+  acId?: string
+}
+
+export interface ExecuteResponse {
+  scenarioId: string
+  acId: string
+  results: TestStep[]
+  passed: number
+  failed: number
+  total: number
+}
+
+// SRE Observability types
+export interface MetricPoint {
+  timestamp: string
+  throughput: number
+  latency: number
+  errorRate: number
+}
+
+export interface MetricsData {
+  metrics: MetricPoint[]
+  summary: {
+    avgThroughput: number
+    p99Latency: number
+    avgErrorRate: number
+  }
+}
+
+export type LogLevel = "DEBUG" | "INFO" | "WARN" | "ERROR" | "FATAL"
+
+export interface LogEntry {
+  id: string
+  timestamp: string
+  level: LogLevel
+  service: string
+  message: string
+  traceId?: string
+}
+
+export interface LogsData {
+  logs: LogEntry[]
+  total: number
+}
+
+export interface TraceSpan {
+  id: string
+  operation: string
+  service: string
+  startTime: string
+  duration: number
+  status: "ok" | "error"
+  children?: TraceSpan[]
+}
+
+export interface TraceData {
+  traceId: string
+  rootSpan: TraceSpan
+  totalSpans: number
+  duration: number
+}
+
+export interface SloTarget {
+  sli: string
+  description: string
+  current: number
+  target: number
+  unit: string
+  trend: "up" | "down" | "stable"
+  withinSlo: boolean
+}
+
+export interface SloData {
+  targets: SloTarget[]
+  summary: {
+    totalSli: number
+    withinSlo: number
+  }
+}
+
+export type ObservabilityType = "metrics" | "logs" | "traces" | "slo"
+
+export interface ObservabilityResponse {
+  type: ObservabilityType
+  data: MetricsData | LogsData | TraceData | SloData
 }

@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server"
 
-interface WipLine {
+export interface WipLine {
   key: string
   name: string
   count: number
   cssVar: string
 }
 
-interface WipResponse {
+export interface WipResponse {
   lines: WipLine[]
   total: number
 }

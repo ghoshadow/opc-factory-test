@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import useSWR from "swr"
 import {
   ClipboardCheck,
@@ -237,11 +237,11 @@ export function PlanReviewPanel() {
 
   const selectedPlan = data?.plans.find((p) => p.id === selectedId) ?? null
 
-  // Set default selection when data loads
-  if (!selectedId && data && data.plans.length > 0) {
-    // Use microtask to avoid render-phase setState warning
-    queueMicrotask(() => setSelectedId(data.plans[0].id))
-  }
+  useEffect(() => {
+    if (!selectedId && data && data.plans.length > 0) {
+      setSelectedId(data.plans[0].id)
+    }
+  }, [selectedId, data])
 
   const handleApprove = useCallback(async () => {
     if (!selectedPlan) return

@@ -11,7 +11,7 @@ interface PipelineNodeProps {
   className?: string;
 }
 
-const statusConfig: Record<PipelineStatus, { dotColor: string; borderColor: string; bg: string }> =
+const statusConfig: Record<PipelineStatus, { dotColor: string; borderColor: string; bg: string; icon?: React.ReactNode }> =
   {
     waiting: {
       dotColor: "bg-muted-foreground/40",

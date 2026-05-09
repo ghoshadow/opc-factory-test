@@ -11,6 +11,7 @@ import {
   Play,
   TestTubeDiagonal,
   Columns3,
+  BarChart3,
   type LucideIcon,
 } from "lucide-react";
 
@@ -75,6 +76,7 @@ export const navigation: NavItem[] = [
     path: "/l5",
     children: [
       { label: "Checker 门禁", icon: Shield, path: "/l5/checker" },
+      { label: "可观测仪表盘", icon: BarChart3, path: "/l5/observability" },
       { label: "Runbooks", icon: Activity, path: "/l5/runbooks" },
     ],
   },

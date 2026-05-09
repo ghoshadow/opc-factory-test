@@ -1,10 +1,10 @@
 import type { Skill } from "@/types/factory"
 
 const skills: Skill[] = [
-  { id: "interview-transcriber", name: "访谈转写", description: "将用户访谈录音自动转写为结构化笔录", line: "requirements", status: "installed" },
-  { id: "concept-extractor", name: "概念抽取", description: "从原始需求文本中抽取领域概念与关系", line: "requirements", status: "available" },
-  { id: "competitor-search", name: "竞品检索", description: "自动检索竞品信息并生成对比分析", line: "requirements", status: "available" },
-  { id: "im-parser", name: "IM解析", description: "从即时消息中解析需求意图与上下文", line: "requirements", status: "installed" },
+  { id: "interview-transcriber", name: "访谈转写", description: "将用户访谈录音自动转写为结构化笔录", line: "requirement", status: "installed" },
+  { id: "concept-extractor", name: "概念抽取", description: "从原始需求文本中抽取领域概念与关系", line: "requirement", status: "available" },
+  { id: "competitor-search", name: "竞品检索", description: "自动检索竞品信息并生成对比分析", line: "requirement", status: "available" },
+  { id: "im-parser", name: "IM解析", description: "从即时消息中解析需求意图与上下文", line: "requirement", status: "installed" },
 
   { id: "ddd-modeler", name: "DDD建模", description: "基于DDD方法论生成领域模型与聚合设计", line: "coding", status: "installed" },
   { id: "code-generator", name: "代码生成", description: "根据设计规范自动生成业务代码骨架", line: "coding", status: "installed" },
