@@ -1,10 +1,16 @@
 import {
-  Activity,
+  LayoutDashboard,
   FileText,
   GitBranch,
-  Layout,
-  LayoutDashboard,
   Shield,
+  Activity,
+  ListOrdered,
+  FileEdit,
+  Award,
+  Zap,
+  Play,
+  TestTubeDiagonal,
+  Columns3,
   type LucideIcon,
 } from "lucide-react";
 
@@ -17,25 +23,11 @@ export interface NavItem {
 
 export const navigation: NavItem[] = [
   {
-    label: "L0 基础",
-    icon: Layout,
-    path: "/l0",
-    children: [
-      { label: "脚手架", icon: Layout, path: "/l0/scaffold" },
-      { label: "路由", icon: Layout, path: "/l0/routing" },
-      { label: "主题", icon: Layout, path: "/l0/theme" },
-      { label: "组件库", icon: Layout, path: "/l0/components" },
-    ],
-  },
-  {
     label: "L1 总览",
     icon: LayoutDashboard,
     path: "/l1",
     children: [
-      { label: "KPI 面板", icon: LayoutDashboard, path: "/l1/kpi" },
       { label: "WIP 统计", icon: LayoutDashboard, path: "/l1/wip" },
-      { label: "产线状态", icon: LayoutDashboard, path: "/l1/status" },
-      { label: "告警", icon: LayoutDashboard, path: "/l1/alerts" },
     ],
   },
   {
@@ -43,11 +35,10 @@ export const navigation: NavItem[] = [
     icon: FileText,
     path: "/l2",
     children: [
-      { label: "入厂队列", icon: FileText, path: "/l2/intake" },
-      { label: "Spec 编辑器", icon: FileText, path: "/l2/spec-editor" },
-      { label: "成熟度评审", icon: FileText, path: "/l2/maturity" },
       { label: "本体管理", icon: FileText, path: "/l2/ontology" },
-      { label: "Gap 追问", icon: FileText, path: "/l2/gap-questions" },
+      { label: "需求队列", icon: ListOrdered, path: "/l2/queue" },
+      { label: "Spec 编辑器", icon: FileEdit, path: "/l2/spec-editor" },
+      { label: "成熟度评审", icon: Award, path: "/l2/maturity" },
     ],
   },
   {
@@ -55,16 +46,16 @@ export const navigation: NavItem[] = [
     icon: GitBranch,
     path: "/l3",
     children: [
-      { label: "需求产线", icon: GitBranch, path: "/l3/requirement" },
-      { label: "编码产线", icon: GitBranch, path: "/l3/coding", children: [
-        { label: "Plan Review", icon: GitBranch, path: "/l3/coding/plan-review" },
-      ]},
-      { label: "测试产线", icon: GitBranch, path: "/l3/testing", children: [
-        { label: "操作台", icon: GitBranch, path: "/l3/testing" },
-        { label: "Bug 分诊", icon: GitBranch, path: "/l3/testing/bugs" },
-        { label: "Pipeline", icon: GitBranch, path: "/l3/testing/pipeline" },
-      ]},
-      { label: "SRE 产线", icon: GitBranch, path: "/l3/sre" },
+      { label: "编码产线", icon: GitBranch, path: "/l3/coding" },
+      { label: "Toco 报告", icon: Zap, path: "/l3/coding/toco-report" },
+      { label: "Plan Review", icon: FileText, path: "/l3/coding/plan-review" },
+      { label: "Design Review", icon: Shield, path: "/l3/coding/design-review" },
+      { label: "Pipeline 流程图", icon: GitBranch, path: "/l3/coding/pipeline-demo" },
+      { label: "测试产线", icon: GitBranch, path: "/l3/testing" },
+      { label: "测试流水线", icon: Play, path: "/l3/testing/pipeline" },
+      { label: "测试用例", icon: TestTubeDiagonal, path: "/l3/testing/cases" },
+      { label: "Bug 分诊", icon: GitBranch, path: "/l3/testing/bugs" },
+      { label: "Kanban 看板", icon: Columns3, path: "/l3/kanban" },
     ],
   },
   {
@@ -73,8 +64,9 @@ export const navigation: NavItem[] = [
     path: "/l4",
     children: [
       { label: "Checker 面板", icon: Shield, path: "/l4/checker" },
-      { label: "Reviewer 看板", icon: Shield, path: "/l4/reviewer" },
       { label: "交付门禁", icon: Shield, path: "/l4/delivery-gate" },
+      { label: "分解图谱", icon: Shield, path: "/l4/pipeline" },
+      { label: "Reviewer 看板", icon: Shield, path: "/l4/reviewer" },
     ],
   },
   {
@@ -82,16 +74,16 @@ export const navigation: NavItem[] = [
     icon: Activity,
     path: "/l5",
     children: [
-      { label: "可观测性", icon: Activity, path: "/l5/observability" },
-      { label: "部署编排", icon: Activity, path: "/l5/deploy" },
-      { label: "事件分类", icon: Activity, path: "/l5/incidents" },
-      { label: "Runbooks", icon: Activity, path: "/l5/runbooks" },
       { label: "Checker 门禁", icon: Shield, path: "/l5/checker" },
+      { label: "Runbooks", icon: Activity, path: "/l5/runbooks" },
     ],
   },
 ];
 
-export function findNavItem(items: NavItem[], path: string): NavItem | null {
+export function findNavItem(
+  items: NavItem[],
+  path: string
+): NavItem | null {
   for (const item of items) {
     if (item.path === path) return item;
     if (item.children) {

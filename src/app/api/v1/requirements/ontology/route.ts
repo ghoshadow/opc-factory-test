@@ -1,0 +1,55 @@
+import { NextResponse } from "next/server"
+import type { OntologyDomain, OntologyTerm, OntologyResponse } from "@/types/factory"
+
+const domains: OntologyDomain[] = [
+  { id: "dom-factory", name: "工厂本体", description: "产线结构、Agent 定义、质量门禁规则、Pipeline 模板，多项目复用", type: "factory", termCount: 8 },
+  { id: "dom-order", name: "订单域", description: "订单全生命周期管理：创建、支付、履约、退款", type: "business", termCount: 5 },
+  { id: "dom-payment", name: "支付域", description: "支付渠道抽象、交易记录、对账", type: "business", termCount: 4 },
+  { id: "dom-user", name: "用户域", description: "账户、认证、权限管理", type: "business", termCount: 3 },
+  { id: "dom-fulfillment", name: "履约域", description: "库存扣减、物流追踪、签收确认", type: "business", termCount: 3 },
+  { id: "dom-notification", name: "通知域", description: "站内信、推送、邮件、短信", type: "business", termCount: 2 },
+]
+
+const terms: OntologyTerm[] = [
+  // 工厂本体
+  { id: "t-f-1", domainId: "dom-factory", name: "产线结构", kind: "entity", definition: "L0-L5 产线拓扑定义：基础(0)、总览(1)、需求(2)、编码(3)、质量门禁(4)、运维监控(5)", attributes: ["lineId", "level", "label", "dependencies", "agentCount"], updatedAt: "2026-04-15" },
+  { id: "t-f-2", domainId: "dom-factory", name: "Agent 定义", kind: "entity", definition: "各产线 Agent 能力声明与协作协议", attributes: ["agentId", "lineId", "capability", "inputSchema", "outputSchema"], updatedAt: "2026-04-20" },
+  { id: "t-f-3", domainId: "dom-factory", name: "质量门禁规则", kind: "business_rule", definition: "Checker 检查项定义与通过标准", attributes: ["ruleId", "lineId", "checkName", "threshold", "severity"], updatedAt: "2026-05-01" },
+  { id: "t-f-4", domainId: "dom-factory", name: "Pipeline 模板", kind: "entity", definition: "各产线流水线阶段定义（8 阶段标准流程）", attributes: ["templateId", "lineId", "stages", "artifacts", "approvals"], updatedAt: "2026-04-28" },
+  { id: "t-f-5", domainId: "dom-factory", name: "事件分类规则", kind: "business_rule", definition: "告警事件、Incident 的分类与路由规则", attributes: ["category", "severity", "escalation", "sla"], updatedAt: "2026-05-03" },
+  { id: "t-f-6", domainId: "dom-factory", name: "部署策略模板", kind: "entity", definition: "Dev/Stg/Canary/Prod 部署策略参数定义", attributes: ["strategy", "environment", "batchSize", "rollbackThreshold"], updatedAt: "2026-05-05" },
+  { id: "t-f-7", domainId: "dom-factory", name: "Runbook 模板", kind: "entity", definition: "运维手册结构：启动/停止/扩缩容/排障树/应急预案", attributes: ["templateId", "sections", "requiredFields"], updatedAt: "2026-05-07" },
+  { id: "t-f-8", domainId: "dom-factory", name: "Bug 分级标准", kind: "business_rule", definition: "P0-P3 缺陷严重程度定义与处理 SLA", attributes: ["priority", "definition", "responseSLA", "resolveSLA"], updatedAt: "2026-04-10" },
+
+  // 订单域
+  { id: "t-o-1", domainId: "dom-order", name: "Order", kind: "aggregate", definition: "订单聚合根，管理订单全生命周期状态", attributes: ["orderId", "status", "items", "totalAmount", "createdAt", "buyerId"], updatedAt: "2026-05-08" },
+  { id: "t-o-2", domainId: "dom-order", name: "OrderItem", kind: "entity", definition: "订单明细项，关联 SKU 与下单数量", attributes: ["skuId", "quantity", "unitPrice", "subtotal"], updatedAt: "2026-05-08" },
+  { id: "t-o-3", domainId: "dom-order", name: "OrderStatus", kind: "value_object", definition: "订单状态枚举：待支付→已支付→履约中→已完成→已取消→退款中→已退款", attributes: ["PENDING", "PAID", "FULFILLING", "COMPLETED", "CANCELLED", "REFUNDING", "REFUNDED"], updatedAt: "2026-05-08" },
+  { id: "t-o-4", domainId: "dom-order", name: "OrderCreated", kind: "domain_event", definition: "订单创建成功后的领域事件", attributes: ["orderId", "buyerId", "totalAmount", "timestamp"], updatedAt: "2026-05-08" },
+  { id: "t-o-5", domainId: "dom-order", name: "退款时效规则", kind: "business_rule", definition: "订单完成 7 日内可申请退款，退款金额 ≤ 实付金额", attributes: ["maxDays", "maxAmount", "condition"], updatedAt: "2026-05-08" },
+
+  // 支付域
+  { id: "t-p-1", domainId: "dom-payment", name: "Payment", kind: "aggregate", definition: "支付聚合根，抽象各渠道支付行为", attributes: ["paymentId", "orderId", "channel", "amount", "status", "paidAt"], updatedAt: "2026-05-07" },
+  { id: "t-p-2", domainId: "dom-payment", name: "PaymentChannel", kind: "value_object", definition: "支付渠道定义：微信支付、支付宝、银行卡", attributes: ["channelId", "name", "feeRate", "settlementCycle"], updatedAt: "2026-05-07" },
+  { id: "t-p-3", domainId: "dom-payment", name: "PaymentCompleted", kind: "domain_event", definition: "支付完成后的领域事件，触发履约流程", attributes: ["paymentId", "orderId", "channel", "amount", "timestamp"], updatedAt: "2026-05-07" },
+  { id: "t-p-4", domainId: "dom-payment", name: "渠道限额规则", kind: "business_rule", definition: "各支付渠道单笔/单日限额限制", attributes: ["channel", "maxPerTransaction", "maxPerDay"], updatedAt: "2026-05-07" },
+
+  // 用户域
+  { id: "t-u-1", domainId: "dom-user", name: "User", kind: "aggregate", definition: "用户聚合根，管理账户与认证", attributes: ["userId", "name", "phone", "roles"], updatedAt: "2026-05-06" },
+  { id: "t-u-2", domainId: "dom-user", name: "Role", kind: "value_object", definition: "角色定义：管理员、运营、普通用户", attributes: ["roleId", "name", "permissions"], updatedAt: "2026-05-06" },
+  { id: "t-u-3", domainId: "dom-user", name: "UserLoggedIn", kind: "domain_event", definition: "用户登录事件，记录登录方式与时间", attributes: ["userId", "loginMethod", "timestamp", "ip"], updatedAt: "2026-05-06" },
+
+  // 履约域
+  { id: "t-fl-1", domainId: "dom-fulfillment", name: "Fulfillment", kind: "aggregate", definition: "履约聚合根，管理发货与物流追踪", attributes: ["fulfillmentId", "orderId", "status", "carrier", "trackingNo"], updatedAt: "2026-05-05" },
+  { id: "t-fl-2", domainId: "dom-fulfillment", name: "ShipmentStatus", kind: "value_object", definition: "物流状态：待发货→已发货→运输中→已签收", attributes: ["PENDING", "SHIPPED", "IN_TRANSIT", "DELIVERED"], updatedAt: "2026-05-05" },
+  { id: "t-fl-3", domainId: "dom-fulfillment", name: "超卖防护规则", kind: "business_rule", definition: "下单时预扣库存，支付超时 15 分钟自动释放", attributes: ["reserveTimeout", "maxOversellRatio"], updatedAt: "2026-05-05" },
+
+  // 通知域
+  { id: "t-n-1", domainId: "dom-notification", name: "Notification", kind: "entity", definition: "通知实体，支持多渠道触达", attributes: ["notificationId", "userId", "channel", "template", "content", "status"], updatedAt: "2026-05-04" },
+  { id: "t-n-2", domainId: "dom-notification", name: "NotificationChannel", kind: "value_object", definition: "通知渠道：站内信、Push、邮件、短信", attributes: ["channelId", "name", "priority", "rateLimit"], updatedAt: "2026-05-04" },
+]
+
+export async function GET() {
+  const response: OntologyResponse = { domains, terms }
+  return NextResponse.json(response)
+}
