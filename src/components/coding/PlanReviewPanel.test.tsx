@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
-import { render, screen } from "@testing-library/react"
+import { render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import type { PlanReviewResponse } from "@/types/coding"
 
@@ -105,88 +105,108 @@ describe("PlanReviewPanel", () => {
   })
 
   // ── Status badges (AC: 审核状态标签: 待审/已确认/已打回) ──
-  it("shows '待审' badge for pending plan", () => {
+  it("shows '待审' badge for pending plan", async () => {
     setSWR({ data: planData({ status: "pending" }), isLoading: false })
     render(<PlanReviewPanel />)
-    expect(screen.getByText("待审")).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText("待审")).toBeInTheDocument()
+    })
   })
 
-  it("shows '已确认' badge for approved plan", () => {
+  it("shows '已确认' badge for approved plan", async () => {
     setSWR({ data: planData({ status: "approved" }), isLoading: false })
     render(<PlanReviewPanel />)
-    expect(screen.getByText("已确认")).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText("已确认")).toBeInTheDocument()
+    })
   })
 
-  it("shows '已打回' badge for rejected plan", () => {
+  it("shows '已打回' badge for rejected plan", async () => {
     setSWR({ data: planData({ status: "rejected", rejectionReason: "r" }), isLoading: false })
     render(<PlanReviewPanel />)
-    expect(screen.getByText("已打回")).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText("已打回")).toBeInTheDocument()
+    })
   })
 
   // ── Four sections (AC: Plan 内容完整展示 - 拆分/API/依赖/预估) ──
-  it("displays all four plan sections", () => {
+  it("displays all four plan sections", async () => {
     setSWR({ data: planData(), isLoading: false })
     render(<PlanReviewPanel />)
-    // getAllByText because React may render multiple copies in concurrent mode
-    expect(screen.getAllByText("任务拆分").length).toBeGreaterThan(0)
-    expect(screen.getAllByText("API 设计").length).toBeGreaterThan(0)
-    expect(screen.getAllByText("依赖关系").length).toBeGreaterThan(0)
-    expect(screen.getAllByText("工作量预估").length).toBeGreaterThan(0)
+    await waitFor(() => {
+      expect(screen.getAllByText("任务拆分").length).toBeGreaterThan(0)
+      expect(screen.getAllByText("API 设计").length).toBeGreaterThan(0)
+      expect(screen.getAllByText("依赖关系").length).toBeGreaterThan(0)
+      expect(screen.getAllByText("工作量预估").length).toBeGreaterThan(0)
+    })
   })
 
-  it("shows hierarchical task tree content", () => {
+  it("shows hierarchical task tree content", async () => {
     setSWR({ data: planData(), isLoading: false })
     render(<PlanReviewPanel />)
-    expect(screen.getAllByText("数据层").length).toBeGreaterThan(0)
-    expect(screen.getAllByText("API 层").length).toBeGreaterThan(0)
-    expect(screen.getAllByText("迁移脚本").length).toBeGreaterThan(0)
-    expect(screen.getAllByText("Model 适配").length).toBeGreaterThan(0)
+    await waitFor(() => {
+      expect(screen.getAllByText("数据层").length).toBeGreaterThan(0)
+      expect(screen.getAllByText("API 层").length).toBeGreaterThan(0)
+      expect(screen.getAllByText("迁移脚本").length).toBeGreaterThan(0)
+      expect(screen.getAllByText("Model 适配").length).toBeGreaterThan(0)
+    })
   })
 
-  it("shows API design table with methods and paths", () => {
+  it("shows API design table with methods and paths", async () => {
     setSWR({ data: planData(), isLoading: false })
     render(<PlanReviewPanel />)
-    expect(screen.getAllByText("POST").length).toBeGreaterThan(0)
-    expect(screen.getAllByText("GET").length).toBeGreaterThan(0)
-    expect(screen.getAllByText("/api/v1/orders/:id/refund").length).toBeGreaterThan(0)
-    expect(screen.getAllByText("退款接口").length).toBeGreaterThan(0)
-    expect(screen.getAllByText("2 个端点").length).toBeGreaterThan(0)
+    await waitFor(() => {
+      expect(screen.getAllByText("POST").length).toBeGreaterThan(0)
+      expect(screen.getAllByText("GET").length).toBeGreaterThan(0)
+      expect(screen.getAllByText("/api/v1/orders/:id/refund").length).toBeGreaterThan(0)
+      expect(screen.getAllByText("退款接口").length).toBeGreaterThan(0)
+      expect(screen.getAllByText("2 个端点").length).toBeGreaterThan(0)
+    })
   })
 
-  it("shows dependency edges", () => {
+  it("shows dependency edges", async () => {
     setSWR({ data: planData(), isLoading: false })
     render(<PlanReviewPanel />)
-    expect(screen.getAllByText("1 条依赖边").length).toBeGreaterThan(0)
-    expect(screen.getAllByText("API 依赖数据层").length).toBeGreaterThan(0)
+    await waitFor(() => {
+      expect(screen.getAllByText("1 条依赖边").length).toBeGreaterThan(0)
+      expect(screen.getAllByText("API 依赖数据层").length).toBeGreaterThan(0)
+    })
   })
 
-  it("shows fallback when no dependencies", () => {
+  it("shows fallback when no dependencies", async () => {
     setSWR({ data: planData({ dependencies: [] }), isLoading: false })
     render(<PlanReviewPanel />)
-    expect(screen.getByText("无依赖关系")).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText("无依赖关系")).toBeInTheDocument()
+    })
   })
 
-  it("shows workload SP and hours", () => {
+  it("shows workload SP and hours", async () => {
     setSWR({ data: planData(), isLoading: false })
     render(<PlanReviewPanel />)
-    // Subtitle shows SP info
-    const matches = screen.queryAllByText(/5 SP/)
-    expect(matches.length).toBeGreaterThan(0)
+    await waitFor(() => {
+      const matches = screen.queryAllByText(/5 SP/)
+      expect(matches.length).toBeGreaterThan(0)
+    })
   })
 
   // ── Action buttons for pending ──
-  it("shows approve and reject buttons for pending plan", () => {
+  it("shows approve and reject buttons for pending plan", async () => {
     setSWR({ data: planData({ status: "pending" }), isLoading: false })
     render(<PlanReviewPanel />)
-    expect(screen.getAllByText("确认冻结").length).toBeGreaterThan(0)
-    expect(screen.getAllByText("驳回").length).toBeGreaterThan(0)
+    await waitFor(() => {
+      expect(screen.getAllByText("确认冻结").length).toBeGreaterThan(0)
+      expect(screen.getAllByText("驳回").length).toBeGreaterThan(0)
+    })
   })
 
   // ── Action buttons hidden for non-pending ──
-  it("shows approved badge for non-pending plan", () => {
+  it("shows approved badge for non-pending plan", async () => {
     setSWR({ data: planData({ status: "approved" }), isLoading: false })
     render(<PlanReviewPanel />)
-    expect(screen.getAllByText("已确认").length).toBeGreaterThan(0)
+    await waitFor(() => {
+      expect(screen.getAllByText("已确认").length).toBeGreaterThan(0)
+    })
   })
 
   // ── Confirm dialog ──
@@ -194,6 +214,9 @@ describe("PlanReviewPanel", () => {
     const user = userEvent.setup()
     setSWR({ data: planData({ status: "pending" }), isLoading: false })
     render(<PlanReviewPanel />)
+    await waitFor(() => {
+      expect(screen.getAllByText("确认冻结").length).toBeGreaterThan(0)
+    })
     await user.click(screen.getAllByText("确认冻结")[0])
     expect(screen.getByText("确认冻结 Plan")).toBeInTheDocument()
     expect(screen.getByText("确认后将进入 Design 阶段，不可修改")).toBeInTheDocument()
@@ -204,6 +227,9 @@ describe("PlanReviewPanel", () => {
     const user = userEvent.setup()
     setSWR({ data: planData({ status: "pending" }), isLoading: false })
     render(<PlanReviewPanel />)
+    await waitFor(() => {
+      expect(screen.getAllByText("驳回").length).toBeGreaterThan(0)
+    })
     await user.click(screen.getAllByText("驳回")[0])
     expect(screen.getByText("驳回 Plan")).toBeInTheDocument()
     expect(screen.getByPlaceholderText("请填写驳回原因及修改建议...")).toBeInTheDocument()
@@ -214,6 +240,9 @@ describe("PlanReviewPanel", () => {
     const user = userEvent.setup()
     setSWR({ data: planData({ status: "pending" }), isLoading: false })
     render(<PlanReviewPanel />)
+    await waitFor(() => {
+      expect(screen.getAllByText("驳回").length).toBeGreaterThan(0)
+    })
     await user.click(screen.getAllByText("驳回")[0])
     await user.click(screen.getByText("确认驳回"))
     expect(screen.getByText("驳回必须填写修改意见")).toBeInTheDocument()
@@ -223,10 +252,9 @@ describe("PlanReviewPanel", () => {
   it("displays rejection reason on rejected plan", async () => {
     setSWR({ data: planData({ status: "rejected", rejectionReason: "工作量评估偏低" }), isLoading: false })
     render(<PlanReviewPanel />)
-    // Verify rejected plan renders with status badge
-    expect(screen.getByText("已打回")).toBeInTheDocument()
-    // The rejectionReason text may not appear synchronously due to queueMicrotask
-    // but it exists in the data model - verified by the badge above
+    await waitFor(() => {
+      expect(screen.getByText("已打回")).toBeInTheDocument()
+    })
   })
 
   // ── Confirm dialog interaction (approve/reject API calls verified in route.test) ──
@@ -235,15 +263,17 @@ describe("PlanReviewPanel", () => {
     setSWR({ data: planData({ status: "pending" }), isLoading: false })
     render(<PlanReviewPanel />)
 
-    // Click approve to open dialog
+    await waitFor(() => {
+      expect(screen.getAllByText("确认冻结").length).toBeGreaterThan(0)
+    })
     await user.click(screen.getAllByText("确认冻结")[0])
     expect(screen.getByText("确认冻结 Plan")).toBeInTheDocument()
 
-    // Cancel closes the dialog — click all cancel buttons to handle concurrent renders
-    for (const btn of screen.getAllByText("取消")) {
-      await user.click(btn)
-    }
-    expect(screen.queryByText("确认冻结 Plan")).toBeNull()
+    // Cancel closes the dialog
+    await user.click(screen.getByText("取消"))
+    await waitFor(() => {
+      expect(screen.queryByText("确认冻结 Plan")).toBeNull()
+    })
   })
 
   // ── Reject API (AC: 修改意见 → PUT reject) ──
@@ -256,6 +286,9 @@ describe("PlanReviewPanel", () => {
     setSWR({ data: planData({ status: "pending" }), isLoading: false })
     render(<PlanReviewPanel />)
 
+    await waitFor(() => {
+      expect(screen.getAllByText("驳回").length).toBeGreaterThan(0)
+    })
     await user.click(screen.getAllByText("驳回")[0])
     await user.type(screen.getByPlaceholderText("请填写驳回原因及修改建议..."), "需要补充测试计划")
     await user.click(screen.getByText("确认驳回"))
@@ -267,11 +300,12 @@ describe("PlanReviewPanel", () => {
   })
 
   // ── Task count ──
-  it("counts total tasks including children", () => {
+  it("counts total tasks including children", async () => {
     setSWR({ data: planData(), isLoading: false })
     render(<PlanReviewPanel />)
-    // t1 + t1.1 + t1.2 + t2 = 4
-    const matches = screen.queryAllByText(/4 个任务/)
-    expect(matches.length).toBeGreaterThan(0)
+    await waitFor(() => {
+      const matches = screen.queryAllByText(/4 个任务/)
+      expect(matches.length).toBeGreaterThan(0)
+    })
   })
 })

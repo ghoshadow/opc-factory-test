@@ -152,7 +152,7 @@ export interface PipelineRun {
 }
 
 // Test case types
-export type TestCaseStatus = "pass" | "fail" | "running" | "pending"
+export type TestCaseStatus = "pass" | "fail" | "passed" | "failed" | "running" | "pending"
 export type TestCasePriority = "high" | "medium" | "low"
 
 export interface TestCase {
@@ -397,4 +397,73 @@ export interface PipelineStageNode {
 export interface PipelineResponse {
   nodes: PipelineStageNode[]
   totalNodes: number
+}
+
+// Coding pipeline types
+export interface CodingPipelineDetails {
+  plan: string
+  code: string
+  design?: string
+  report: string
+}
+
+export interface CodingPipelineNode {
+  id: string
+  label: string
+  description: string
+  status: PipelineNodeStatus
+  details: CodingPipelineDetails
+}
+
+export interface CodingPipelineResponse {
+  nodes: CodingPipelineNode[]
+  currentStep: number
+  totalSteps: number
+}
+
+// Test execution types
+export type TestStepStatus = "pending" | "running" | "passed" | "failed"
+
+export interface TestStep {
+  id: string
+  description: string
+  expectedResult: string
+  status: TestStepStatus
+  duration?: number
+  actualResult?: string
+  errorDetail?: string
+  screenshot?: string
+  log?: string
+}
+
+export interface AcceptanceCriterion {
+  id: string
+  title: string
+  steps: TestStep[]
+}
+
+export interface TestScenario {
+  id: string
+  name: string
+  feature: string
+  acceptanceCriteria: AcceptanceCriterion[]
+}
+
+export interface TestCasesResponse {
+  scenarios: TestScenario[]
+  total: number
+}
+
+export interface ExecuteRequest {
+  scenarioId?: string
+  acId?: string
+}
+
+export interface ExecuteResponse {
+  scenarioId: string
+  acId: string
+  results: TestStep[]
+  passed: number
+  failed: number
+  total: number
 }

@@ -1,8 +1,7 @@
-import { ProductionLine } from "@/lib/types";
-import { LineStatusCard } from "./LineStatusCard";
+import { LineStatusCard, type LineSummary } from "./LineStatusCard";
 
 interface LineStatusGridProps {
-  lines: ProductionLine[];
+  lines: LineSummary[];
 }
 
 export function LineStatusGrid({ lines }: LineStatusGridProps) {

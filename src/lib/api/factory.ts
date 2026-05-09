@@ -42,7 +42,7 @@ export function useLineStatus() {
 export function useLineDetail(lineId: string) {
   const { lines, isLoading, isError } = useLineStatus()
 
-  const line = lines?.find((l) => l.id === lineId)
+  const line = lines?.data?.find((l) => l.id === lineId)
 
   return {
     line,

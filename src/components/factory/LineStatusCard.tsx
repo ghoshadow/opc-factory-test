@@ -3,11 +3,21 @@
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "./StatusBadge";
-import { ProductionLine } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
+export interface LineSummary {
+  id: string;
+  name: string;
+  opc: string;
+  function: string;
+  wip: number;
+  completed: number;
+  anomaly: string | null;
+  status: "NOMINAL" | "ATTENTION";
+}
+
 interface LineStatusCardProps {
-  line: ProductionLine;
+  line: LineSummary;
 }
 
 export function LineStatusCard({ line }: LineStatusCardProps) {
