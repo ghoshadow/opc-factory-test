@@ -1,28 +1,14 @@
-import { KpiGrid } from "@/components/factory/KpiGrid"
-import { LineStatusGrid } from "@/components/factory/LineStatusGrid"
-import { WipStats } from "@/components/factory/WipStats"
+import { productionLines } from "@/lib/mock-data";
+import { LineStatusGrid } from "@/components/factory/LineStatusGrid";
 
-export default function Home() {
+export default function FactoryOverviewPage() {
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold tracking-tight">OPC Factory</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          工厂总览 — 4 条 AI Agent 产线实时监控
-        </p>
+    <div className="flex flex-1 flex-col gap-6 p-6">
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">工厂总览</h1>
+        <p className="text-muted-foreground">OPC Factory · 生产线状态一览</p>
       </div>
-      <section className="mb-8">
-        <h2 className="mb-3 text-base font-semibold">KPI 指标</h2>
-        <KpiGrid />
-      </section>
-      <section className="mb-8">
-        <h2 className="mb-3 text-base font-semibold">产线状态</h2>
-        <LineStatusGrid />
-      </section>
-      <section>
-        <h2 className="mb-3 text-base font-semibold">在制品 (WIP)</h2>
-        <WipStats />
-      </section>
+      <LineStatusGrid lines={productionLines} />
     </div>
   )
 }

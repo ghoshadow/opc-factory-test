@@ -1,60 +1,59 @@
-"use client"
+"use client";
 
-import { useRouter } from "next/navigation"
-import { ArrowRight, Zap, Clock, Package } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { StatusBadge } from "@/components/ui/StatusBadge"
-import type { LineInfo } from "@/app/api/v1/factory/line-status/route"
+import { useRouter } from "next/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { StatusBadge } from "./StatusBadge";
+import { ProductionLine } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 interface LineStatusCardProps {
-  line: LineInfo
-  className?: string
+  line: ProductionLine;
 }
 
-export function LineStatusCard({ line, className }: LineStatusCardProps) {
-  const router = useRouter()
+export function LineStatusCard({ line }: LineStatusCardProps) {
+  const router = useRouter();
 
   return (
-    <div
+    <Card
       className={cn(
-        "group rounded-xl border bg-card p-5 shadow-sm cursor-pointer transition-all hover:shadow-md hover:border-primary/30",
-        className,
+        "cursor-pointer transition-shadow hover:shadow-md",
+        line.status === "ATTENTION"
+          ? "border-amber-400 ring-amber-400/20"
+          : "border-transparent"
       )}
-      onClick={() => router.push(`/lines/${line.id}`)}
+      onClick={() => router.push(`/${line.id}`)}
     >
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="font-semibold text-base">{line.name}</h3>
-        <StatusBadge status={line.status} />
-      </div>
-
-      <div className="grid grid-cols-3 gap-3 mb-3">
-        <div className="flex items-center gap-1.5">
-          <Zap className="size-3.5 text-muted-foreground" />
-          <div>
-            <div className="text-lg font-semibold">{line.throughput}</div>
-            <div className="text-[10px] text-muted-foreground">feat/wk</div>
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-lg">{line.name}</CardTitle>
+          <StatusBadge status={line.status} />
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <span className="font-medium text-foreground">OPC:</span>
+          {line.opc}
+          <span className="mx-1.5 text-border">|</span>
+          <span className="font-medium text-foreground">职能:</span>
+          {line.function}
+        </div>
+        <div className="grid grid-cols-2 gap-3 text-sm">
+          <div className="rounded-md bg-muted/50 p-2 text-center">
+            <div className="text-2xl font-bold text-foreground">{line.wip}</div>
+            <div className="text-xs text-muted-foreground">在制</div>
+          </div>
+          <div className="rounded-md bg-muted/50 p-2 text-center">
+            <div className="text-2xl font-bold text-foreground">
+              {line.completed}
+            </div>
+            <div className="text-xs text-muted-foreground">已完成</div>
           </div>
         </div>
-        <div className="flex items-center gap-1.5">
-          <Package className="size-3.5 text-muted-foreground" />
-          <div>
-            <div className="text-lg font-semibold">{line.wip}</div>
-            <div className="text-[10px] text-muted-foreground">WIP</div>
-          </div>
+        <div className="text-xs text-muted-foreground">
+          <span className="font-medium text-foreground">异常:</span>{" "}
+          {line.anomaly}
         </div>
-        <div className="flex items-center gap-1.5">
-          <Clock className="size-3.5 text-muted-foreground" />
-          <div>
-            <div className="text-lg font-semibold">{line.cycleTime}</div>
-            <div className="text-[10px] text-muted-foreground">hr</div>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex items-center gap-1 text-xs text-muted-foreground group-hover:text-primary transition-colors">
-        <span>查看详情</span>
-        <ArrowRight className="size-3 group-hover:translate-x-0.5 transition-transform" />
-      </div>
-    </div>
-  )
+      </CardContent>
+    </Card>
+  );
 }

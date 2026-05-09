@@ -1,51 +1,22 @@
-export interface KpiData {
-  totalItems: number;
-  inProgress: number;
-  completed: number;
-  blocked: number;
-  passRate: number;
-  avgCycleTime: string;
-  activeAgents: number;
+export type LineStatus = "NOMINAL" | "ATTENTION";
+
+export interface PipelineStep {
+  label: string;
 }
 
-export interface LineWipStats {
-  total: number;
-  byPhase: Record<string, number>;
+export interface Deliverable {
+  label: string;
 }
 
-export interface WipStats {
-  requirementLine: LineWipStats;
-  codingLine: LineWipStats;
-  testingLine: LineWipStats;
-  sreLine: LineWipStats;
-}
-
-export type AlertType = "warning" | "error" | "info";
-
-export interface Alert {
+export interface ProductionLine {
   id: string;
-  type: AlertType;
-  message: string;
-  source: string;
-  timestamp: string;
-}
-
-export type LineStatus = "healthy" | "degraded" | "blocked" | "idle";
-
-export interface LineStatusData {
-  line: "requirement" | "coding" | "testing" | "sre";
   name: string;
+  opc: string;
+  function: string;
+  wip: number;
+  completed: number;
+  anomaly: string;
   status: LineStatus;
-  activeItems: number;
-  completedToday: number;
-  currentPhase: string;
-  nextMilestone: string;
-}
-
-export interface DashboardData {
-  kpis: KpiData;
-  wipStats: WipStats;
-  alerts: Alert[];
-  lineStatuses: LineStatusData[];
-  lastUpdated: string;
+  pipelineSteps: PipelineStep[];
+  deliverables: Deliverable[];
 }

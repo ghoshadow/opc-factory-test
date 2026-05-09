@@ -1,104 +1,95 @@
-import { DashboardData } from "./types";
+import { ProductionLine } from "./types";
 
-export function generateMockDashboardData(): DashboardData {
-  const now = new Date().toISOString();
-
-  return {
-    kpis: {
-      totalItems: 142,
-      inProgress: 38,
-      completed: 89,
-      blocked: 15,
-      passRate: 87.3,
-      avgCycleTime: "2.3h",
-      activeAgents: 12,
-    },
-    wipStats: {
-      requirementLine: {
-        total: 12,
-        byPhase: { "Phase 1": 3, "Phase 2": 5, "Phase 3": 4 },
-      },
-      codingLine: {
-        total: 18,
-        byPhase: { "Phase 1": 6, "Phase 2": 7, "Phase 3": 5 },
-      },
-      testingLine: {
-        total: 6,
-        byPhase: { "Phase 1": 2, "Phase 2": 3, "Phase 3": 1 },
-      },
-      sreLine: {
-        total: 2,
-        byPhase: { "Phase 1": 1, "Phase 2": 1, "Phase 3": 0 },
-      },
-    },
-    alerts: [
-      {
-        id: "alt-1",
-        type: "warning",
-        message: "编码产线 Phase 3 阻塞项超过阈值 (5/10)",
-        source: "编码产线",
-        timestamp: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
-      },
-      {
-        id: "alt-2",
-        type: "error",
-        message: "测试产线 Checker 检测到 3 项未通过",
-        source: "测试产线",
-        timestamp: new Date(Date.now() - 1000 * 60 * 32).toISOString(),
-      },
-      {
-        id: "alt-3",
-        type: "info",
-        message: "SRE 产线新部署版本 v2.1.4 已上线",
-        source: "SRE产线",
-        timestamp: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
-      },
-      {
-        id: "alt-4",
-        type: "warning",
-        message: "需求产线待审核 Spec 数量: 7",
-        source: "需求产线",
-        timestamp: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
-      },
+export const productionLines: ProductionLine[] = [
+  {
+    id: "requirement",
+    name: "需求产线",
+    opc: "陈",
+    function: "Spec 产出与审核",
+    wip: 12,
+    completed: 47,
+    anomaly: "—",
+    status: "NOMINAL",
+    pipelineSteps: [
+      { label: "需求提交" },
+      { label: "Spec 产出" },
+      { label: "成熟度评审" },
+      { label: "交付" },
     ],
-    lineStatuses: [
-      {
-        line: "requirement",
-        name: "需求产线",
-        status: "healthy",
-        activeItems: 12,
-        completedToday: 5,
-        currentPhase: "Phase 2 · Spec 撰写",
-        nextMilestone: "Maturity Review",
-      },
-      {
-        line: "coding",
-        name: "编码产线",
-        status: "degraded",
-        activeItems: 18,
-        completedToday: 7,
-        currentPhase: "Phase 3 · 实现",
-        nextMilestone: "PR Review",
-      },
-      {
-        line: "testing",
-        name: "测试产线",
-        status: "healthy",
-        activeItems: 6,
-        completedToday: 3,
-        currentPhase: "Phase 2 · 执行",
-        nextMilestone: "Bug Report",
-      },
-      {
-        line: "sre",
-        name: "SRE产线",
-        status: "idle",
-        activeItems: 2,
-        completedToday: 1,
-        currentPhase: "Phase 1 · 部署",
-        nextMilestone: "监控上线",
-      },
+    deliverables: [
+      { label: "Spec 文档" },
+      { label: "本体条目" },
+      { label: "需求规格书" },
+      { label: "评审记录" },
     ],
-    lastUpdated: now,
-  };
-}
+  },
+  {
+    id: "coding",
+    name: "编码产线",
+    opc: "林",
+    function: "代码实现与评审",
+    wip: 8,
+    completed: 35,
+    anomaly: "F-2341 Silent Gap",
+    status: "ATTENTION",
+    pipelineSteps: [
+      { label: "方案评审" },
+      { label: "设计评审" },
+      { label: "编码实现" },
+      { label: "PR 审查" },
+      { label: "交付" },
+    ],
+    deliverables: [
+      { label: "代码" },
+      { label: "测试用例" },
+      { label: "PR 记录" },
+      { label: "方案文档" },
+    ],
+  },
+  {
+    id: "testing",
+    name: "测试产线",
+    opc: "王",
+    function: "测试执行与缺陷管理",
+    wip: 5,
+    completed: 28,
+    anomaly: "—",
+    status: "NOMINAL",
+    pipelineSteps: [
+      { label: "测试计划" },
+      { label: "用例设计" },
+      { label: "执行测试" },
+      { label: "缺陷报告" },
+      { label: "交付" },
+    ],
+    deliverables: [
+      { label: "测试用例" },
+      { label: "缺陷报告" },
+      { label: "覆盖报告" },
+      { label: "测试总结" },
+    ],
+  },
+  {
+    id: "sre",
+    name: "SRE产线",
+    opc: "张",
+    function: "部署与监控运维",
+    wip: 3,
+    completed: 15,
+    anomaly: "—",
+    status: "NOMINAL",
+    pipelineSteps: [
+      { label: "部署准备" },
+      { label: "灰度发布" },
+      { label: "监控观察" },
+      { label: "全量发布" },
+      { label: "运维" },
+    ],
+    deliverables: [
+      { label: "部署配置" },
+      { label: "Runbook" },
+      { label: "告警规则" },
+      { label: "回滚方案" },
+    ],
+  },
+];
