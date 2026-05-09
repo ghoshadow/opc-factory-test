@@ -4,7 +4,6 @@ import { useState, useCallback } from "react"
 import useSWR from "swr"
 import {
   FlaskConical,
-  ChevronDown,
   ChevronRight,
   Clock,
   Loader2,
@@ -113,7 +112,8 @@ function StepDetail({ step }: StepDetailProps) {
       {step.screenshot && (
         <div>
           <div className="flex items-center gap-1.5 mb-1">
-            <Image className="size-3 text-red-500" />
+            {/* eslint-disable-next-line jsx-a11y/alt-text -- lucide-react Image icon renders SVG, not <img> */}
+            <Image className="size-3 text-red-500" aria-hidden="true" />
             <span className="text-xs font-semibold text-red-700 dark:text-red-400">截图</span>
           </div>
           <p className="text-xs text-red-500 font-mono">{step.screenshot}</p>
