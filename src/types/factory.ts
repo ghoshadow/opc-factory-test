@@ -65,24 +65,29 @@ export interface SreCheckerResponse {
   canRelease: boolean
 }
 
-// Coding pipeline types
-export type PipelineNodeStatus = "waiting" | "running" | "done" | "failed"
+// Skills types
+export type ProductionLine = "requirements" | "coding" | "testing" | "sre"
 
-export interface CodingPipelineNode {
+export type SkillStatus = "installed" | "available"
+
+export interface Skill {
   id: string
-  label: string
+  name: string
   description: string
-  status: PipelineNodeStatus
-  details: {
-    plan?: string
-    design?: string
-    code?: string
-    report?: string
-  }
+  line: ProductionLine
+  status: SkillStatus
 }
 
-export interface CodingPipelineResponse {
-  nodes: CodingPipelineNode[]
-  currentStep: number
-  totalSteps: number
+export interface SkillsResponse {
+  skills: Skill[]
+}
+
+export interface InstallSkillRequest {
+  skillId: string
+  action: "install" | "uninstall"
+}
+
+export interface InstallSkillResponse {
+  skillId: string
+  status: SkillStatus
 }
