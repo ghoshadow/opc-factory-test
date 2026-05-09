@@ -12,3 +12,37 @@ export interface LineStatusData {
   anomaly: string | null
   status: LineStatus
 }
+
+// Bug triage types
+export type BugPriority = "P0" | "P1" | "P2" | "P3"
+
+export type BugStatus = "open" | "in_progress" | "resolved" | "closed"
+
+export interface TraceChainNode {
+  id: string
+  type: "bug" | "test_case" | "ac" | "spec"
+  label: string
+  title: string
+}
+
+export interface SimilarBug {
+  id: string
+  title: string
+  similarity: number
+}
+
+export interface Bug {
+  id: string
+  title: string
+  priority: BugPriority
+  module: string
+  status: BugStatus
+  owner: string
+  traceChain: TraceChainNode[]
+  similarBugs: SimilarBug[]
+}
+
+export interface BugTriageResponse {
+  bugs: Bug[]
+  total: number
+}
