@@ -64,3 +64,25 @@ export interface SreCheckerResponse {
   allPass: boolean
   canRelease: boolean
 }
+
+// Coding pipeline types
+export type PipelineNodeStatus = "waiting" | "running" | "done" | "failed"
+
+export interface CodingPipelineNode {
+  id: string
+  label: string
+  description: string
+  status: PipelineNodeStatus
+  details: {
+    plan?: string
+    design?: string
+    code?: string
+    report?: string
+  }
+}
+
+export interface CodingPipelineResponse {
+  nodes: CodingPipelineNode[]
+  currentStep: number
+  totalSteps: number
+}
