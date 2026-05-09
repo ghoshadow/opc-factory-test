@@ -1,15 +1,17 @@
-"use client"
+"use client";
 
-import { cn } from "@/lib/utils"
-import type { LucideIcon } from "lucide-react"
-import { type ReactNode } from "react"
+import { type ReactNode } from "react";
+
+import type { LucideIcon } from "lucide-react";
+
+import { cn } from "@/lib/utils";
 
 interface EmptyStateProps {
-  icon?: LucideIcon
-  title: string
-  description?: string
-  action?: ReactNode
-  className?: string
+  icon?: LucideIcon;
+  title: string;
+  description?: string;
+  action?: ReactNode;
+  className?: string;
 }
 
 export function EmptyState({ icon: Icon, title, description, action, className }: EmptyStateProps) {
@@ -24,5 +26,5 @@ export function EmptyState({ icon: Icon, title, description, action, className }
       {description && <p className="mt-1 max-w-sm text-sm text-muted-foreground">{description}</p>}
       {action && <div className="mt-4">{action}</div>}
     </div>
-  )
+  );
 }

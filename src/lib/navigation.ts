@@ -1,10 +1,10 @@
 import {
-  Layout,
-  LayoutDashboard,
+  Activity,
   FileText,
   GitBranch,
+  Layout,
+  LayoutDashboard,
   Shield,
-  Activity,
   type LucideIcon,
 } from "lucide-react";
 
@@ -90,10 +90,7 @@ export const navigation: NavItem[] = [
   },
 ];
 
-export function findNavItem(
-  items: NavItem[],
-  path: string
-): NavItem | null {
+export function findNavItem(items: NavItem[], path: string): NavItem | null {
   for (const item of items) {
     if (item.path === path) return item;
     if (item.children) {

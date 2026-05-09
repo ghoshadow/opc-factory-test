@@ -43,5 +43,5 @@ next-env.d.ts
 # playwright
 .playwright-mcp/
 
-# plane dev tools
+# tools
 plane-cli
