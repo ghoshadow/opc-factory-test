@@ -16,15 +16,27 @@ interface WipResponse {
   total: number
 }
 
+interface WipStatsProps {
+  data?: WipResponse
+  isLoading?: boolean
+  error?: unknown
+}
+
 const fetcher = (url: string): Promise<WipResponse> =>
   fetch(url).then((res) => res.json())
 
-export function WipStats() {
-  const { data, error, isLoading } = useSWR<WipResponse>(
-    "/api/v1/factory/wip",
+export function WipStats({ data: propData, isLoading: propLoading, error: propError }: WipStatsProps = {}) {
+  const hasProps = propData !== undefined || propLoading !== undefined || propError !== undefined
+
+  const { data: swrData, error: swrError, isLoading: swrLoading } = useSWR<WipResponse>(
+    hasProps ? null : "/api/v1/factory/wip",
     fetcher,
     { refreshInterval: 10000 }
   )
+
+  const data = hasProps ? propData : swrData
+  const isLoading = hasProps ? (propLoading ?? false) : swrLoading
+  const error = hasProps ? propError : swrError
 
   if (isLoading) {
     return (
