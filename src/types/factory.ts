@@ -152,7 +152,7 @@ export interface PipelineRun {
 }
 
 // Test case types
-export type TestCaseStatus = "pass" | "fail" | "running" | "pending"
+export type TestCaseStatus = "pending" | "running" | "passed" | "failed"
 export type TestCasePriority = "high" | "medium" | "low"
 
 export interface TestCase {
@@ -169,6 +169,57 @@ export interface TestCase {
 export interface TestCaseListResponse {
   cases: TestCase[]
   passRate: number
+  total: number
+}
+
+// Test scenario & execution types
+export type TestStepStatus = "pending" | "running" | "passed" | "failed"
+
+export interface BaseTestStep {
+  id: string
+  description: string
+  expectedResult: string
+  status: TestStepStatus
+}
+
+export interface TestStep extends BaseTestStep {
+  status: TestStepStatus
+  duration?: number
+  actualResult?: string
+  errorDetail?: string
+  screenshot?: string
+  log?: string
+}
+
+export interface AcceptanceCriterion {
+  id: string
+  title: string
+  steps: TestStep[]
+}
+
+export interface TestScenario {
+  id: string
+  name: string
+  feature: string
+  acceptanceCriteria: AcceptanceCriterion[]
+}
+
+export interface TestCasesResponse {
+  scenarios: TestScenario[]
+  total: number
+}
+
+export interface ExecuteRequest {
+  scenarioId?: string
+  acId?: string
+}
+
+export interface ExecuteResponse {
+  scenarioId: string
+  acId: string
+  results: TestStep[]
+  passed: number
+  failed: number
   total: number
 }
 
@@ -245,6 +296,26 @@ export interface CodingOpsResponse {
   designReview: DesignReviewItem[]
   tocoReport: TocoReportData
   kanban: KanbanBoardData
+}
+
+// Coding pipeline node types
+export interface CodingPipelineNode {
+  id: string
+  label: string
+  description: string
+  status: PipelineNodeStatus
+  details: {
+    plan: string
+    code: string
+    report: string
+    design?: string
+  }
+}
+
+export interface CodingPipelineResponse {
+  nodes: CodingPipelineNode[]
+  currentStep: number
+  totalSteps: number
 }
 
 // Delivery gate types
