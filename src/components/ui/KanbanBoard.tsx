@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback, useRef } from "react"
+import { useState, useCallback, useRef, useEffect } from "react"
 import {
   DndContext,
   DragOverlay,
@@ -77,7 +77,9 @@ function ColumnDropZone({
 export function KanbanBoard({ columns, onCardMove }: KanbanBoardProps) {
   const [activeId, setActiveId] = useState<string | null>(null)
   const columnsRef = useRef(columns)
-  columnsRef.current = columns
+  useEffect(() => {
+    columnsRef.current = columns
+  }, [columns])
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
