@@ -43,7 +43,7 @@ export const navigation: NavItem[] = [
     icon: FileText,
     path: "/l2",
     children: [
-      { label: "需求队列", icon: FileText, path: "/l2/queue" },
+      { label: "入厂队列", icon: FileText, path: "/l2/intake" },
       { label: "Spec 编辑器", icon: FileText, path: "/l2/spec-editor" },
       { label: "成熟度评审", icon: FileText, path: "/l2/maturity" },
       { label: "本体管理", icon: FileText, path: "/l2/ontology" },
