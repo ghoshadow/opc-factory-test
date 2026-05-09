@@ -26,7 +26,7 @@ const STATUS_COLUMNS = [
 
 export default function RequirementsPipelinePage() {
   const { data, error, isLoading } = useSWR<PipelineResponse>(
-    "/api/v1/requirements/pipeline",
+    "/api/v1/l2/pipeline",
     fetcher,
   )
 
