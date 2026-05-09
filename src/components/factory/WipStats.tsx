@@ -19,6 +19,13 @@ interface WipResponse {
 const fetcher = (url: string): Promise<WipResponse> =>
   fetch(url).then((res) => res.json())
 
+const LINE_COLORS: Record<string, string> = {
+  requirement: "#3B82F6",
+  coding: "#22C55E",
+  testing: "#F59E0B",
+  sre: "#8B5CF6",
+}
+
 export function WipStats() {
   const { data, error, isLoading } = useSWR<WipResponse>(
     "/api/v1/factory/wip",
@@ -90,7 +97,7 @@ export function WipStats() {
                   )}
                   style={{
                     width: line.count > 0 ? `${barWidth}%` : "0%",
-                    backgroundColor: `var(${line.cssVar})`,
+                    backgroundColor: LINE_COLORS[line.key] ?? "#6B7280",
                   }}
                 />
               </div>
