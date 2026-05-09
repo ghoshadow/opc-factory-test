@@ -65,50 +65,24 @@ export interface SreCheckerResponse {
   canRelease: boolean
 }
 
-// Test case types
-export type TestCaseStatus = "pending" | "running" | "passed" | "failed"
-export type TestStepStatus = "pending" | "running" | "passed" | "failed"
+// Coding pipeline types
+export type PipelineNodeStatus = "waiting" | "running" | "done" | "failed"
 
-export interface TestStep {
+export interface CodingPipelineNode {
   id: string
+  label: string
   description: string
-  expectedResult: string
-  status: TestStepStatus
-  actualResult?: string
-  errorDetail?: string
-  screenshot?: string
-  log?: string
-  duration?: number
+  status: PipelineNodeStatus
+  details: {
+    plan?: string
+    design?: string
+    code?: string
+    report?: string
+  }
 }
 
-export interface AcceptanceCriterion {
-  id: string
-  title: string
-  steps: TestStep[]
-}
-
-export interface TestScenario {
-  id: string
-  name: string
-  feature: string
-  acceptanceCriteria: AcceptanceCriterion[]
-}
-
-export interface TestCasesResponse {
-  scenarios: TestScenario[]
-  total: number
-}
-
-export interface ExecuteRequest {
-  scenarioId?: string
-  acId?: string
-}
-
-export interface ExecuteResponse {
-  scenarioId: string
-  acId: string
-  results: TestStep[]
-  passed: number
-  failed: number
-  total: number
+export interface CodingPipelineResponse {
+  nodes: CodingPipelineNode[]
+  currentStep: number
+  totalSteps: number
 }
