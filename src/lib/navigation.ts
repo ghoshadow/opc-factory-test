@@ -47,6 +47,7 @@ export const navigation: NavItem[] = [
       { label: "Spec 编辑器", icon: FileText, path: "/l2/spec-editor" },
       { label: "成熟度评审", icon: FileText, path: "/l2/maturity" },
       { label: "本体管理", icon: FileText, path: "/l2/ontology" },
+      { label: "Gap 追问", icon: FileText, path: "/l2/gap-questions" },
     ],
   },
   {
