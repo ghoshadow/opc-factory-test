@@ -64,3 +64,21 @@ export interface SreCheckerResponse {
   allPass: boolean
   canRelease: boolean
 }
+
+// TocoAgent report types
+export type TocoLoopAction = "checker" | "developer" | "designer"
+
+export interface TocoCheckItem {
+  id: string
+  name: string
+  description: string
+  status: CheckerItemStatus
+  detail: string
+}
+
+export interface TocoReportResponse {
+  items: TocoCheckItem[]
+  loopAction: TocoLoopAction
+  loopLabel: string
+  loopDescription: string
+}
