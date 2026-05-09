@@ -56,8 +56,6 @@ function QuestionCard({
   onChange: (questionId: string, value: string) => void
   disabled: boolean
 }) {
-  const cfg = severityConfig[question.severity]
-
   return (
     <div className="flex gap-0 rounded-lg border bg-card overflow-hidden">
       <SeverityBar severity={question.severity} />

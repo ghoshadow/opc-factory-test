@@ -11,6 +11,8 @@ import {
   Play,
   TestTubeDiagonal,
   Columns3,
+  Inbox,
+  HelpCircle,
   type LucideIcon,
 } from "lucide-react";
 
@@ -35,10 +37,12 @@ export const navigation: NavItem[] = [
     icon: FileText,
     path: "/l2",
     children: [
-      { label: "本体管理", icon: FileText, path: "/l2/ontology" },
+      { label: "入厂需求", icon: Inbox, path: "/l2/intake" },
       { label: "需求队列", icon: ListOrdered, path: "/l2/queue" },
       { label: "Spec 编辑器", icon: FileEdit, path: "/l2/spec-editor" },
       { label: "成熟度评审", icon: Award, path: "/l2/maturity" },
+      { label: "Gap 追问", icon: HelpCircle, path: "/l2/gap-questions" },
+      { label: "本体管理", icon: FileText, path: "/l2/ontology" },
     ],
   },
   {

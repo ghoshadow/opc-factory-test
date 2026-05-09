@@ -3,7 +3,6 @@
 import { useState } from "react"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
 import { toast } from "sonner"
 import { Loader2 } from "lucide-react"
 
@@ -12,31 +11,16 @@ import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { SegmentedControl } from "@/components/ui/segmented-control"
 import { Label } from "@/components/ui/label"
+import { intakeSchema, type IntakeInput } from "@/lib/validations/intake"
 
-// ── Schema (error-level validations only) ──────────────────────────
-const intakeSchema = z.object({
-  type: z.enum(["初步需求", "Bug 单", "改动单"], {
-    error: "请选择需求类型",
-  }),
-  title: z
-    .string()
-    .min(1, "请输入需求标题")
-    .max(200, "标题最多 200 字符"),
-  description: z
-    .string()
-    .min(1, "请输入需求描述"),
-  priority: z.enum(["P0", "P1", "P2", "P3"], {
-    error: "请选择优先级",
-  }),
-})
-
-type IntakeFormData = z.infer<typeof intakeSchema>
+type IntakeFormData = IntakeInput
 
 // ── Options ────────────────────────────────────────────────────────
 const typeOptions = [
   { value: "初步需求" as const, label: "初步需求" },
-  { value: "Bug 单" as const, label: "Bug 单" },
-  { value: "改动单" as const, label: "改动单" },
+  { value: "功能需求" as const, label: "功能需求" },
+  { value: "技术需求" as const, label: "技术需求" },
+  { value: "Bug 报告" as const, label: "Bug 报告" },
 ]
 
 const priorityOptions = [
