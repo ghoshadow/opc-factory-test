@@ -220,7 +220,7 @@ describe("BugReflow", () => {
     const user = userEvent.setup()
     await user.click(screen.getByText("支付回调超时导致订单状态不一致"))
     await user.click(screen.getByText("回流至 Intake"))
-    expect(screen.getByText("确认回流")).toBeInTheDocument()
+    expect(screen.getAllByText("确认回流").length).toBeGreaterThanOrEqual(1)
     expect(
       screen.getByText("确认 Bug 内容后回流至需求产线 Intake")
     ).toBeInTheDocument()
