@@ -6,13 +6,11 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: "jsdom",
-    globals: true,
-    setupFiles: ["./vitest.setup.ts"],
+    setupFiles: ["./src/test/setup.ts"],
     include: ["src/**/*.test.{ts,tsx}"],
     coverage: {
-      provider: "v8",
       include: ["src/**/*.{ts,tsx}"],
-      exclude: ["src/types/**", "src/**/*.test.*"],
+      exclude: ["src/test/**", "src/types/**", "**/*.test.*"],
     },
   },
   resolve: {
