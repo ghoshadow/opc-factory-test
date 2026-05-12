@@ -1,3 +1,5 @@
+import type { ACItem, DataContract } from "./spec"
+
 export type LineStatus = "NOMINAL" | "ATTENTION"
 
 export type LineId = "requirements" | "coding" | "testing" | "sre"
@@ -507,4 +509,82 @@ export interface ReflowStatusResponse {
   bugId: string
   status: ReflowStatus
   timeline: ReflowTimelineEntry[]
+}
+
+// Archaeology report types (Brownfield code archaeology)
+export interface CodeTreeNode {
+  name: string
+  type: "directory" | "file"
+  children?: CodeTreeNode[]
+  size?: number
+  lines?: number
+  language?: string
+}
+
+export interface DependencyNode {
+  name: string
+  version: string
+  type: "production" | "dev" | "internal"
+  usedBy: string[]
+}
+
+export interface DependencyEdge {
+  source: string
+  target: string
+  label?: string
+  weight: number
+}
+
+export type TechDebtType = "security" | "deprecated_api" | "code_quality" | "performance" | "architecture"
+
+export type TechDebtSeverity = "critical" | "major" | "minor"
+
+export interface TechDebtItem {
+  id: string
+  type: TechDebtType
+  severity: TechDebtSeverity
+  location: string
+  description: string
+  suggestion: string
+}
+
+export interface ChangePattern {
+  period: string
+  commits: number
+  filesChanged: number
+  insertions: number
+  deletions: number
+  topAuthors: string[]
+  description: string
+}
+
+export interface ReverseSpecData {
+  id: string
+  sourceRepo: string
+  minedAt: string
+  userStory: string
+  acceptanceCriteria: ACItem[]
+  dataContract: DataContract
+  uxDraft: string
+  qualityScore: number
+}
+
+export interface ArchaeologyReportData {
+  id: string
+  projectId: string
+  createdAt: string
+  codeTree: CodeTreeNode
+  dependencies: {
+    production: DependencyNode[]
+    dev: DependencyNode[]
+    internal: { name: string; coupling: number }[]
+    graph: DependencyEdge[]
+  }
+  techDebt: TechDebtItem[]
+  changeHistory: ChangePattern[]
+  reverseSpec: ReverseSpecData
+}
+
+export interface ArchaeologyResponse {
+  report: ArchaeologyReportData
 }
