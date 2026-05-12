@@ -322,13 +322,15 @@ export function SpecEditor({ specId }: SpecEditorProps) {
               spec.status === "draft" && "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
               spec.status === "ready_for_review" && "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
               spec.status === "in_review" && "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
-              spec.status === "signed_off" && "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+              spec.status === "signed_off" && "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+              spec.status === "rework" && "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
             )}
           >
             {spec.status === "draft" && "草稿"}
             {spec.status === "ready_for_review" && "待评审"}
             {spec.status === "in_review" && "评审中"}
             {spec.status === "signed_off" && "已签批"}
+            {spec.status === "rework" && "已打回"}
           </span>
         </div>
         <div className="flex items-center gap-3">
@@ -712,12 +714,15 @@ export function SpecEditor({ specId }: SpecEditorProps) {
                     ct.source === "gap_agent" &&
                       "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
                     ct.source === "revision_engine" &&
-                      "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+                      "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+                    ct.source === "signoff" &&
+                      "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400"
                   )}
                 >
                   {ct.source === "review_board" && "Review Board"}
                   {ct.source === "gap_agent" && "Gap Agent"}
                   {ct.source === "revision_engine" && "Revision Engine"}
+                  {ct.source === "signoff" && "签收审核"}
                 </span>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm">{ct.description}</p>

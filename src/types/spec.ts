@@ -25,6 +25,13 @@ export interface ChangeRecord {
   versionTo: number
 }
 
+export interface SignoffAction {
+  action: 'approve' | 'reject'
+  comment?: string
+  reviewerName: string
+  timestamp: string
+}
+
 export interface MetaSpec {
   id: string
   version: number
