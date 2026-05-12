@@ -343,7 +343,7 @@ export function PlanReviewPanel() {
           )}
           <select
             className="rounded-md border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-            value={selectedId ?? ""}
+            value={selectedPlan?.id ?? ""}
             onChange={(e) => setSelectedId(e.target.value)}
           >
             {data.plans.map((p) => (

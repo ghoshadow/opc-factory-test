@@ -2,11 +2,11 @@
 
 import { cn } from "@/lib/utils";
 
-type Status = "NOMINAL" | "ATTENTION" | "BLOCKED";
+type Status = "NOMINAL" | "ATTENTION" | "BLOCKED" | "healthy" | "degraded" | "blocked" | "idle"
 
 interface StatusBadgeProps {
-  status: Status;
-  className?: string;
+  status: Status
+  className?: string
 }
 
 const statusConfig: Record<
@@ -30,6 +30,30 @@ const statusConfig: Record<
     dotColor: "bg-red-500",
     textColor: "text-red-700 dark:text-red-400",
     bg: "bg-red-50 dark:bg-red-950/40",
+  },
+  healthy: {
+    label: "正常",
+    dotColor: "bg-emerald-500",
+    textColor: "text-emerald-700 dark:text-emerald-400",
+    bg: "bg-emerald-50 dark:bg-emerald-950/40",
+  },
+  degraded: {
+    label: "降级",
+    dotColor: "bg-amber-500",
+    textColor: "text-amber-700 dark:text-amber-400",
+    bg: "bg-amber-50 dark:bg-amber-950/40",
+  },
+  blocked: {
+    label: "阻塞",
+    dotColor: "bg-red-500",
+    textColor: "text-red-700 dark:text-red-400",
+    bg: "bg-red-50 dark:bg-red-950/40",
+  },
+  idle: {
+    label: "空闲",
+    dotColor: "bg-gray-500",
+    textColor: "text-gray-700 dark:text-gray-400",
+    bg: "bg-gray-50 dark:bg-gray-950/40",
   },
 };
 

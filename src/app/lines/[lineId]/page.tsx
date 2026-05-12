@@ -61,31 +61,7 @@ export default function LineDetailPage() {
   }
 
   const deliverableColumns = [
-    { key: "id", header: "ID" },
-    { key: "name", header: "名称" },
-    { key: "type", header: "类型" },
-    {
-      key: "status",
-      header: "状态",
-      render: (item: Deliverable) => {
-        const statusLabel: Record<string, string> = {
-          done: "已完成",
-          in_progress: "进行中",
-          pending: "待开始",
-        }
-        const statusColor: Record<string, string> = {
-          done: "text-emerald-600 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-950/30",
-          in_progress: "text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-950/30",
-          pending: "text-muted-foreground bg-muted",
-        }
-        return (
-          <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${statusColor[item.status]}`}>
-            {statusLabel[item.status]}
-          </span>
-        )
-      },
-    },
-    { key: "updatedAt", header: "更新时间" },
+    { key: "label", header: "名称" },
   ]
 
   return (
@@ -147,11 +123,11 @@ export default function LineDetailPage() {
                 status={stage.status}
                 isActive={stage.status === "running"}
               />
-              {i < line.pipeline.length - 1 && (
+              {i < stages.length - 1 && (
                 <div className="w-6 h-px bg-border" />
               )}
             </div>
-          ))}
+          ))})()}
         </div>
       </section>
 

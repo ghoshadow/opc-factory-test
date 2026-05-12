@@ -6,6 +6,7 @@ export type LineId = "requirements" | "coding" | "testing" | "sre"
 
 export interface LineStatusData {
   id: LineId
+  line: "requirement" | "coding" | "testing" | "sre"
   name: string
   opc: string
   function: string
@@ -13,6 +14,18 @@ export interface LineStatusData {
   completed: number
   anomaly: string | null
   status: LineStatus
+  activeItems?: number
+  completedToday?: number
+  currentPhase?: string
+  nextMilestone?: string
+}
+
+export interface DeliverableDetail {
+  id: string
+  name: string
+  type: string
+  status: "done" | "in_progress" | "pending"
+  updatedAt: string
 }
 
 // Bug triage types
@@ -430,15 +443,13 @@ export interface SpecVersionsResponse {
 }
 
 // Skills types
-export type ProductionLine = "requirements" | "coding" | "testing" | "sre"
-
 export type SkillStatus = "installed" | "available"
 
 export interface Skill {
   id: string
   name: string
   description: string
-  line: ProductionLine
+  line: LineId
   status: SkillStatus
 }
 

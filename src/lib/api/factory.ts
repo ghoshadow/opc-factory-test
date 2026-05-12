@@ -1,12 +1,12 @@
 import useSWR from "swr"
-import type { FactoryMetrics } from "@/app/api/v1/factory/metrics/route"
+import type { MetricsResponse } from "@/app/api/v1/factory/metrics/route"
 import type { LineStatusResponse } from "@/app/api/v1/factory/line-status/route"
 import type { WipResponse } from "@/app/api/v1/factory/wip/route"
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
-export function useFactoryMetrics() {
-  const { data, error, isLoading } = useSWR<FactoryMetrics>(
+export function useDashboardMetrics() {
+  const { data, error, isLoading } = useSWR<MetricsResponse>(
     "/api/v1/factory/metrics",
     fetcher,
     {
@@ -16,7 +16,7 @@ export function useFactoryMetrics() {
   )
 
   return {
-    metrics: data,
+    data,
     isLoading,
     isError: !!error,
   }

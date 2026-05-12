@@ -5,6 +5,11 @@ export interface PipelineStep {
   status: "waiting" | "running" | "done" | "failed"
 }
 
+export interface PipelineStage {
+  name: string
+  status: "waiting" | "running" | "done" | "failed"
+}
+
 export interface Deliverable {
   id: string
   name: string

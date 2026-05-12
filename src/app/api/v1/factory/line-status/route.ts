@@ -12,9 +12,16 @@ export interface LineStatusResponse {
   updatedAt: string;
 }
 
+export interface Deliverable {
+  id: string
+  name: string
+  type: string
+  status: "done" | "in_progress" | "pending"
+  updatedAt: string
+}
+
+export type LineStatusResponse = typeof productionLines
+
 export async function GET() {
-  return NextResponse.json({
-    data: productionLines,
-    updatedAt: new Date().toISOString(),
-  });
+  return NextResponse.json(productionLines);
 }

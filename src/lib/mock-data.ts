@@ -46,6 +46,12 @@ export const productionLines: ProductionLine[] = [
       { name: "成熟度评审", status: "running" },
       { name: "交付", status: "waiting" },
     ],
+    pipeline: [
+      { name: "需求提交", status: "done" },
+      { name: "Spec 产出", status: "done" },
+      { name: "成熟度评审", status: "running" },
+      { name: "交付", status: "waiting" },
+    ],
     deliverables: [
       { id: "req-d1", name: "Spec 文档", type: "文档", status: "done", updatedAt: "2026-05-09" },
       { id: "req-d2", name: "本体条目", type: "数据", status: "done", updatedAt: "2026-05-08" },
@@ -64,6 +70,13 @@ export const productionLines: ProductionLine[] = [
     status: "ATTENTION",
     throughput: 6,
     cycleTime: 3.5,
+    pipeline: [
+      { name: "方案评审", status: "done" },
+      { name: "设计评审", status: "done" },
+      { name: "编码实现", status: "running" },
+      { name: "PR 审查", status: "waiting" },
+      { name: "交付", status: "waiting" },
+    ],
     pipeline: [
       { name: "方案评审", status: "done" },
       { name: "设计评审", status: "done" },
@@ -96,6 +109,13 @@ export const productionLines: ProductionLine[] = [
       { name: "缺陷报告", status: "waiting" },
       { name: "交付", status: "waiting" },
     ],
+    pipeline: [
+      { name: "测试计划", status: "done" },
+      { name: "用例设计", status: "done" },
+      { name: "执行测试", status: "running" },
+      { name: "缺陷报告", status: "waiting" },
+      { name: "交付", status: "waiting" },
+    ],
     deliverables: [
       { id: "tst-d1", name: "测试用例", type: "测试", status: "done", updatedAt: "2026-05-09" },
       { id: "tst-d2", name: "缺陷报告", type: "报告", status: "done", updatedAt: "2026-05-08" },
@@ -118,6 +138,13 @@ export const productionLines: ProductionLine[] = [
       { name: "部署准备", status: "done" },
       { name: "灰度发布", status: "done" },
       { name: "监控观察", status: "running" },
+      { name: "全量发布", status: "waiting" },
+      { name: "运维", status: "waiting" },
+    ],
+    pipeline: [
+      { name: "部署准备", status: "done" },
+      { name: "灰度发布", status: "running" },
+      { name: "监控观察", status: "waiting" },
       { name: "全量发布", status: "waiting" },
       { name: "运维", status: "waiting" },
     ],

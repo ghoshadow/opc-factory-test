@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { LineStatus } from "@/lib/types";
+import type { LineStatus } from "@/types/factory";
 
 interface StatusBadgeProps {
   status: LineStatus;
