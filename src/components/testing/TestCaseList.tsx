@@ -19,7 +19,6 @@ import type {
   TestScenario,
   AcceptanceCriterion,
   TestStep,
-  TestCaseStatus,
   TestStepStatus,
   ExecuteResponse,
 } from "@/types/factory"
@@ -35,7 +34,7 @@ const statusConfig: Record<TestStepStatus, { icon: typeof Clock; label: string; 
   failed: { icon: XCircle, label: "失败", color: "text-red-500" },
 }
 
-function scenarioStatus(scenario: TestScenario): TestCaseStatus {
+function scenarioStatus(scenario: TestScenario): TestStepStatus {
   const allSteps = scenario.acceptanceCriteria.flatMap((ac) => ac.steps)
   if (allSteps.some((s) => s.status === "running")) return "running"
   const nonPending = allSteps.filter((s) => s.status !== "pending")
@@ -45,7 +44,7 @@ function scenarioStatus(scenario: TestScenario): TestCaseStatus {
   return "pending"
 }
 
-function acStatus(ac: AcceptanceCriterion): TestCaseStatus {
+function acStatus(ac: AcceptanceCriterion): TestStepStatus {
   if (ac.steps.some((s) => s.status === "running")) return "running"
   const nonPending = ac.steps.filter((s) => s.status !== "pending")
   if (nonPending.length === 0) return "pending"
@@ -71,7 +70,7 @@ function StepIcon({ status }: { status: TestStepStatus }) {
   return <Icon className={`size-4 shrink-0 ${cfg.color}`} />
 }
 
-function CaseStatusBadge({ status }: { status: TestCaseStatus }) {
+function CaseStatusBadge({ status }: { status: TestStepStatus }) {
   const cfg = caseStatusBadge[status]
   const Icon = cfg.icon
   return (

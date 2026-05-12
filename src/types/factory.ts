@@ -2,7 +2,7 @@ import type { ACItem, DataContract } from "./spec"
 
 export type LineStatus = "NOMINAL" | "ATTENTION"
 
-export type LineId = "requirements" | "coding" | "testing" | "sre"
+export type LineId = "requirement" | "coding" | "testing" | "sre"
 
 export interface LineStatusData {
   id: LineId

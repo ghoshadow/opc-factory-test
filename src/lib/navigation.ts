@@ -56,6 +56,7 @@ export const navigation: NavItem[] = [
       { label: "Toco 报告", icon: Zap, path: "/l3/coding/toco-report" },
       { label: "Plan Review", icon: FileText, path: "/l3/coding/plan-review" },
       { label: "Design Review", icon: Shield, path: "/l3/coding/design-review" },
+      { label: "安全重构", icon: Shield, path: "/l3/coding/refactor" },
       { label: "Pipeline 流程图", icon: GitBranch, path: "/l3/coding/pipeline-demo" },
       { label: "测试产线", icon: GitBranch, path: "/l3/testing" },
       { label: "测试流水线", icon: Play, path: "/l3/testing/pipeline" },
@@ -83,6 +84,7 @@ export const navigation: NavItem[] = [
     path: "/l5",
     children: [
       { label: "Checker 门禁", icon: Shield, path: "/l5/checker" },
+      { label: "可观测仪表盘", icon: BarChart3, path: "/l5/observability" },
       { label: "Runbooks", icon: Activity, path: "/l5/runbooks" },
       { label: "告警管理", icon: Activity, path: "/l5/alerts" },
       { label: "事件分诊", icon: Activity, path: "/l5/incidents" },

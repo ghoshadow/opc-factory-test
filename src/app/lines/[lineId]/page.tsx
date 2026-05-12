@@ -119,8 +119,8 @@ export default function LineDetailPage() {
           {line.pipeline.map((stage: PipelineStage, i: number) => (
             <div key={i} className="flex items-center gap-2">
               <PipelineNode
-                label={stage.name}
-                status={stage.status}
+                label={stage.name ?? ""}
+                status={stage.status as "waiting" | "running" | "done" | "failed" | undefined}
                 isActive={stage.status === "running"}
               />
               {i < stages.length - 1 && (
