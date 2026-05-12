@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
-import type { IntakeItem, IntakePriority, IntakeStatus, IntakeType } from "@/types/requirement"
+import type { IntakeItem, IntakePriority } from "@/types/requirement"
+import { intakeSchema } from "@/lib/validations/intake"
 
 const mockItems: IntakeItem[] = [
   {
@@ -105,4 +106,29 @@ export async function GET(request: NextRequest) {
   filtered.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority])
 
   return NextResponse.json({ items: filtered, total: filtered.length })
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json()
+    const parsed = intakeSchema.safeParse(body)
+
+    if (!parsed.success) {
+      const fields: Record<string, string> = {}
+      for (const issue of parsed.error.issues) {
+        const key = issue.path.join(".")
+        if (!fields[key]) {
+          fields[key] = issue.message
+        }
+      }
+      return NextResponse.json({ error: "参数验证失败", fields }, { status: 400 })
+    }
+
+    const now = new Date().toISOString()
+    const id = `SYM-${crypto.randomUUID().slice(0, 4).toUpperCase()}`
+
+    return NextResponse.json({ id, status: "queued", createdAt: now }, { status: 201 })
+  } catch {
+    return NextResponse.json({ error: "请求体格式无效，需要 JSON 格式" }, { status: 400 })
+  }
 }

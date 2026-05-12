@@ -1,120 +1,189 @@
-"use client"
+"use client";
 
-import useSWR from "swr"
-import { Siren, AlertTriangle, Info, Clock, User } from "lucide-react"
-import type { IncidentResponse, Incident, AlertSeverity, IncidentStatus } from "@/types/factory"
-import { Skeleton } from "@/components/ui/skeleton"
+import { useState } from "react";
 
-const fetcher = (url: string): Promise<IncidentResponse> =>
-  fetch(url).then((res) => res.json())
+import { AlertTriangle, Bug, Clock, Search, Shield } from "lucide-react";
+import useSWR from "swr";
 
-const severityIcon: Record<AlertSeverity, typeof Siren> = {
-  critical: Siren,
-  warning: AlertTriangle,
-  info: Info,
+import { Skeleton } from "@/components/ui/skeleton";
+import type {
+  Incident,
+  IncidentListResponse,
+  IncidentSeverity,
+  IncidentStatus,
+} from "@/types/factory";
+
+const fetcher = (url: string): Promise<IncidentListResponse> =>
+  fetch(url).then((res) => res.json());
+
+const severityConfig: Record<IncidentSeverity, { badgeClass: string; dotClass: string }> = {
+  P0: {
+    badgeClass:
+      "bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-400 border-red-200 dark:border-red-800",
+    dotClass: "bg-red-500",
+  },
+  P1: {
+    badgeClass:
+      "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border-amber-200 dark:border-amber-800",
+    dotClass: "bg-amber-500",
+  },
+  P2: {
+    badgeClass:
+      "bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400 border-blue-200 dark:border-blue-800",
+    dotClass: "bg-blue-500",
+  },
+  P3: {
+    badgeClass: "bg-muted text-muted-foreground border-border",
+    dotClass: "bg-muted-foreground/40",
+  },
+};
+
+const statusConfig: Record<IncidentStatus, { badgeClass: string }> = {
+  待诊断: {
+    badgeClass: "bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-400",
+  },
+  已诊断: {
+    badgeClass: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400",
+  },
+  已回流: {
+    badgeClass: "bg-muted text-muted-foreground",
+  },
+};
+
+interface IncidentListProps {
+  onSelect: (incident: Incident) => void;
+  selectedId?: string;
 }
 
-const severityClass: Record<AlertSeverity, string> = {
-  critical: "text-red-500",
-  warning: "text-amber-500",
-  info: "text-blue-500",
-}
-
-const statusConfig: Record<IncidentStatus, { label: string; className: string }> = {
-  open: { label: "待处理", className: "bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-400" },
-  investigating: { label: "调查中", className: "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400" },
-  mitigated: { label: "已缓解", className: "bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400" },
-  resolved: { label: "已解决", className: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400" },
-}
-
-export function IncidentList() {
-  const { data, error, isLoading } = useSWR<IncidentResponse>(
+export function IncidentList({ onSelect, selectedId }: IncidentListProps) {
+  const [search, setSearch] = useState("");
+  const { data, error, isLoading } = useSWR<IncidentListResponse>(
     "/api/v1/sre/incidents",
     fetcher,
-    { refreshInterval: 30000 }
-  )
+    { refreshInterval: 30000 },
+  );
 
   if (isLoading) {
     return (
-      <div className="rounded-xl border bg-card shadow-sm p-6 space-y-4">
-        <Skeleton className="h-7 w-40" />
-        {Array.from({ length: 6 }).map((_, i) => (
-          <Skeleton key={i} className="h-16 w-full rounded-lg" />
+      <div className="space-y-3 p-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Skeleton key={i} className="h-20 w-full rounded-lg" />
         ))}
       </div>
-    )
+    );
   }
 
   if (error) {
     return (
-      <div className="rounded-xl border bg-card shadow-sm p-6">
-        <div className="flex items-center gap-3">
-          <Siren className="size-6 text-muted-foreground/40" />
+      <div className="p-4">
+        <div className="flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/20 p-4">
+          <AlertTriangle className="size-5 text-red-500" />
           <div>
             <p className="text-sm font-medium">加载失败</p>
-            <p className="text-xs text-muted-foreground">无法获取事件列表，请稍后重试</p>
+            <p className="text-xs text-muted-foreground">无法获取 Incident 列表，请稍后重试</p>
           </div>
         </div>
       </div>
-    )
+    );
   }
 
-  if (!data) return null
+  const incidents = data?.incidents ?? [];
+  const filtered = search
+    ? incidents.filter(
+        (inc) =>
+          inc.description.toLowerCase().includes(search.toLowerCase()) ||
+          inc.service.toLowerCase().includes(search.toLowerCase()) ||
+          inc.id.toLowerCase().includes(search.toLowerCase()),
+      )
+    : incidents;
 
   return (
-    <div className="rounded-xl border bg-card shadow-sm p-6 space-y-5">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Siren className="size-5 text-primary" />
-          <div>
-            <h2 className="text-lg font-semibold">事件列表</h2>
-            <p className="text-xs text-muted-foreground">近期生产事件</p>
-          </div>
-        </div>
-        <div className="text-sm tabular-nums">
-          <Siren className="size-4 text-red-500 inline mr-1" />
-          <span className="text-red-600 font-semibold">{data.openCount}</span>
-          <span className="text-muted-foreground ml-1">进行中</span>
+    <div className="flex flex-col h-full">
+      {/* Search */}
+      <div className="p-4 border-b border-border">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="搜索 Incident..."
+            className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring focus:border-input"
+          />
         </div>
       </div>
 
-      <div className="space-y-2">
-        {data.incidents.map((inc) => {
-          const Icon = severityIcon[inc.severity]
-          const stCfg = statusConfig[inc.status]
-          return (
-            <div
-              key={inc.id}
-              className={`flex items-start gap-3 rounded-lg border px-4 py-3 transition-colors ${
-                inc.status === "open" || inc.status === "investigating"
-                  ? "border-red-200 bg-red-50/50 dark:border-red-800 dark:bg-red-950/10"
-                  : "border-border bg-muted/30"
-              }`}
-            >
-              <Icon className={`size-4 mt-0.5 shrink-0 ${severityClass[inc.severity]}`} />
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-sm font-medium">{inc.title}</span>
-                  <span className={`inline-flex items-center rounded px-1.5 py-0.5 text-xs font-medium ${stCfg.className}`}>
-                    {stCfg.label}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
-                  <span className="inline-flex items-center gap-1">
-                    <Clock className="size-3" />
-                    {new Date(inc.openedAt).toLocaleString("zh-CN")}
-                  </span>
-                  <span className="inline-flex items-center gap-1">
-                    <User className="size-3" />
-                    {inc.owner}
-                  </span>
-                  <span>{inc.service}</span>
-                </div>
-              </div>
-            </div>
-          )
-        })}
+      {/* List */}
+      <div className="flex-1 overflow-auto">
+        {filtered.length === 0 ? (
+          <div className="p-8 text-center">
+            <Shield className="size-8 text-muted-foreground/30 mx-auto mb-2" />
+            <p className="text-sm text-muted-foreground">
+              {search ? "无匹配结果" : "暂无 Incident"}
+            </p>
+          </div>
+        ) : (
+          <div className="p-2 space-y-1">
+            {filtered.map((inc) => {
+              const sev = severityConfig[inc.severity];
+              const st = statusConfig[inc.status];
+              return (
+                <button
+                  key={inc.id}
+                  type="button"
+                  onClick={() => onSelect(inc)}
+                  className={`w-full text-left p-3 rounded-lg transition-colors ${
+                    selectedId === inc.id
+                      ? "bg-primary/10 border border-primary/30"
+                      : "hover:bg-accent border border-transparent"
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`mt-0.5 size-2 rounded-full shrink-0 ${sev.dotClass}`} />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span
+                          className={`inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-bold border ${sev.badgeClass}`}
+                        >
+                          {inc.severity}
+                        </span>
+                        <span
+                          className={`inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium ${st.badgeClass}`}
+                        >
+                          {inc.status}
+                        </span>
+                      </div>
+                      <p className="text-sm mt-1 line-clamp-2 leading-snug">{inc.description}</p>
+                      <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
+                        <span className="inline-flex items-center gap-1">
+                          <Bug className="size-3" />
+                          {inc.service}
+                        </span>
+                        <span className="inline-flex items-center gap-1">
+                          <Clock className="size-3" />
+                          {new Date(inc.discoveredAt).toLocaleTimeString("zh-CN", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Footer */}
+      <div className="p-3 border-t border-border text-xs text-muted-foreground flex items-center justify-between">
+        <span>共 {incidents.length} 个 Incident</span>
+        <span className="inline-flex items-center gap-1">
+          <span className="size-2 rounded-full bg-red-500" />
+          {incidents.filter((i) => i.status === "待诊断").length} 待诊断
+        </span>
       </div>
     </div>
-  )
+  );
 }

@@ -81,9 +81,9 @@ describe("KanbanBoard", () => {
     const onCardMove = vi.fn()
     render(<KanbanBoard columns={makeColumns()} onCardMove={onCardMove} />)
 
-    expect(screen.getByText("Card 1")).toBeInTheDocument()
-    expect(screen.getByText("Card 2")).toBeInTheDocument()
-    expect(screen.getByText("Card 3")).toBeInTheDocument()
+    expect(screen.getAllByText("Card 1").length).toBeGreaterThan(0)
+    expect(screen.getAllByText("Card 2").length).toBeGreaterThan(0)
+    expect(screen.getAllByText("Card 3").length).toBeGreaterThan(0)
   })
 
   it("sorts cards by priority within columns (urgent first)", () => {

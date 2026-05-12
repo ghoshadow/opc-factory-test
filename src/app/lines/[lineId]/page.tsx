@@ -7,7 +7,7 @@ import { StatusBadge } from "@/components/ui/StatusBadge"
 import { PipelineNode } from "@/components/ui/PipelineNode"
 import { DataTable } from "@/components/ui/DataTable"
 import { EmptyState } from "@/components/ui/EmptyState"
-import type { Deliverable } from "@/app/api/v1/factory/line-status/route"
+import type { Deliverable } from "@/lib/types"
 
 export default function LineDetailPage() {
   const params = useParams()

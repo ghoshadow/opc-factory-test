@@ -1,3 +1,5 @@
+import type { ACItem, DataContract } from "./spec"
+
 export type LineStatus = "NOMINAL" | "ATTENTION"
 
 export type LineId = "requirements" | "coding" | "testing" | "sre"
@@ -152,7 +154,7 @@ export interface PipelineRun {
 }
 
 // Test case types
-export type TestCaseStatus = "pass" | "fail" | "running" | "pending"
+export type TestCaseStatus = "pending" | "running" | "passed" | "failed"
 export type TestCasePriority = "high" | "medium" | "low"
 
 export interface TestCase {
@@ -169,6 +171,57 @@ export interface TestCase {
 export interface TestCaseListResponse {
   cases: TestCase[]
   passRate: number
+  total: number
+}
+
+// Test scenario & execution types
+export type TestStepStatus = "pending" | "running" | "passed" | "failed"
+
+export interface BaseTestStep {
+  id: string
+  description: string
+  expectedResult: string
+  status: TestStepStatus
+}
+
+export interface TestStep extends BaseTestStep {
+  status: TestStepStatus
+  duration?: number
+  actualResult?: string
+  errorDetail?: string
+  screenshot?: string
+  log?: string
+}
+
+export interface AcceptanceCriterion {
+  id: string
+  title: string
+  steps: TestStep[]
+}
+
+export interface TestScenario {
+  id: string
+  name: string
+  feature: string
+  acceptanceCriteria: AcceptanceCriterion[]
+}
+
+export interface TestCasesResponse {
+  scenarios: TestScenario[]
+  total: number
+}
+
+export interface ExecuteRequest {
+  scenarioId?: string
+  acId?: string
+}
+
+export interface ExecuteResponse {
+  scenarioId: string
+  acId: string
+  results: TestStep[]
+  passed: number
+  failed: number
   total: number
 }
 
@@ -245,6 +298,26 @@ export interface CodingOpsResponse {
   designReview: DesignReviewItem[]
   tocoReport: TocoReportData
   kanban: KanbanBoardData
+}
+
+// Coding pipeline node types
+export interface CodingPipelineNode {
+  id: string
+  label: string
+  description: string
+  status: PipelineNodeStatus
+  details: {
+    plan: string
+    code: string
+    report: string
+    design?: string
+  }
+}
+
+export interface CodingPipelineResponse {
+  nodes: CodingPipelineNode[]
+  currentStep: number
+  totalSteps: number
 }
 
 // Delivery gate types
@@ -399,96 +472,119 @@ export interface PipelineResponse {
   totalNodes: number
 }
 
-// SRE Deploy types
-export type DeployStatus = "success" | "in_progress" | "failed" | "rolled_back"
+// Bug Reflow types (SRE → Intake)
+export type ReflowStatus = "open" | "reflowed_to_intake" | "coding_in_progress" | "fixed"
 
-export interface DeployRecord {
+export interface ReflowTimelineEntry {
   id: string
-  version: string
-  service: string
-  environment: string
-  status: DeployStatus
-  startedAt: string
-  completedAt: string | null
-  triggeredBy: string
-  commitSha: string
-}
-
-export interface DeployResponse {
-  deploys: DeployRecord[]
-  total: number
-  successRate: number
-}
-
-// SRE Observability types
-export interface MetricSeries {
-  name: string
-  value: number
-  unit: string
-  trend: "up" | "down" | "stable"
-  changePercent: number
-}
-
-export interface ObservabilityResponse {
-  metrics: MetricSeries[]
-  lastUpdated: string
-}
-
-// SRE Alert types
-export type AlertSeverity = "critical" | "warning" | "info"
-
-export interface AlertRule {
-  id: string
-  name: string
+  status: ReflowStatus
+  label: string
   description: string
-  severity: AlertSeverity
-  source: string
-  threshold: string
-  currentValue: string
-  status: "firing" | "ok"
-  lastFired: string | null
+  timestamp: string
 }
 
-export interface AlertsResponse {
-  rules: AlertRule[]
-  total: number
-  firingCount: number
-}
-
-// SRE Incident types
-export type IncidentStatus = "open" | "investigating" | "mitigated" | "resolved"
-
-export interface Incident {
+export interface ReflowBug {
   id: string
   title: string
-  severity: AlertSeverity
-  status: IncidentStatus
-  service: string
-  openedAt: string
-  owner: string
+  description: string
+  priority: BugPriority
+  module: string
+  status: ReflowStatus
+  source: string
+  createdAt: string
+  timeline: ReflowTimelineEntry[]
 }
 
-export interface IncidentResponse {
-  incidents: Incident[]
+export interface ReflowBugListResponse {
+  bugs: ReflowBug[]
   total: number
-  openCount: number
 }
 
-// SRE Rollback types
-export type RollbackReadiness = "ready" | "preparing" | "not_ready"
+export interface ReflowRequest {
+  title: string
+  description: string
+}
 
-export interface RollbackTarget {
+export interface ReflowStatusResponse {
+  bugId: string
+  status: ReflowStatus
+  timeline: ReflowTimelineEntry[]
+}
+
+// Archaeology report types (Brownfield code archaeology)
+export interface CodeTreeNode {
+  name: string
+  type: "directory" | "file"
+  children?: CodeTreeNode[]
+  size?: number
+  lines?: number
+  language?: string
+}
+
+export interface DependencyNode {
+  name: string
+  version: string
+  type: "production" | "dev" | "internal"
+  usedBy: string[]
+}
+
+export interface DependencyEdge {
+  source: string
+  target: string
+  label?: string
+  weight: number
+}
+
+export type TechDebtType = "security" | "deprecated_api" | "code_quality" | "performance" | "architecture"
+
+export type TechDebtSeverity = "critical" | "major" | "minor"
+
+export interface TechDebtItem {
   id: string
-  service: string
-  currentVersion: string
-  targetVersion: string
-  readiness: RollbackReadiness
-  estimatedDowntime: string
-  lastValidated: string
+  type: TechDebtType
+  severity: TechDebtSeverity
+  location: string
+  description: string
+  suggestion: string
 }
 
-export interface RollbackResponse {
-  targets: RollbackTarget[]
-  total: number
-  readyCount: number
+export interface ChangePattern {
+  period: string
+  commits: number
+  filesChanged: number
+  insertions: number
+  deletions: number
+  topAuthors: string[]
+  description: string
+}
+
+export interface ReverseSpecData {
+  id: string
+  sourceRepo: string
+  minedAt: string
+  userStory: string
+  acceptanceCriteria: ACItem[]
+  dataContract: DataContract
+  uxDraft: string
+  qualityScore: number
+}
+
+export interface ArchaeologyReportData {
+  id: string
+  projectId: string
+  createdAt: string
+  codeTree: CodeTreeNode
+  dependencies: {
+    production: DependencyNode[]
+    dev: DependencyNode[]
+    internal: { name: string; coupling: number }[]
+    graph: DependencyEdge[]
+  }
+  techDebt: TechDebtItem[]
+  changeHistory: ChangePattern[]
+  reverseSpec: ReverseSpecData
+}
+
+export interface ArchaeologyResponse {
+  report: ArchaeologyReportData
 }

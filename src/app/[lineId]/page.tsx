@@ -40,12 +40,12 @@ export default async function LineDetailPage({ params }: LineDetailPageProps) {
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap items-center gap-2 py-8 text-sm text-muted-foreground justify-center">
-              {line.pipelineSteps.map((step, i) => (
-                <span key={step.label} className="inline-flex items-center gap-2">
+              {line.pipeline.map((step, i) => (
+                <span key={step.name} className="inline-flex items-center gap-2">
                   <span className="rounded-md bg-muted px-3 py-1.5 text-xs font-medium">
-                    {step.label}
+                    {step.name}
                   </span>
-                  {i < line.pipelineSteps.length - 1 && (
+                  {i < line.pipeline.length - 1 && (
                     <span className="text-border">→</span>
                   )}
                 </span>
@@ -87,9 +87,9 @@ export default async function LineDetailPage({ params }: LineDetailPageProps) {
           <CardContent>
             <ul className="space-y-1.5 text-sm text-muted-foreground">
               {line.deliverables.map((d) => (
-                <li key={d.label} className="flex items-center gap-2">
+                <li key={d.id} className="flex items-center gap-2">
                   <span className="size-1.5 rounded-full bg-emerald-500" />
-                  {d.label}
+                  {d.name}
                 </li>
               ))}
             </ul>

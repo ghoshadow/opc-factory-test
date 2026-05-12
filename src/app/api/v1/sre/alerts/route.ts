@@ -1,81 +1,139 @@
-import { NextResponse } from "next/server"
-import type { AlertsResponse, AlertRule } from "@/types/factory"
+import { NextRequest, NextResponse } from "next/server"
+import type { AlertRule, AlertRuleListResponse } from "@/types/factory"
+import { defaultRouting } from "@/lib/alert-constants"
 
-const alertRules: AlertRule[] = [
+const sampleRules: AlertRule[] = [
   {
-    id: "alt-001",
-    name: "支付网关 P99 延迟过高",
-    description: "支付网关 P99 延迟超过 500ms",
+    id: "ar-001",
+    name: "F-2341: Silent Gap",
+    metric: "spec_silent_gap_hours",
+    condition: "gt",
+    threshold: 48,
+    severity: "warning",
+    enabled: true,
+    routing: [
+      { target: "oncall", label: "SRE 值班人员", enabled: true },
+      { target: "opc", label: "对应产线 OPC", enabled: true },
+      { target: "auto_remediation", label: "自愈触发", enabled: false },
+    ],
+    description: "需求产线 Spec 静默缺口 — 超过 48h 未更新触发告警",
+    createdAt: "2026-04-10T08:00:00Z",
+    updatedAt: "2026-05-08T14:00:00Z",
+  },
+  {
+    id: "ar-002",
+    name: "F-2360: Spec-Code Drift",
+    metric: "spec_code_drift_pct",
+    condition: "gt",
+    threshold: 10,
     severity: "critical",
-    source: "prometheus",
-    threshold: "> 500ms",
-    currentValue: "487ms",
-    status: "ok",
-    lastFired: "2026-05-09T08:30:00Z",
+    enabled: true,
+    routing: [
+      { target: "oncall", label: "SRE 值班人员", enabled: true },
+      { target: "opc", label: "对应产线 OPC", enabled: true },
+      { target: "auto_remediation", label: "自愈触发", enabled: true },
+    ],
+    description: "Spec-Code 漂移超过 10% 阈值触发严重告警",
+    createdAt: "2026-04-12T09:00:00Z",
+    updatedAt: "2026-05-09T10:00:00Z",
   },
   {
-    id: "alt-002",
-    name: "订单服务 5xx 率飙升",
-    description: "订单服务 5xx 错误率超过 1%",
+    id: "ar-003",
+    name: "支付回调 5xx 率",
+    metric: "payment_callback_5xx_rate",
+    condition: "gt",
+    threshold: 0.1,
     severity: "critical",
-    source: "grafana",
-    threshold: "> 1%",
-    currentValue: "2.3%",
-    status: "firing",
-    lastFired: "2026-05-10T15:00:00Z",
+    enabled: true,
+    routing: [
+      { target: "oncall", label: "SRE 值班人员", enabled: true },
+      { target: "opc", label: "对应产线 OPC", enabled: false },
+      { target: "auto_remediation", label: "自愈触发", enabled: false },
+    ],
+    description: "支付回调 5xx 错误率超过 0.1%",
+    createdAt: "2026-04-15T10:00:00Z",
+    updatedAt: "2026-05-07T16:00:00Z",
   },
   {
-    id: "alt-003",
-    name: "Redis 连接数接近上限",
-    description: "Redis 连接数超过 80% 上限",
+    id: "ar-004",
+    name: "订单服务 P99 延迟",
+    metric: "order_service_p99_latency_ms",
+    condition: "gt",
+    threshold: 500,
     severity: "warning",
-    source: "prometheus",
-    threshold: "> 80%",
-    currentValue: "76%",
-    status: "ok",
-    lastFired: "2026-05-08T22:00:00Z",
-  },
-  {
-    id: "alt-004",
-    name: "通知服务推送延迟",
-    description: "通知服务推送延迟超过 10s",
-    severity: "warning",
-    source: "grafana",
-    threshold: "> 10s",
-    currentValue: "12s",
-    status: "firing",
-    lastFired: "2026-05-10T14:45:00Z",
-  },
-  {
-    id: "alt-005",
-    name: "SSL 证书即将过期",
-    description: "生产环境 SSL 证书 7 天后过期",
-    severity: "info",
-    source: "internal",
-    threshold: "< 7 days",
-    currentValue: "5 days",
-    status: "firing",
-    lastFired: "2026-05-09T00:00:00Z",
-  },
-  {
-    id: "alt-006",
-    name: "PostgreSQL 慢查询增多",
-    description: "慢查询数量超过基准值",
-    severity: "warning",
-    source: "prometheus",
-    threshold: "> 10/min",
-    currentValue: "8/min",
-    status: "ok",
-    lastFired: "2026-05-07T14:00:00Z",
+    enabled: true,
+    routing: [
+      { target: "oncall", label: "SRE 值班人员", enabled: true },
+      { target: "opc", label: "对应产线 OPC", enabled: false },
+      { target: "auto_remediation", label: "自愈触发", enabled: false },
+    ],
+    description: "订单服务 P99 延迟超过 500ms",
+    createdAt: "2026-04-20T11:00:00Z",
+    updatedAt: "2026-05-06T12:00:00Z",
   },
 ]
 
 export async function GET() {
-  const firingCount = alertRules.filter((a) => a.status === "firing").length
-  const response: AlertsResponse = {
-    rules: alertRules,
-    total: alertRules.length,
-    firingCount,
+  const response: AlertRuleListResponse = {
+    rules: sampleRules,
+    total: sampleRules.length,
   }
   return NextResponse.json(response)
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json()
+    const newRule: AlertRule = {
+      id: `ar-${Date.now()}`,
+      name: body.name || "未命名规则",
+      metric: body.metric || "",
+      condition: body.condition || "gt",
+      threshold: body.threshold ?? 0,
+      severity: body.severity || "warning",
+      enabled: body.enabled ?? true,
+      routing: body.routing || defaultRouting,
+      description: body.description || "",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }
+    sampleRules.push(newRule)
+    return NextResponse.json(newRule, { status: 201 })
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 })
+  }
+}
+
+export async function PUT(request: NextRequest) {
+  try {
+    const body = await request.json()
+    const { id, ...updates } = body
+    const idx = sampleRules.findIndex((r) => r.id === id)
+    if (idx === -1) {
+      return NextResponse.json({ error: "Alert rule not found" }, { status: 404 })
+    }
+    sampleRules[idx] = {
+      ...sampleRules[idx],
+      ...updates,
+      updatedAt: new Date().toISOString(),
+    }
+    return NextResponse.json(sampleRules[idx])
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 })
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const body = await request.json()
+    const { id } = body
+    const idx = sampleRules.findIndex((r) => r.id === id)
+    if (idx === -1) {
+      return NextResponse.json({ error: "Alert rule not found" }, { status: 404 })
+    }
+    const removed = sampleRules.splice(idx, 1)[0]
+    return NextResponse.json(removed)
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 })
+  }
 }

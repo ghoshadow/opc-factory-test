@@ -1,167 +1,94 @@
-"use client"
+"use client";
 
-import { useState, useCallback } from "react"
-import {
-  Rocket,
-  Shield,
-  BarChart3,
-  Bell,
-  Siren,
-  RotateCcw,
-  BookOpen,
-} from "lucide-react"
-import { DeployPanel } from "@/components/sre/DeployPanel"
-import { SreCheckerPanel } from "@/components/sre/SreCheckerPanel"
-import { ObservabilityPanel } from "@/components/sre/ObservabilityPanel"
-import { AlertRulesPanel } from "@/components/sre/AlertRulesPanel"
-import { IncidentList } from "@/components/sre/IncidentList"
-import { RollbackPanel } from "@/components/sre/RollbackPanel"
-import { RunbookList } from "@/components/sre/RunbookList"
-import { RunbookEditor } from "@/components/sre/RunbookEditor"
-import { TroubleshootTree } from "@/components/sre/TroubleshootTree"
-import type { Runbook } from "@/types/factory"
+import { useEffect, useRef } from "react";
 
-const anchorSections = [
-  { id: "deploy", label: "部署", icon: Rocket },
-  { id: "checker", label: "门禁", icon: Shield },
-  { id: "observability", label: "观测", icon: BarChart3 },
-  { id: "alerts", label: "告警", icon: Bell },
-  { id: "incidents", label: "事件", icon: Siren },
-  { id: "rollback", label: "回滚", icon: RotateCcw },
-  { id: "runbooks", label: "手册", icon: BookOpen },
-]
+import { AlertRulesPanel } from "@/components/sre/AlertRulesPanel";
+import { IncidentListPanel } from "@/components/sre/IncidentListPanel";
+import { ObservabilityPanel } from "@/components/sre/ObservabilityPanel";
+import { RollbackPanel } from "@/components/sre/RollbackPanel";
+import { RunbookPanel } from "@/components/sre/RunbookPanel";
+import { SreCheckerPanel } from "@/components/sre/SreCheckerPanel";
 
-export default function SreOpsPage() {
-  const [selectedRunbook, setSelectedRunbook] = useState<Runbook | null>(null)
-  const [showNewRunbook, setShowNewRunbook] = useState(false)
+const sections = [
+  { id: "checker", label: "发布门禁" },
+  { id: "observability", label: "可观测性" },
+  { id: "alerts", label: "告警规则" },
+  { id: "incidents", label: "故障工单" },
+  { id: "rollbacks", label: "回滚记录" },
+  { id: "runbooks", label: "运维手册" },
+];
 
-  const scrollTo = useCallback((id: string) => {
-    const el = document.getElementById(id)
+export default function SreOpsCenterPage() {
+  const navRef = useRef<HTMLDivElement>(null);
+
+  const scrollTo = (id: string) => {
+    const el = document.getElementById(id);
     if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" })
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
     }
-  }, [])
-
-  const handleSelectRunbook = useCallback((rb: Runbook) => {
-    setSelectedRunbook(rb)
-    setShowNewRunbook(false)
-  }, [])
-
-  const handleCreateNew = useCallback(() => {
-    setSelectedRunbook(null)
-    setShowNewRunbook(true)
-  }, [])
-
-  const handleBack = useCallback(() => {
-    setSelectedRunbook(null)
-    setShowNewRunbook(false)
-  }, [])
-
-  const handleSaved = useCallback(() => {
-    setShowNewRunbook(false)
-  }, [])
+  };
 
   return (
-    <div className="flex flex-1 flex-col gap-6 p-6">
+    <div className="space-y-6">
       {/* Page header */}
       <div>
         <h1 className="text-2xl font-bold tracking-tight">SRE 运维中心</h1>
         <p className="text-sm text-muted-foreground mt-1">
-          部署管理 · 发布门禁 · 可观测性 · 告警 · 事件 · 回滚 · 运维手册
+          可观测性 · 告警 · 故障管理 · 回滚 · 运维手册
         </p>
       </div>
 
-      {/* Anchor navigation */}
-      <nav className="sticky top-0 z-20 -mx-6 px-6 pb-3 pt-2 bg-background border-b border-border">
-        <div className="flex items-center gap-1 overflow-x-auto">
-          {anchorSections.map((section) => {
-            const Icon = section.icon
-            return (
-              <button
-                key={section.id}
-                type="button"
-                onClick={() => scrollTo(section.id)}
-                className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors shrink-0"
-              >
-                <Icon className="size-4" />
-                {section.label}
-              </button>
-            )
-          })}
+      {/* Sticky anchor nav */}
+      <div
+        ref={navRef}
+        className="sticky top-0 z-10 -mx-4 px-4 py-2 bg-background/95 backdrop-blur border-b border-border overflow-x-auto"
+      >
+        <nav className="flex items-center gap-1 min-w-max" aria-label="SRE 运维中心导航">
+          {sections.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => scrollTo(s.id)}
+              className="px-3 py-1.5 text-sm font-medium rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            >
+              {s.label}
+            </button>
+          ))}
+        </nav>
+      </div>
+
+      {/* Content sections */}
+      <div className="space-y-6">
+        {/* Full width: SRE Checker */}
+        <section id="checker" className="scroll-mt-20">
+          <SreCheckerPanel />
+        </section>
+
+        {/* Full width: Observability */}
+        <section id="observability" className="scroll-mt-20">
+          <ObservabilityPanel />
+        </section>
+
+        {/* 2-column: Alert Rules + Incident List */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <section id="alerts" className="scroll-mt-20">
+            <AlertRulesPanel />
+          </section>
+          <section id="incidents" className="scroll-mt-20">
+            <IncidentListPanel />
+          </section>
         </div>
-      </nav>
 
-      {/* Deploy */}
-      <section id="deploy">
-        <DeployPanel />
-      </section>
-
-      {/* Checker */}
-      <section id="checker">
-        <SreCheckerPanel />
-      </section>
-
-      {/* Observability */}
-      <section id="observability">
-        <ObservabilityPanel />
-      </section>
-
-      {/* Alerts */}
-      <section id="alerts">
-        <AlertRulesPanel />
-      </section>
-
-      {/* Incidents */}
-      <section id="incidents">
-        <IncidentList />
-      </section>
-
-      {/* Rollback */}
-      <section id="rollback">
-        <RollbackPanel />
-      </section>
-
-      {/* Runbooks */}
-      <section id="runbooks">
-        <div className="rounded-xl border bg-card shadow-sm p-6 space-y-5">
-          <div className="flex items-center gap-3">
-            <BookOpen className="size-5 text-primary" />
-            <div>
-              <h2 className="text-lg font-semibold">运维手册</h2>
-              <p className="text-xs text-muted-foreground">Runbook 管理 · 排障树 · 应急预案</p>
-            </div>
-          </div>
-
-          {showNewRunbook ? (
-            <RunbookEditor
-              runbook={null}
-              onBack={handleBack}
-              onSaved={handleSaved}
-            />
-          ) : selectedRunbook ? (
-            <div className="space-y-6">
-              <RunbookEditor
-                runbook={selectedRunbook}
-                onBack={handleBack}
-                onSaved={handleSaved}
-              />
-              {selectedRunbook.troubleshootTree.length > 0 && (
-                <div className="border-t border-border pt-5">
-                  <h3 className="text-sm font-semibold mb-4">排障决策树</h3>
-                  <TroubleshootTree nodes={selectedRunbook.troubleshootTree} />
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="border border-border rounded-lg overflow-hidden" style={{ height: 480 }}>
-              <RunbookList
-                onSelect={handleSelectRunbook}
-                onCreateNew={handleCreateNew}
-              />
-            </div>
-          )}
+        {/* 2-column: Rollback + Runbook */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <section id="rollbacks" className="scroll-mt-20">
+            <RollbackPanel />
+          </section>
+          <section id="runbooks" className="scroll-mt-20">
+            <RunbookPanel />
+          </section>
         </div>
-      </section>
+      </div>
     </div>
-  )
+  );
 }
