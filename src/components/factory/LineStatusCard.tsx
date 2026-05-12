@@ -21,7 +21,7 @@ export function LineStatusCard({ line }: LineStatusCardProps) {
           ? "border-amber-400 ring-amber-400/20"
           : "border-transparent"
       )}
-      onClick={() => router.push(`/${line.id}`)}
+      onClick={() => router.push(`/lines/${line.id}`)}
     >
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">

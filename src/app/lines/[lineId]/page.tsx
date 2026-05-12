@@ -7,7 +7,6 @@ import { StatusBadge } from "@/components/ui/StatusBadge"
 import { PipelineNode } from "@/components/ui/PipelineNode"
 import { DataTable } from "@/components/ui/DataTable"
 import { EmptyState } from "@/components/ui/EmptyState"
-import type { DeliverableDetail } from "@/types/factory"
 
 export default function LineDetailPage() {
   const params = useParams()
@@ -60,31 +59,7 @@ export default function LineDetailPage() {
   }
 
   const deliverableColumns = [
-    { key: "id", header: "ID" },
-    { key: "name", header: "名称" },
-    { key: "type", header: "类型" },
-    {
-      key: "status",
-      header: "状态",
-      render: (item: DeliverableDetail) => {
-        const statusLabel: Record<string, string> = {
-          done: "已完成",
-          in_progress: "进行中",
-          pending: "待开始",
-        }
-        const statusColor: Record<string, string> = {
-          done: "text-emerald-600 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-950/30",
-          in_progress: "text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-950/30",
-          pending: "text-muted-foreground bg-muted",
-        }
-        return (
-          <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${statusColor[item.status]}`}>
-            {statusLabel[item.status]}
-          </span>
-        )
-      },
-    },
-    { key: "updatedAt", header: "更新时间" },
+    { key: "label", header: "名称" },
   ]
 
   return (
@@ -161,7 +136,7 @@ export default function LineDetailPage() {
         <h2 className="mb-3 text-base font-semibold">交付物</h2>
         <DataTable
           columns={deliverableColumns}
-          data={line.deliverables as unknown as DeliverableDetail[]}
+          data={line.deliverables}
           emptyMessage="暂无交付物"
         />
       </section>

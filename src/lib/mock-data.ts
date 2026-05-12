@@ -49,6 +49,13 @@ export const productionLines: ProductionLine[] = [
       { label: "PR 审查" },
       { label: "交付" },
     ],
+    pipeline: [
+      { name: "方案评审", status: "done" },
+      { name: "设计评审", status: "done" },
+      { name: "编码实现", status: "running" },
+      { name: "PR 审查", status: "waiting" },
+      { name: "交付", status: "waiting" },
+    ],
     deliverables: [
       { label: "代码" },
       { label: "测试用例" },
@@ -65,12 +72,21 @@ export const productionLines: ProductionLine[] = [
     completed: 28,
     anomaly: "—",
     status: "NOMINAL",
+    throughput: 5,
+    cycleTime: 6.0,
     pipelineSteps: [
       { label: "测试计划" },
       { label: "用例设计" },
       { label: "执行测试" },
       { label: "缺陷报告" },
       { label: "交付" },
+    ],
+    pipeline: [
+      { name: "测试计划", status: "done" },
+      { name: "用例设计", status: "done" },
+      { name: "执行测试", status: "running" },
+      { name: "缺陷报告", status: "waiting" },
+      { name: "交付", status: "waiting" },
     ],
     deliverables: [
       { label: "测试用例" },
@@ -88,12 +104,21 @@ export const productionLines: ProductionLine[] = [
     completed: 15,
     anomaly: "—",
     status: "NOMINAL",
+    throughput: 3,
+    cycleTime: 12.0,
     pipelineSteps: [
       { label: "部署准备" },
       { label: "灰度发布" },
       { label: "监控观察" },
       { label: "全量发布" },
       { label: "运维" },
+    ],
+    pipeline: [
+      { name: "部署准备", status: "done" },
+      { name: "灰度发布", status: "running" },
+      { name: "监控观察", status: "waiting" },
+      { name: "全量发布", status: "waiting" },
+      { name: "运维", status: "waiting" },
     ],
     deliverables: [
       { label: "部署配置" },
