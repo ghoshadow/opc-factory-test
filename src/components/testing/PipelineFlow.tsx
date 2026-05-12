@@ -6,8 +6,8 @@ import { cn } from "@/lib/utils"
 import type { PipelineRun, PipelineStageStatus, TestingOpsResponse } from "@/types/factory"
 import { Skeleton } from "@/components/ui/skeleton"
 
-const fetcher = (url: string): Promise<PipelineRun> =>
-  fetch(url).then((res) => res.json()).then((d: TestingOpsResponse) => d.pipeline)
+const fetcher = (url: string): Promise<TestingOpsResponse> =>
+  fetch(url).then((res) => res.json())
 
 const statusConfig: Record<PipelineStageStatus, { dotColor: string; borderColor: string; bg: string; textColor: string }> = {
   waiting: {
@@ -46,7 +46,7 @@ function ConnectorLine({ active }: { active: boolean }) {
 }
 
 export function PipelineFlow() {
-  const { data, error, isLoading } = useSWR<PipelineRun>(
+  const { data, error, isLoading } = useSWR<TestingOpsResponse>(
     "/api/v1/testing/ops",
     fetcher,
     { refreshInterval: 15000 }
@@ -81,20 +81,22 @@ export function PipelineFlow() {
 
   if (!data) return null
 
+  const pl = data.pipeline
+
   return (
     <div className="rounded-xl border bg-card shadow-sm p-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold">测试流水线</h2>
-        {data.startedAt && (
+        {pl.startedAt && (
           <span className="text-xs text-muted-foreground tabular-nums">
-            启动于 {new Date(data.startedAt).toLocaleTimeString("zh-CN")}
+            启动于 {new Date(pl.startedAt).toLocaleTimeString("zh-CN")}
           </span>
         )}
       </div>
       <div className="flex items-start gap-0 overflow-x-auto pb-3 scrollbar-thin">
-        {data.stages.map((stage, i) => {
+        {pl.stages.map((stage, i) => {
           const cfg = statusConfig[stage.status]
-          const isActive = stage.id === data.currentStageId
+          const isActive = stage.id === pl.currentStageId
 
           return (
             <div key={stage.id} className="flex items-center shrink-0">
@@ -120,7 +122,7 @@ export function PipelineFlow() {
                   </span>
                 )}
               </div>
-              {i < data.stages.length - 1 && (
+              {i < pl.stages.length - 1 && (
                 <ConnectorLine active={
                   stage.status === "done" || stage.status === "running"
                 } />

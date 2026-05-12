@@ -1,5 +1,33 @@
 import { ProductionLine } from "./types";
 
+export interface DashboardAlert {
+  id: string
+  type: "warning" | "error" | "info"
+  message: string
+  source: string
+  timestamp: string
+  routing: string[]
+}
+
+export const dashboardAlerts: DashboardAlert[] = [
+  {
+    id: "F-2341",
+    type: "warning",
+    message: "Silent Gap — 需求产线 Spec 存在静默缺口，成熟度评审未覆盖全部 AC",
+    source: "编码产线",
+    timestamp: new Date(Date.now() - 3600000).toISOString(),
+    routing: ["oncall", "opc"],
+  },
+  {
+    id: "F-2360",
+    type: "error",
+    message: "Spec-Code Drift — 编码产线已实现代码与上游 Spec 存在漂移，接口签名不一致",
+    source: "编码产线",
+    timestamp: new Date(Date.now() - 7200000).toISOString(),
+    routing: ["oncall", "opc", "auto_remediation"],
+  },
+]
+
 export const productionLines: ProductionLine[] = [
   {
     id: "requirement",

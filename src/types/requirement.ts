@@ -45,3 +45,44 @@ export interface GapSubmitResponse {
   passed: boolean
   message: string
 }
+
+// Queue types
+export type QueueItemStatus = "queued" | "speccing" | "ready_for_review" | "dispatched"
+
+export interface QueueItem {
+  id: string
+  intakeId: string
+  title: string
+  type: string
+  priority: IntakePriority
+  status: QueueItemStatus
+  acceptedAt: string
+  specId?: string
+}
+
+export interface QueueResponse {
+  items: QueueItem[]
+  total: number
+}
+
+// Maturity review types
+export type MaturityDimensionKey = "completeness" | "testability" | "consistency" | "clarity"
+
+export interface MaturityDimension {
+  key: MaturityDimensionKey
+  name: string
+  score: number
+  maxScore: number
+  status: "pass" | "fail" | "warning"
+  details: string[]
+}
+
+export interface MaturityReviewResponse {
+  specId: string
+  specTitle: string
+  dimensions: MaturityDimension[]
+  overallScore: number
+  threshold: number
+  passed: boolean
+  reviewedAt: string
+}

@@ -2,13 +2,13 @@
 
 import useSWR from "swr"
 import { TocoReport } from "@/components/coding/TocoReport"
-import type { CodingOpsResponse, TocoReportData } from "@/types/factory"
+import type { CodingOpsResponse } from "@/types/factory"
 
-const fetcher = (url: string): Promise<TocoReportData> =>
-  fetch(url).then((res) => res.json()).then((d: CodingOpsResponse) => d.tocoReport)
+const fetcher = (url: string): Promise<CodingOpsResponse> =>
+  fetch(url).then((res) => res.json())
 
 export default function TocoReportPage() {
-  const { data, isLoading } = useSWR<TocoReportData>(
+  const { data, isLoading } = useSWR<CodingOpsResponse>(
     "/api/v1/coding/ops",
     fetcher,
     { refreshInterval: 30000 }
@@ -22,7 +22,7 @@ export default function TocoReportPage() {
           代码质量分析与变更影响评估
         </p>
       </div>
-      <TocoReport data={data} isLoading={isLoading} />
+      <TocoReport data={data?.tocoReport} isLoading={isLoading} />
     </div>
   )
 }

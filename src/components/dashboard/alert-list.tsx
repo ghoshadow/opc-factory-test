@@ -9,6 +9,13 @@ interface Alert {
   message: string
   source: string
   timestamp: string
+  routing?: string[]
+}
+
+const routingLabels: Record<string, string> = {
+  oncall: "值班",
+  opc: "OPC",
+  auto_remediation: "自愈",
 }
 
 interface AlertListProps {
@@ -85,6 +92,17 @@ export function AlertList({ alerts }: AlertListProps) {
                   </span>
                   <span>{alert.source}</span>
                   <span>{relativeTime(alert.timestamp)}</span>
+                  {alert.routing && alert.routing.length > 0 && (
+                    <span className="flex items-center gap-1">
+                      <span className="text-border">|</span>
+                      <span className="text-muted-foreground">路由:</span>
+                      {alert.routing.map((r) => (
+                        <span key={r} className="rounded bg-muted px-1 py-0.5 text-muted-foreground">
+                          {routingLabels[r] || r}
+                        </span>
+                      ))}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>

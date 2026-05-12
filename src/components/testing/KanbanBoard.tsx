@@ -7,13 +7,13 @@ import { cn } from "@/lib/utils"
 import type { KanbanBoardData, KanbanItem, TestingOpsResponse } from "@/types/factory"
 import { Skeleton } from "@/components/ui/skeleton"
 
-const fetcher = (url: string): Promise<KanbanBoardData> =>
-  fetch(url).then((res) => res.json()).then((d: TestingOpsResponse) => d.kanban)
+const fetcher = (url: string): Promise<TestingOpsResponse> =>
+  fetch(url).then((res) => res.json())
 
 export function KanbanBoard() {
-  const { data, error, isLoading } = useSWR<KanbanBoardData>(
+  const { data, error, isLoading } = useSWR<TestingOpsResponse>(
     "/api/v1/testing/ops",
-    (url: string) => fetcher(url).then((d) => d),
+    fetcher,
     { refreshInterval: 25000 }
   )
 
@@ -70,7 +70,9 @@ export function KanbanBoard() {
     )
   }
 
-  if (!data) return null
+  if (!data || !data.kanban || !data.kanban.columns) return null
+
+  const kanban = data.kanban
 
   return (
     <div className="rounded-xl border bg-card shadow-sm p-6 space-y-4">
@@ -83,7 +85,7 @@ export function KanbanBoard() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        {data.columns.map((col) => (
+        {kanban.columns.map((col) => (
           <div
             key={col.id}
             onDragOver={(e) => handleDragOver(e, col.id)}

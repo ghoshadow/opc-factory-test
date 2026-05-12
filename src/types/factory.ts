@@ -508,3 +508,86 @@ export interface ReflowStatusResponse {
   status: ReflowStatus
   timeline: ReflowTimelineEntry[]
 }
+
+// ─── Refactor / Brownfield types ────────────────────────────
+
+export type RefactorPhase = "analyzing" | "refactoring" | "validating" | "complete"
+export type SeverityLevel = "low" | "medium" | "high"
+export type RiskLevel = "low" | "medium" | "high"
+export type DeliverableType = "code" | "spec" | "doc" | "test_report"
+export type DeliverableStatus = "ready" | "generating"
+
+export interface RefactorChange {
+  id: string
+  file: string
+  description: string
+  before: string
+  after: string
+  linesChanged: number
+}
+
+export interface RefactorImpact {
+  id: string
+  area: string
+  description: string
+  severity: SeverityLevel
+  affectedFiles: string[]
+}
+
+export interface RefactorRisk {
+  id: string
+  title: string
+  description: string
+  level: RiskLevel
+  mitigation: string
+}
+
+export interface RefactorPlan {
+  id: string
+  title: string
+  changes: RefactorChange[]
+  impacts: RefactorImpact[]
+  risks: RefactorRisk[]
+  estimatedHours: number
+}
+
+export interface CoverageByFile {
+  file: string
+  coverage: number
+}
+
+export interface CoverageData {
+  overall: number
+  target: number
+  byFile: CoverageByFile[]
+  updatedAt: string
+}
+
+export interface DeliverableItem {
+  type: DeliverableType
+  label: string
+  description: string
+  status: DeliverableStatus
+  detail: string
+}
+
+export interface RefactorStatusResponse {
+  id: string
+  plan: RefactorPlan
+  phase: RefactorPhase
+  progress: number
+  coverage: CoverageData | null
+  deliverables: DeliverableItem[]
+  startedAt: string | null
+  completedAt: string | null
+}
+
+export interface RefactorConfirmRequest {
+  action: "confirm" | "execute"
+}
+
+export interface RefactorConfirmResponse {
+  id: string
+  phase: RefactorPhase
+  message: string
+}

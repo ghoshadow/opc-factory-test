@@ -339,6 +339,13 @@ export function SpecEditor({ specId }: SpecEditorProps) {
             <History className="size-3.5" />
             版本历史
           </Link>
+          <Link
+            href={`/l2/maturity?specId=${specId}`}
+            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:border-muted-foreground/40 transition-colors"
+          >
+            <CheckSquare className="size-3.5" />
+            成熟度评审
+          </Link>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             {saving ? (
               <>

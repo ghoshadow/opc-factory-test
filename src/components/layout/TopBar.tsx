@@ -33,7 +33,7 @@ export function TopBar({ status = "running" }: TopBarProps) {
   const Icon = cfg.icon;
 
   return (
-    <header className="sticky top-0 z-50 flex h-14 items-center justify-between border-b border-border bg-background px-4">
+    <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-border bg-background px-4">
       <div className="flex items-center gap-3">
         <span className="text-lg font-bold tracking-tight">OPC Factory</span>
         <div

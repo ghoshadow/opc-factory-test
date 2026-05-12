@@ -13,6 +13,7 @@ import {
   Columns3,
   HelpCircle,
   Inbox,
+  Puzzle,
   type LucideIcon,
 } from "lucide-react";
 
@@ -29,6 +30,7 @@ export const navigation: NavItem[] = [
     icon: LayoutDashboard,
     path: "/l1",
     children: [
+      { label: "工厂总览", icon: LayoutDashboard, path: "/l1/overview" },
       { label: "WIP 统计", icon: LayoutDashboard, path: "/l1/wip" },
     ],
   },
@@ -61,6 +63,7 @@ export const navigation: NavItem[] = [
       { label: "Bug 分诊", icon: GitBranch, path: "/l3/testing/bugs" },
       { label: "Kanban 看板", icon: Columns3, path: "/l3/kanban" },
       { label: "安全重构", icon: Shield, path: "/l3/coding/refactor" },
+      { label: "技能安装", icon: Puzzle, path: "/l3/skills" },
     ],
   },
   {

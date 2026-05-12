@@ -30,8 +30,12 @@ const priorityOptions = [
   { value: "P3" as const, label: "P3" },
 ]
 
+interface IntakeFormProps {
+  onSuccess?: () => void
+}
+
 // ── Component ──────────────────────────────────────────────────────
-export function IntakeForm() {
+export function IntakeForm({ onSuccess }: IntakeFormProps) {
   const [descWarning, setDescWarning] = useState<string | null>(null)
 
   const {
@@ -51,13 +55,32 @@ export function IntakeForm() {
   })
 
   const onSubmit = async (data: IntakeFormData) => {
-    // Simulate API call — replace with real endpoint later
-    await new Promise((resolve) => setTimeout(resolve, 1200))
-    toast.success("需求已提交", {
-      description: `「${data.title}」已成功进入需求队列`,
-    })
-    reset()
-    setDescWarning(null)
+    try {
+      const res = await fetch("/api/v1/intake", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      })
+
+      if (!res.ok) {
+        const err = await res.json()
+        toast.error("提交失败", {
+          description: err.error || "请稍后重试",
+        })
+        return
+      }
+
+      toast.success("需求已提交", {
+        description: `「${data.title}」已成功进入需求队列`,
+      })
+      reset()
+      setDescWarning(null)
+      onSuccess?.()
+    } catch {
+      toast.error("网络错误", {
+        description: "请检查网络连接后重试",
+      })
+    }
   }
 
   const handleDescBlur = (e: React.FocusEvent<HTMLTextAreaElement>) => {
