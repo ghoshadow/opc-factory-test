@@ -1,8 +1,8 @@
-import { ProductionLine } from "@/lib/types";
-import { LineStatusCard } from "./LineStatusCard";
+import { LineStatusData } from "@/types/factory"
+import { LineStatusCard } from "./LineStatusCard"
 
 interface LineStatusGridProps {
-  lines: ProductionLine[];
+  lines: LineStatusData[]
 }
 
 export function LineStatusGrid({ lines }: LineStatusGridProps) {
