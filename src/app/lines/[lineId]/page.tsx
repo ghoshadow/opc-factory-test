@@ -14,7 +14,8 @@ export default function LineDetailPage() {
   const router = useRouter()
   const lineId = params.lineId as string
 
-  const { line, isLoading, isError, isNotFound } = useLineDetail(lineId)
+  const { line: rawLine, isLoading, isError, isNotFound } = useLineDetail(lineId)
+  const line = rawLine as unknown as LineDetail | null
 
   if (isLoading) {
     return (
@@ -139,7 +140,7 @@ export default function LineDetailPage() {
       <section className="mb-8">
         <h2 className="mb-3 text-base font-semibold">Pipeline</h2>
         <div className="flex items-center gap-2 flex-wrap">
-          {line.pipeline.map((stage, i) => (
+          {line.pipeline.map((stage: PipelineStage, i: number) => (
             <div key={i} className="flex items-center gap-2">
               <PipelineNode
                 label={stage.name}

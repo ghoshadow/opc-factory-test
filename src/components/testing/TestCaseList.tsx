@@ -57,6 +57,8 @@ function acStatus(ac: AcceptanceCriterion): TestCaseStatus {
 const caseStatusBadge: Record<TestCaseStatus, { icon: typeof Clock; label: string; className: string }> = {
   pending: { icon: Clock, label: "待执行", className: "bg-gray-100 text-gray-600 dark:bg-gray-900/40 dark:text-gray-400" },
   running: { icon: Loader2, label: "执行中", className: "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400" },
+  pass: { icon: CheckCircle2, label: "通过", className: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400" },
+  fail: { icon: XCircle, label: "失败", className: "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400" },
   passed: { icon: CheckCircle2, label: "通过", className: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400" },
   failed: { icon: XCircle, label: "失败", className: "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400" },
 }

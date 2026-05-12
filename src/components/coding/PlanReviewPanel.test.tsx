@@ -269,11 +269,11 @@ describe("PlanReviewPanel", () => {
     await user.click(screen.getAllByText("确认冻结")[0])
     expect(screen.getByText("确认冻结 Plan")).toBeInTheDocument()
 
-    // Cancel closes the dialog — click all cancel buttons to handle concurrent renders
-    for (const btn of screen.getAllByText("取消")) {
-      await user.click(btn)
-    }
-    expect(screen.queryByText("确认冻结 Plan")).toBeNull()
+    // Cancel closes the dialog
+    await user.click(screen.getByText("取消"))
+    await waitFor(() => {
+      expect(screen.queryByText("确认冻结 Plan")).toBeNull()
+    })
   })
 
   // ── Reject API (AC: 修改意见 → PUT reject) ──

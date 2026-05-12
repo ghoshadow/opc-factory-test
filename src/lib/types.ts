@@ -64,3 +64,19 @@ export interface DashboardData {
   wip: WipStats
   lastUpdated: string | null
 }
+
+export interface KpiData {
+  totalItems: number;
+  inProgress: number;
+  completed: number;
+  blocked: number;
+  passRate: number;
+  avgCycleTime: string;
+  activeAgents: number;
+}
+
+export interface DashboardData {
+  lastUpdated: string;
+  kpi: KpiData;
+  lines: ProductionLine[];
+}

@@ -7,6 +7,11 @@ export interface LineStatusResponse {
   updatedAt: string;
 }
 
+export interface LineStatusResponse {
+  data: typeof productionLines;
+  updatedAt: string;
+}
+
 export async function GET() {
   return NextResponse.json({
     data: productionLines,

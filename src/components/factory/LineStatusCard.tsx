@@ -6,6 +6,17 @@ import { StatusBadge } from "./StatusBadge";
 import type { LineStatusData } from "@/types/factory";
 import { cn } from "@/lib/utils";
 
+export interface LineSummary {
+  id: string;
+  name: string;
+  opc: string;
+  function: string;
+  wip: number;
+  completed: number;
+  anomaly: string | null;
+  status: "NOMINAL" | "ATTENTION";
+}
+
 interface LineStatusCardProps {
   line: LineStatusData;
 }
