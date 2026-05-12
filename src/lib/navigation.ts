@@ -1,14 +1,15 @@
 import {
-  LayoutDashboard,
+  Activity,
+  Award,
+  Columns3,
+  FileEdit,
   FileText,
   GitBranch,
-  Shield,
-  Activity,
+  LayoutDashboard,
   ListOrdered,
-  FileEdit,
-  Award,
-  Zap,
   Play,
+  Shield,
+  Siren,
   TestTubeDiagonal,
   Columns3,
   HelpCircle,
@@ -93,10 +94,7 @@ export const navigation: NavItem[] = [
   },
 ];
 
-export function findNavItem(
-  items: NavItem[],
-  path: string
-): NavItem | null {
+export function findNavItem(items: NavItem[], path: string): NavItem | null {
   for (const item of items) {
     if (item.path === path) return item;
     if (item.children) {
