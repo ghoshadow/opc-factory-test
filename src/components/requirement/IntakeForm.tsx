@@ -51,8 +51,20 @@ export function IntakeForm() {
   })
 
   const onSubmit = async (data: IntakeFormData) => {
-    // Simulate API call — replace with real endpoint later
-    await new Promise((resolve) => setTimeout(resolve, 1200))
+    const response = await fetch("/api/v1/intake", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    })
+
+    if (!response.ok) {
+      const err = await response.json()
+      toast.error(err.error || "提交失败", {
+        description: err.fields ? Object.values(err.fields).join("；") : undefined,
+      })
+      return
+    }
+
     toast.success("需求已提交", {
       description: `「${data.title}」已成功进入需求队列`,
     })

@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
     }
 
     const now = new Date().toISOString()
-    const id = `SYM-${crypto.randomUUID().slice(0, 4).toUpperCase()}`
+    const id = `SYM-${crypto.randomUUID()}`
 
     return NextResponse.json({ id, status: "queued", createdAt: now }, { status: 201 })
   } catch {
