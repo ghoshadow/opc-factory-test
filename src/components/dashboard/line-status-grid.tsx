@@ -1,32 +1,20 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { DashboardLineStatusData, DashboardLineStatus } from "@/lib/types";
 import { GitBranch, Code, TestTube, Server, CheckCircle2, AlertTriangle, XCircle, Pause } from "lucide-react";
 
-type LineKey = "requirement" | "coding" | "testing" | "sre"
-type LineStatus = "healthy" | "degraded" | "blocked" | "idle"
-
-interface DashboardLine {
-  line: LineKey
-  name: string
-  status: LineStatus
-  activeItems: number
-  completedToday: number
-  currentPhase: string
-  nextMilestone: string
-}
-
 interface LineStatusGridProps {
-  data: DashboardLine[];
+  data: DashboardLineStatusData[];
 }
 
-const lineIcons: Record<LineKey, typeof GitBranch> = {
+const lineIcons: Record<DashboardLineStatusData["line"], typeof GitBranch> = {
   requirement: GitBranch,
   coding: Code,
   testing: TestTube,
   sre: Server,
 };
 
-const statusConfig: Record<LineStatus, { icon: typeof CheckCircle2; label: string; variant: "default" | "secondary" | "destructive" | "outline"; color: string }> = {
+const statusConfig: Record<DashboardLineStatus, { icon: typeof CheckCircle2; label: string; variant: "default" | "secondary" | "destructive" | "outline"; color: string }> = {
   healthy: { icon: CheckCircle2, label: "正常", variant: "default", color: "text-green-600" },
   degraded: { icon: AlertTriangle, label: "降级", variant: "secondary", color: "text-amber-600" },
   blocked: { icon: XCircle, label: "阻塞", variant: "destructive", color: "text-red-600" },

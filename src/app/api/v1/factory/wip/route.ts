@@ -7,7 +7,7 @@ interface WipLine {
   cssVar: string
 }
 
-interface WipResponse {
+export interface WipResponse {
   lines: WipLine[]
   total: number
 }

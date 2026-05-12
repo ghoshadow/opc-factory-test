@@ -11,6 +11,8 @@ import {
   Play,
   TestTubeDiagonal,
   Columns3,
+  HelpCircle,
+  Inbox,
   type LucideIcon,
 } from "lucide-react";
 
@@ -35,10 +37,12 @@ export const navigation: NavItem[] = [
     icon: FileText,
     path: "/l2",
     children: [
+      { label: "入厂队列", icon: Inbox, path: "/l2/intake" },
       { label: "本体管理", icon: FileText, path: "/l2/ontology" },
       { label: "需求队列", icon: ListOrdered, path: "/l2/queue" },
       { label: "Spec 编辑器", icon: FileEdit, path: "/l2/spec-editor" },
       { label: "成熟度评审", icon: Award, path: "/l2/maturity" },
+      { label: "Gap 追问", icon: HelpCircle, path: "/l2/gap-questions" },
     ],
   },
   {
@@ -56,6 +60,7 @@ export const navigation: NavItem[] = [
       { label: "测试用例", icon: TestTubeDiagonal, path: "/l3/testing/cases" },
       { label: "Bug 分诊", icon: GitBranch, path: "/l3/testing/bugs" },
       { label: "Kanban 看板", icon: Columns3, path: "/l3/kanban" },
+      { label: "安全重构", icon: Shield, path: "/l3/coding/refactor" },
     ],
   },
   {
@@ -76,6 +81,9 @@ export const navigation: NavItem[] = [
     children: [
       { label: "Checker 门禁", icon: Shield, path: "/l5/checker" },
       { label: "Runbooks", icon: Activity, path: "/l5/runbooks" },
+      { label: "告警管理", icon: Activity, path: "/l5/alerts" },
+      { label: "事件分诊", icon: Activity, path: "/l5/incidents" },
+      { label: "可观测性", icon: Activity, path: "/l5/observability" },
     ],
   },
 ];

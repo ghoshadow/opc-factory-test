@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "./StatusBadge";
-import { LineStatusData } from "@/types/factory";
+import type { LineStatusData } from "@/types/factory";
 import { cn } from "@/lib/utils";
 
 interface LineStatusCardProps {

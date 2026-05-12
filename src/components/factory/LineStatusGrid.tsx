@@ -1,4 +1,4 @@
-import { LineStatusData } from "@/types/factory";
+import type { LineStatusData } from "@/types/factory";
 import { LineStatusCard } from "./LineStatusCard";
 
 interface LineStatusGridProps {

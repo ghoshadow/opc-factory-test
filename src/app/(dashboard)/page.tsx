@@ -78,7 +78,7 @@ export default function DashboardPage() {
     )
   }
 
-  const { kpi, wip, alerts, lines, timestamp } = data
+  const { kpi, alerts, lines, timestamp } = data
 
   const systemHealthTrend =
     kpi.systemHealth >= 75 ? "up" as const :
