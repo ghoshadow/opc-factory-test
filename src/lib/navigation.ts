@@ -11,6 +11,7 @@ import {
   Play,
   TestTubeDiagonal,
   Columns3,
+  Rocket,
   type LucideIcon,
 } from "lucide-react";
 
@@ -76,6 +77,7 @@ export const navigation: NavItem[] = [
     children: [
       { label: "Checker 门禁", icon: Shield, path: "/l5/checker" },
       { label: "Runbooks", icon: Activity, path: "/l5/runbooks" },
+      { label: "SRE 运维中心", icon: Rocket, path: "/sre" },
     ],
   },
 ];

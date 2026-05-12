@@ -398,3 +398,97 @@ export interface PipelineResponse {
   nodes: PipelineStageNode[]
   totalNodes: number
 }
+
+// SRE Deploy types
+export type DeployStatus = "success" | "in_progress" | "failed" | "rolled_back"
+
+export interface DeployRecord {
+  id: string
+  version: string
+  service: string
+  environment: string
+  status: DeployStatus
+  startedAt: string
+  completedAt: string | null
+  triggeredBy: string
+  commitSha: string
+}
+
+export interface DeployResponse {
+  deploys: DeployRecord[]
+  total: number
+  successRate: number
+}
+
+// SRE Observability types
+export interface MetricSeries {
+  name: string
+  value: number
+  unit: string
+  trend: "up" | "down" | "stable"
+  changePercent: number
+}
+
+export interface ObservabilityResponse {
+  metrics: MetricSeries[]
+  lastUpdated: string
+}
+
+// SRE Alert types
+export type AlertSeverity = "critical" | "warning" | "info"
+
+export interface AlertRule {
+  id: string
+  name: string
+  description: string
+  severity: AlertSeverity
+  source: string
+  threshold: string
+  currentValue: string
+  status: "firing" | "ok"
+  lastFired: string | null
+}
+
+export interface AlertsResponse {
+  rules: AlertRule[]
+  total: number
+  firingCount: number
+}
+
+// SRE Incident types
+export type IncidentStatus = "open" | "investigating" | "mitigated" | "resolved"
+
+export interface Incident {
+  id: string
+  title: string
+  severity: AlertSeverity
+  status: IncidentStatus
+  service: string
+  openedAt: string
+  owner: string
+}
+
+export interface IncidentResponse {
+  incidents: Incident[]
+  total: number
+  openCount: number
+}
+
+// SRE Rollback types
+export type RollbackReadiness = "ready" | "preparing" | "not_ready"
+
+export interface RollbackTarget {
+  id: string
+  service: string
+  currentVersion: string
+  targetVersion: string
+  readiness: RollbackReadiness
+  estimatedDowntime: string
+  lastValidated: string
+}
+
+export interface RollbackResponse {
+  targets: RollbackTarget[]
+  total: number
+  readyCount: number
+}
