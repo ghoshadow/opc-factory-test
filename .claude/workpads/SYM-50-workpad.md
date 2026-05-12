@@ -281,3 +281,19 @@ Error responses:
 ### Confusions
 
 - None identified during this execution. The ticket description was comprehensive and the codebase exploration revealed a clear implementation path.
+
+---
+
+### Stage 8 — External Reviewer (交接) Completion
+
+- **Workpad finalized:** all 8 stages documented with deliverables
+- **Spec version:** v2
+- **Maturity score:** 35/40 (PASS)
+- **Implementation status:** Complete — all 29 tests passing
+  - `src/components/requirement/SignoffPanel.tsx` — 268 lines, 16 tests passing
+  - `src/app/api/v1/specs/[id]/signoff/route.ts` — POST handler, 13 tests passing
+  - `src/types/spec.ts` — SignoffAction, rework status, signoff source added
+  - `src/app/l2/spec-editor/page.tsx` — SignoffPanel integrated
+  - `src/app/api/v1/specs/store.ts` — spec-001 status set to `in_review`
+- **Open questions:** none — implementation complete and verified
+- **Remaining action:** Move SYM-50 to `Human Review` in Linear (requires Linear API access)

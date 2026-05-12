@@ -398,3 +398,25 @@ export interface PipelineResponse {
   nodes: PipelineStageNode[]
   totalNodes: number
 }
+
+// Coding pipeline types (matching pipeline-nodes constants)
+export interface CodingPipelineNodeDetails {
+  plan: string
+  design?: string
+  code: string
+  report: string
+}
+
+export interface CodingPipelineNode {
+  id: string
+  label: string
+  description: string
+  status: PipelineNodeStatus
+  details: CodingPipelineNodeDetails
+}
+
+export interface CodingPipelineResponse {
+  nodes: CodingPipelineNode[]
+  currentStep: number
+  totalSteps: number
+}
