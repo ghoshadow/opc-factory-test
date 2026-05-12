@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import type { SignoffAction } from "@/types/spec"
-import { specs } from "../../store"
+import { specs, saveVersionSnapshot } from "@/lib/spec-store"
 
 export async function POST(
   req: NextRequest,
@@ -64,7 +64,7 @@ export async function POST(
     changeTrace: [
       ...spec.changeTrace,
       {
-        source: "signoff" as const,
+        source: "signoff",
         timestamp,
         description,
         versionFrom: spec.version,
@@ -72,6 +72,8 @@ export async function POST(
       },
     ],
   }
+
+  saveVersionSnapshot(id)
 
   return NextResponse.json(specs[id])
 }

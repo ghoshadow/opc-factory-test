@@ -35,3 +35,10 @@ export interface MetaSpec {
   status: 'draft' | 'ready_for_review' | 'in_review' | 'signed_off' | 'rework'
   changeTrace: ChangeRecord[]
 }
+
+export interface SignoffAction {
+  action: 'approve' | 'reject'
+  reviewerName: string
+  timestamp: string
+  comment?: string
+}

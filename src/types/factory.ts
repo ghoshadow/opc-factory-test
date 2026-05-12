@@ -1,3 +1,5 @@
+import type { ACItem, DataContract } from "./spec"
+
 export type LineStatus = "NOMINAL" | "ATTENTION"
 
 export type LineId = "requirements" | "coding" | "testing" | "sre"
@@ -509,85 +511,80 @@ export interface ReflowStatusResponse {
   timeline: ReflowTimelineEntry[]
 }
 
-// ─── Refactor / Brownfield types ────────────────────────────
+// Archaeology report types (Brownfield code archaeology)
+export interface CodeTreeNode {
+  name: string
+  type: "directory" | "file"
+  children?: CodeTreeNode[]
+  size?: number
+  lines?: number
+  language?: string
+}
 
-export type RefactorPhase = "analyzing" | "refactoring" | "validating" | "complete"
-export type SeverityLevel = "low" | "medium" | "high"
-export type RiskLevel = "low" | "medium" | "high"
-export type DeliverableType = "code" | "spec" | "doc" | "test_report"
-export type DeliverableStatus = "ready" | "generating"
+export interface DependencyNode {
+  name: string
+  version: string
+  type: "production" | "dev" | "internal"
+  usedBy: string[]
+}
 
-export interface RefactorChange {
+export interface DependencyEdge {
+  source: string
+  target: string
+  label?: string
+  weight: number
+}
+
+export type TechDebtType = "security" | "deprecated_api" | "code_quality" | "performance" | "architecture"
+
+export type TechDebtSeverity = "critical" | "major" | "minor"
+
+export interface TechDebtItem {
   id: string
-  file: string
+  type: TechDebtType
+  severity: TechDebtSeverity
+  location: string
   description: string
-  before: string
-  after: string
-  linesChanged: number
+  suggestion: string
 }
 
-export interface RefactorImpact {
-  id: string
-  area: string
+export interface ChangePattern {
+  period: string
+  commits: number
+  filesChanged: number
+  insertions: number
+  deletions: number
+  topAuthors: string[]
   description: string
-  severity: SeverityLevel
-  affectedFiles: string[]
 }
 
-export interface RefactorRisk {
+export interface ReverseSpecData {
   id: string
-  title: string
-  description: string
-  level: RiskLevel
-  mitigation: string
+  sourceRepo: string
+  minedAt: string
+  userStory: string
+  acceptanceCriteria: ACItem[]
+  dataContract: DataContract
+  uxDraft: string
+  qualityScore: number
 }
 
-export interface RefactorPlan {
+export interface ArchaeologyReportData {
   id: string
-  title: string
-  changes: RefactorChange[]
-  impacts: RefactorImpact[]
-  risks: RefactorRisk[]
-  estimatedHours: number
+  projectId: string
+  createdAt: string
+  codeTree: CodeTreeNode
+  dependencies: {
+    production: DependencyNode[]
+    dev: DependencyNode[]
+    internal: { name: string; coupling: number }[]
+    graph: DependencyEdge[]
+  }
+  techDebt: TechDebtItem[]
+  changeHistory: ChangePattern[]
+  reverseSpec: ReverseSpecData
 }
 
-export interface CoverageByFile {
-  file: string
-  coverage: number
-}
-
-export interface CoverageData {
-  overall: number
-  target: number
-  byFile: CoverageByFile[]
-  updatedAt: string
-}
-
-export interface DeliverableItem {
-  type: DeliverableType
-  label: string
-  description: string
-  status: DeliverableStatus
-  detail: string
-}
-
-export interface RefactorStatusResponse {
-  id: string
-  plan: RefactorPlan
-  phase: RefactorPhase
-  progress: number
-  coverage: CoverageData | null
-  deliverables: DeliverableItem[]
-  startedAt: string | null
-  completedAt: string | null
-}
-
-export interface RefactorConfirmRequest {
-  action: "confirm" | "execute"
-}
-
-export interface RefactorConfirmResponse {
-  id: string
-  phase: RefactorPhase
-  message: string
+export interface ArchaeologyResponse {
+  report: ArchaeologyReportData
 }
