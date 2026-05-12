@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest"
 import { POST } from "@/app/api/v1/specs/[id]/signoff/route"
-import { specs } from "@/app/api/v1/specs/store"
+import { specs, versionSnapshots } from "@/lib/spec-store"
 import type { NextRequest } from "next/server"
 
 const initialSpec = {
@@ -29,6 +29,8 @@ describe("POST /api/v1/specs/:id/signoff", () => {
   beforeEach(() => {
     // Reset spec-001 to in_review before each test
     specs["spec-001"] = { ...initialSpec, changeTrace: [], acceptanceCriteria: [], dataContract: { inputs: [], outputs: [] } }
+    // Clear version snapshots to avoid test pollution
+    delete versionSnapshots["spec-001"]
   })
 
   // ── Approve ──
