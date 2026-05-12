@@ -1,13 +1,25 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { LineStatusData, LineStatus } from "@/lib/types";
 import { GitBranch, Code, TestTube, Server, CheckCircle2, AlertTriangle, XCircle, Pause } from "lucide-react";
 
-interface LineStatusGridProps {
-  data: LineStatusData[];
+type LineKey = "requirement" | "coding" | "testing" | "sre"
+type LineStatus = "healthy" | "degraded" | "blocked" | "idle"
+
+interface DashboardLine {
+  line: LineKey
+  name: string
+  status: LineStatus
+  activeItems: number
+  completedToday: number
+  currentPhase: string
+  nextMilestone: string
 }
 
-const lineIcons: Record<LineStatusData["line"], typeof GitBranch> = {
+interface LineStatusGridProps {
+  data: DashboardLine[];
+}
+
+const lineIcons: Record<LineKey, typeof GitBranch> = {
   requirement: GitBranch,
   coding: Code,
   testing: TestTube,

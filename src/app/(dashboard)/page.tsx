@@ -155,7 +155,7 @@ export default function DashboardPage() {
       {/* WIP + Alerts row */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-1">
-          <WipStats data={wip} />
+          <WipStats />
         </div>
         <div className="lg:col-span-2">
           <AlertList alerts={alerts} />
